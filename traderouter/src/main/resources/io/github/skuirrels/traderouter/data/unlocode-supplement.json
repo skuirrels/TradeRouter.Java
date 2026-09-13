@@ -1,0 +1,6 @@
+[
+  { "code": "GBLGW", "name": "Gatwick Apt/London", "lon": -0.19028, "lat": 51.14806, "source": "Wikipedia, Gatwick Airport, 51°08′53″N 0°11′25″W" },
+  { "code": "CNSHZ", "name": "Shanghai Railway Station", "lon": 121.45045, "lat": 31.25155, "source": "Wikipedia, Shanghai railway station, 31°15′06″N 121°27′02″E" },
+  { "code": "CNSHA", "name": "Shanghai Hongqiao International Apt", "lon": 121.33639, "lat": 31.19806, "source": "Wikipedia, Shanghai Hongqiao International Airport, 31°11′53″N 121°20′11″E" },
+  { "code": "AUMRS", "name": "Melrose", "lon": 138.183, "lat": -32.817, "source": "Wikipedia, Melrose, South Australia, 32.817°S 138.183°E; an inland Flinders Ranges town 65 km east of Port Augusta" }
+]

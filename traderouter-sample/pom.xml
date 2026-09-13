@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.skuirrels</groupId>
+    <artifactId>traderouter-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+
+  <artifactId>traderouter-sample</artifactId>
+  <packaging>jar</packaging>
+
+  <name>TradeRouter.Java Sample</name>
+  <description>Console application exercising every TradeRouter.Java entry point.</description>
+
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+    <exec.mainClass>io.github.skuirrels.traderouter.sample.Program</exec.mainClass>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.github.skuirrels</groupId>
+      <artifactId>traderouter</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>${exec.mainClass}</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

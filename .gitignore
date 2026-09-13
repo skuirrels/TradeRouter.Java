@@ -1,0 +1,20 @@
+# Build output
+target/
+*.jar
+*.class
+
+# JMH
+jmh-result.*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+.DS_Store
+
+# Test results
+surefire-reports/
