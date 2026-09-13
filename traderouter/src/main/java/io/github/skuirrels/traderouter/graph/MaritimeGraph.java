@@ -384,7 +384,7 @@ public final class MaritimeGraph {
             if (restriction == null) {
                 continue;
             }
-            Integer id = passageIdsByLowerName.get(restriction.toLowerCase(Locale.ROOT));
+            Integer id = passageIdsByLowerName.get(restriction.trim().toLowerCase(Locale.ROOT));
             if (id != null) {
                 if (restricted == null) {
                     restricted = new boolean[passageNames.size()];

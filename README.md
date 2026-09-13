@@ -445,7 +445,7 @@ JMH, Java 26 on Apple M4 Pro, one fork, five one-second iterations after three w
 | Paris to Tokyo with port resolution | 314 µs |
 | Nearest-port lookup | 45 ns |
 
-The Dijkstra figures match TradeRouter.Net on the same machine. A* is slower here because the heuristic scale is zero on the embedded network, as explained under [known limitations](#known-limitations-and-judgement-calls). Cold start, including decompressing and indexing the embedded data, is about 100 ms and happens once per process.
+The Dijkstra figures are in line with those TradeRouter.Net reports for its 1.1.0 release on the same hardware class; the .NET benchmarks were not re-run for this port. A* is slower here because the heuristic scale is zero on the embedded network, as explained under [known limitations](#known-limitations-and-judgement-calls). Cold start, including decompressing and indexing the embedded data, is about 100 ms and happens once per process.
 
 Run the benchmarks yourself:
 

@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The operational allowance a sea leg receives on top of its travelling time, chosen by trade corridor.
@@ -62,11 +62,11 @@ public final class SeaServiceAllowance {
      * @return the corridor label and the fraction of travelling time to add
      */
     public static CorridorAllowance resolve(Iterable<String> traversedPassages, Coordinate from, Coordinate to) {
-        Set<String> passages = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        Set<String> passages = new HashSet<>();
         if (traversedPassages != null) {
             for (String passage : traversedPassages) {
                 if (passage != null) {
-                    passages.add(passage.toLowerCase(Locale.ROOT));
+                    passages.add(passage.trim().toLowerCase(Locale.ROOT));
                 }
             }
         }

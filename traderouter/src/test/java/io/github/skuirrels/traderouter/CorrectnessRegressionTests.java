@@ -297,6 +297,44 @@ class CorrectnessRegressionTests {
         assertThat(copy.getRestrictions()).containsExactlyInAnyOrder(Passage.SUEZ, Passage.PANAMA);
     }
 
+    @Test
+    void paddedRestrictionIsAppliedToTheSearch() {
+        Coordinate origin = new Coordinate(52.99, 25.01);
+        Coordinate dest = new Coordinate(-61.87, 17.15);
+
+        GeoJsonFeature route = TradeRoutes.calculate(origin, dest,
+                new TradeRouterOptions().setRestrictions(" Suez ").setReturnPassages(true));
+
+        assertThat(route.properties().getTraversedPassages()).doesNotContain(Passage.SUEZ);
+        assertThat(route.properties().getTraversedPassages()).contains(Passage.SOUTH_AFRICA);
+    }
+
+    @Test
+    void nullRestrictionIsRejectedWithAnArgumentException() {
+        assertThatThrownBy(() -> new TradeRouterOptions().setRestrictions(java.util.Arrays.asList(Passage.SUEZ, null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null");
+    }
+
+    @Test
+    void locationFromCodeRejectsNullCoordinate() {
+        assertThatThrownBy(() -> Location.fromCode("CNSHG", null, "Shanghai"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("coordinate");
+    }
+
+    @Test
+    void locationFunctionSetsAreSharedAndImmutable() {
+        assertThat(io.github.skuirrels.traderouter.locations.LocationFunction.fromFlags(9))
+                .isSameAs(io.github.skuirrels.traderouter.locations.LocationFunction.fromFlags(9))
+                .containsExactlyInAnyOrder(
+                        io.github.skuirrels.traderouter.locations.LocationFunction.SEA_PORT,
+                        io.github.skuirrels.traderouter.locations.LocationFunction.AIRPORT);
+        assertThatThrownBy(() -> io.github.skuirrels.traderouter.locations.LocationFunction.fromFlags(1)
+                .add(io.github.skuirrels.traderouter.locations.LocationFunction.AIRPORT))
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
     private static double[] flatten(List<double[]> positions) {
         return positions.stream().flatMapToDouble(java.util.Arrays::stream).toArray();
     }

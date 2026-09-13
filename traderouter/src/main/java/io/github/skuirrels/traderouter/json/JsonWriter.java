@@ -8,6 +8,8 @@ import java.util.Deque;
  * shortest representation that round-trips, and integral doubles without a decimal point.
  */
 public final class JsonWriter {
+    private static final char[] HEX = "0123456789abcdef".toCharArray();
+
     private final StringBuilder out = new StringBuilder(256);
     private final boolean indented;
     private final Deque<Boolean> firstInScope = new ArrayDeque<>();
@@ -175,7 +177,7 @@ public final class JsonWriter {
                 case '\f' -> out.append("\\f");
                 default -> {
                     if (c < 0x20) {
-                        out.append(String.format("\\u%04x", (int) c));
+                        out.append("\\u00").append(HEX[c >> 4]).append(HEX[c & 0xF]);
                     } else {
                         out.append(c);
                     }

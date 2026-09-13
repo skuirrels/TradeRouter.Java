@@ -30,6 +30,9 @@ public final class Location {
 
     /** Creates a location from a code with a known coordinate and display name, bypassing lookup. */
     public static Location fromCode(String code, Coordinate coordinate, String name) {
+        if (coordinate == null) {
+            throw new IllegalArgumentException("Location coordinate cannot be null; use fromCode(code) to resolve the code instead.");
+        }
         return new Location(normalizeCode(code), coordinate, name);
     }
 

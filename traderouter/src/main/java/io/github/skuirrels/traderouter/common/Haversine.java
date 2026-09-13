@@ -27,6 +27,10 @@ public final class Haversine {
         c1.validate();
         c2.validate();
         DistanceUnit.requireUnit(unit);
+        return distanceUnchecked(c1, c2, unit);
+    }
+
+    private static double distanceUnchecked(Coordinate c1, Coordinate c2, DistanceUnit unit) {
         double dLat = toRadians(c2.latitude() - c1.latitude());
         double dLon = toRadians(c2.longitude() - c1.longitude());
 
@@ -85,8 +89,11 @@ public final class Haversine {
         }
 
         double total = 0.0;
-        for (int i = 0; i < coordinates.size() - 1; i++) {
-            total += distance(coordinates.get(i), coordinates.get(i + 1), unit);
+        Coordinate previous = coordinates.get(0);
+        for (int i = 1; i < coordinates.size(); i++) {
+            Coordinate current = coordinates.get(i);
+            total += distanceUnchecked(previous, current, unit);
+            previous = current;
         }
         return total;
     }

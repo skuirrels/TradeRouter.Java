@@ -52,6 +52,14 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         static final DefaultTradeRouterEngine INSTANCE = new DefaultTradeRouterEngine();
     }
 
+    private static final Set<LocationFunction> SEA_PORT_ONLY = LocationFunction.of(LocationFunction.SEA_PORT);
+    private static final Set<LocationFunction> AIRPORT_ONLY = LocationFunction.of(LocationFunction.AIRPORT);
+    private static final Set<LocationFunction> RAIL_TERMINAL_ONLY = LocationFunction.of(LocationFunction.RAIL_TERMINAL);
+    private static final Set<LocationFunction> TERMINAL_FUNCTIONS = LocationFunction.of(
+            LocationFunction.SEA_PORT, LocationFunction.RAIL_TERMINAL, LocationFunction.ROAD_TERMINAL, LocationFunction.MULTIMODAL);
+    private static final Set<LocationFunction> DEPOT_FUNCTIONS = LocationFunction.of(
+            LocationFunction.ROAD_TERMINAL, LocationFunction.RAIL_TERMINAL, LocationFunction.MULTIMODAL);
+
     private final Lazy<MaritimeGraph> lazyGraph;
     private final Lazy<PortDatabase> lazyPorts;
     private final Lazy<UnLocodeDatabase> lazyUnLocodes = new Lazy<>(EmbeddedResources::loadUnLocodes);
@@ -430,7 +438,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (knownLocation != null) {
             return knownLocation.functions();
         }
-        return knownPort == null ? null : LocationFunction.of(LocationFunction.SEA_PORT);
+        return knownPort == null ? null : SEA_PORT_ONLY;
     }
 
     @Override
@@ -451,7 +459,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         // When the names disagree (the port list's CNSHG is Sanshan, UN/LOCODE's is Shanghai Pt) UN/LOCODE wins.
         if (port != null && (unLocode == null || namesAgree(port.name(), unLocode.name()))) {
             return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
-                    unLocode != null ? unLocode.functions() : LocationFunction.of(LocationFunction.SEA_PORT));
+                    unLocode != null ? unLocode.functions() : SEA_PORT_ONLY);
         }
 
         if (unLocode != null && unLocode.coordinate() != null) {
@@ -460,7 +468,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
         if (port != null) {
             return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
-                    unLocode != null ? unLocode.functions() : LocationFunction.of(LocationFunction.SEA_PORT));
+                    unLocode != null ? unLocode.functions() : SEA_PORT_ONLY);
         }
 
         if (resolver != null) {
@@ -625,13 +633,11 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         Set<LocationFunction> functions = location.functions();
         Set<LocationFunction> requiredByKind = switch (waypointKind) {
             case UNSPECIFIED, PLACE -> LocationFunction.NONE;
-            case PORT -> LocationFunction.of(LocationFunction.SEA_PORT);
-            case AIRPORT -> LocationFunction.of(LocationFunction.AIRPORT);
-            case STATION -> LocationFunction.of(LocationFunction.RAIL_TERMINAL);
-            case TERMINAL -> LocationFunction.of(LocationFunction.SEA_PORT, LocationFunction.RAIL_TERMINAL,
-                    LocationFunction.ROAD_TERMINAL, LocationFunction.MULTIMODAL);
-            case DEPOT -> LocationFunction.of(LocationFunction.ROAD_TERMINAL, LocationFunction.RAIL_TERMINAL,
-                    LocationFunction.MULTIMODAL);
+            case PORT -> SEA_PORT_ONLY;
+            case AIRPORT -> AIRPORT_ONLY;
+            case STATION -> RAIL_TERMINAL_ONLY;
+            case TERMINAL -> TERMINAL_FUNCTIONS;
+            case DEPOT -> DEPOT_FUNCTIONS;
         };
 
         if (!requiredByKind.isEmpty() && Collections.disjoint(functions, requiredByKind)) {
@@ -641,9 +647,9 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         }
 
         Set<LocationFunction> requiredByMode = switch (mode) {
-            case SEA -> LocationFunction.of(LocationFunction.SEA_PORT);
-            case AIR -> LocationFunction.of(LocationFunction.AIRPORT);
-            case RAIL -> LocationFunction.of(LocationFunction.RAIL_TERMINAL);
+            case SEA -> SEA_PORT_ONLY;
+            case AIR -> AIRPORT_ONLY;
+            case RAIL -> RAIL_TERMINAL_ONLY;
             case ROAD -> LocationFunction.NONE;
         };
         if (!requiredByMode.isEmpty() && Collections.disjoint(functions, requiredByMode)) {

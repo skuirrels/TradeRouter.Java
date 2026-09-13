@@ -95,7 +95,12 @@ public final class TradeRouterOptions {
             throw new IllegalArgumentException("Restrictions cannot be null.");
         }
         Set<String> copy = newRestrictionSet();
-        copy.addAll(restrictions);
+        for (String restriction : restrictions) {
+            if (restriction == null) {
+                throw new IllegalArgumentException("Restrictions cannot contain null.");
+            }
+            copy.add(restriction);
+        }
         this.restrictions = copy;
         return this;
     }
