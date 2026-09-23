@@ -22,6 +22,7 @@ import io.github.skuirrels.traderouter.movements.MovementLeg;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
+import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
 import io.github.skuirrels.traderouter.movements.SeaServiceAllowance;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.movements.WaypointKind;
@@ -41,6 +42,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 /**
@@ -62,7 +67,9 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
     private final Lazy<MaritimeGraph> lazyGraph;
     private final Lazy<PortDatabase> lazyPorts;
+    private final String maritimeDistanceSource;
     private final Lazy<UnLocodeDatabase> lazyUnLocodes = new Lazy<>(EmbeddedResources::loadUnLocodes);
+    private final Lazy<Map<String, String>> lazyPortCodeAliases = new Lazy<>(EmbeddedResources::loadPortCodeAliases);
 
     /** The default global instance with the embedded Marnet and ports datasets, created lazily on first use. */
     public static DefaultTradeRouterEngine getDefault() {
@@ -71,7 +78,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
     /** Creates an engine using the default embedded datasets, loaded lazily on first use. */
     public DefaultTradeRouterEngine() {
-        this(EmbeddedResources::loadMaritimeGraph, EmbeddedResources::loadPortDatabase);
+        this(EmbeddedResources::loadMaritimeGraph, EmbeddedResources::loadPortDatabase, "marnet");
     }
 
     /** Creates an engine with custom graph and port instances. The graph must be finalized with buildIndex(). */
@@ -84,10 +91,18 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         }
         lazyGraph = Lazy.of(graph);
         lazyPorts = Lazy.of(ports);
+        maritimeDistanceSource = "custom_graph";
     }
 
     /** Creates an engine with custom factories, invoked lazily on first use. */
     public DefaultTradeRouterEngine(Supplier<MaritimeGraph> graphFactory, Supplier<PortDatabase> portsFactory) {
+        this(graphFactory, portsFactory, "custom_graph");
+    }
+
+    private DefaultTradeRouterEngine(
+            Supplier<MaritimeGraph> graphFactory,
+            Supplier<PortDatabase> portsFactory,
+            String maritimeDistanceSource) {
         Objects.requireNonNull(graphFactory, "graphFactory");
         Objects.requireNonNull(portsFactory, "portsFactory");
         lazyGraph = new Lazy<>(() -> validateGraph(graphFactory.get()));
@@ -98,6 +113,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             }
             return ports;
         });
+        this.maritimeDistanceSource = maritimeDistanceSource;
     }
 
     @Override
@@ -127,11 +143,11 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
     @Override
     public GeoJsonFeature calculateRoute(String originPortCode, String destPortCode, TradeRouterOptions options) {
-        Port originPort = ports().getByCode(originPortCode);
+        Port originPort = getPortByCodeOrAlias(originPortCode);
         if (originPort == null) {
             throw new IllegalArgumentException("Port '" + originPortCode + "' not found in port database.");
         }
-        Port destPort = ports().getByCode(destPortCode);
+        Port destPort = getPortByCodeOrAlias(destPortCode);
         if (destPort == null) {
             throw new IllegalArgumentException("Port '" + destPortCode + "' not found in port database.");
         }
@@ -140,6 +156,22 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         feature.properties().setPortOrigin(originPort);
         feature.properties().setPortDest(destPort);
         return feature;
+    }
+
+    /**
+     * Finds a port by its code. A code the port list does not hold is looked up in the reviewed alias list, which
+     * maps official UN/LOCODEs such as AGSJO to the port list's own code for the same port, here AGSJS.
+     */
+    private Port getPortByCodeOrAlias(String portCode) {
+        if (portCode == null || portCode.isBlank()) {
+            throw new IllegalArgumentException("Port code cannot be null or whitespace.");
+        }
+        Port port = ports().getByCode(portCode);
+        if (port != null) {
+            return port;
+        }
+        String alias = lazyPortCodeAliases.get().get(portCode.trim().toUpperCase(Locale.ROOT));
+        return alias != null ? ports().getByCode(alias) : null;
     }
 
     @Override
@@ -154,7 +186,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         boolean appendOrigDest = effective.isAppendOriginDestination();
         boolean includePorts = effective.isIncludePorts();
         boolean returnPassages = effective.isReturnPassages();
-        Set<String> restrictions = effective.getRestrictions();
+        Set<String> restrictions = effective.getClosedPassages();
         String algorithm = effective.getAlgorithm();
 
         List<PortPair> portMatrix;
@@ -220,6 +252,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     .setLength(totalLength)
                     .setUnits(units.unitString())
                     .setDurationHours(duration)
+                    .setDistanceBasis("maritime_network")
+                    .setDistanceSource(maritimeDistanceSource)
+                    .setDurationBasis("assumed_speed")
+                    .setGeometryBasis("maritime_network")
                     .setPortOrigin(includePorts ? pFrom : null)
                     .setPortDest(includePorts ? pTo : null)
                     .setTraversedPassages(returnPassages ? Passage.filterValidPassages(processed.traversedPassages()) : null);
@@ -234,7 +270,48 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
     public MovementResult calculateMovement(MovementRequest request) {
         Objects.requireNonNull(request, "request");
         validateMovement(request);
+        boolean hasRoadLegWithoutOverride = false;
+        List<MovementLeg> legs = request.getLegs();
+        for (int i = 0; i < legs.size(); i++) {
+            if (legs.get(i).mode() == TransportMode.ROAD && !request.getRoadRouteOverrides().containsKey(i + 1)) {
+                hasRoadLegWithoutOverride = true;
+                break;
+            }
+        }
+        if (request.getRoadRouteProvider() != null
+                && request.getRoadRoutingMode() != RoadRoutingMode.ESTIMATE_ONLY
+                && hasRoadLegWithoutOverride) {
+            throw new IllegalStateException(
+                    "This movement is configured to call a road-route provider. Use calculateMovementAsync so provider I/O does not block the calling thread.");
+        }
 
+        // Without a provider every step completes on this thread, so the future is already done.
+        CompletableFuture<MovementResult> result = calculateMovementCore(request, false);
+        try {
+            return result.join();
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof RuntimeException runtime) {
+                throw runtime;
+            }
+            if (e.getCause() instanceof Error error) {
+                throw error;
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public CompletableFuture<MovementResult> calculateMovementAsync(MovementRequest request) {
+        Objects.requireNonNull(request, "request");
+        validateMovement(request);
+        return calculateMovementCore(request, true);
+    }
+
+    /**
+     * Routes the legs one after another. Each road leg may wait on the configured provider; the next leg starts
+     * when it completes. Cancelling the returned future stops further legs and cancels an in-flight provider call.
+     */
+    private CompletableFuture<MovementResult> calculateMovementCore(MovementRequest request, boolean allowProvider) {
         // Movement legs always include their resolved endpoints so consecutive legs join end to end.
         TradeRouterOptions seaOptions = (request.getSeaOptions() == null ? new TradeRouterOptions() : request.getSeaOptions()).copy();
         seaOptions.setAppendOriginDestination(true);
@@ -243,28 +320,79 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         Map<String, ResolvedLocation> resolvedByCode = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         List<MovementLeg> legs = request.getLegs();
         List<LegResult> legResults = new ArrayList<>(legs.size());
-
-        for (int i = 0; i < legs.size(); i++) {
-            MovementLeg leg = legs.get(i);
-            int sequence = i + 1;
-            ResolvedLocation from = resolveLocation(leg.from(), request, resolvedByCode);
-            ResolvedLocation to = resolveLocation(leg.to(), request, resolvedByCode);
-            validateWaypoint(sequence, "from", leg.fromKind(), leg.mode(), from);
-            validateWaypoint(sequence, "to", leg.toKind(), leg.mode(), to);
-
-            if (i > 0) {
-                ResolvedLocation prior = legResults.get(legResults.size() - 1).to();
-                if (Haversine.distanceKm(prior.coordinate(), from.coordinate()) > 0.001) {
-                    throw new IllegalArgumentException(
-                            "Leg " + sequence + " starts at " + from.label() + ", but leg " + (sequence - 1) + " ends at "
-                                    + prior.label() + ". Movement legs must form one continuous chain.");
-                }
+        CompletableFuture<MovementResult> result = new CompletableFuture<>();
+        AtomicReference<CompletableFuture<?>> inFlight = new AtomicReference<>();
+        result.whenComplete((ignored, error) -> {
+            CompletableFuture<?> pending = inFlight.get();
+            if (result.isCancelled() && pending != null) {
+                pending.cancel(true);
             }
+        });
 
-            GeoJsonFeature feature = leg.mode() == TransportMode.SEA
-                    ? calculateSeaLeg(sequence, leg, from, to, seaOptions)
-                    : calculateStraightLeg(from, to, leg.mode(), units, request.getSpeedsKmh());
+        CompletableFuture<Void> chain = CompletableFuture.completedFuture(null);
+        for (int i = 0; i < legs.size(); i++) {
+            int index = i;
+            chain = chain.thenCompose(ignored -> {
+                if (result.isDone()) {
+                    throw new CancellationException("The movement calculation was cancelled.");
+                }
+                return calculateLeg(index, request, allowProvider, seaOptions, units, resolvedByCode, legResults, inFlight);
+            });
+        }
 
+        chain.whenComplete((ignored, error) -> {
+            if (error != null) {
+                result.completeExceptionally(error instanceof CompletionException && error.getCause() != null ? error.getCause() : error);
+            } else {
+                result.complete(new MovementResult(legResults, units.unitString(), request.getCargoTonnes(), request.getCargoTeu()));
+            }
+        });
+        return result;
+    }
+
+    private CompletableFuture<Void> calculateLeg(
+            int index,
+            MovementRequest request,
+            boolean allowProvider,
+            TradeRouterOptions seaOptions,
+            DistanceUnit units,
+            Map<String, ResolvedLocation> resolvedByCode,
+            List<LegResult> legResults,
+            AtomicReference<CompletableFuture<?>> inFlight) {
+        List<MovementLeg> legs = request.getLegs();
+        MovementLeg leg = legs.get(index);
+        int sequence = index + 1;
+        ResolvedLocation from = resolveLocation(leg.from(), request, resolvedByCode);
+        ResolvedLocation to = resolveLocation(leg.to(), request, resolvedByCode);
+        validateWaypoint(sequence, "from", leg.fromKind(), leg.mode(), from);
+        validateWaypoint(sequence, "to", leg.toKind(), leg.mode(), to);
+
+        if (index > 0) {
+            ResolvedLocation prior = legResults.get(legResults.size() - 1).to();
+            if (Haversine.distanceKm(prior.coordinate(), from.coordinate()) > 0.001) {
+                throw new IllegalArgumentException(
+                        "Leg " + sequence + " starts at " + from.label() + ", but leg " + (sequence - 1) + " ends at "
+                                + prior.label() + ". Movement legs must form one continuous chain.");
+            }
+        }
+
+        CompletableFuture<GeoJsonFeature> featureFuture;
+        if (leg.mode() == TransportMode.SEA) {
+            GeoJsonFeature feature = calculateSeaLeg(sequence, leg, from, to, seaOptions);
+            feature.properties()
+                    .setDistanceBasis("maritime_network")
+                    .setDistanceSource(maritimeDistanceSource)
+                    .setGeometryBasis("maritime_network")
+                    .setDurationBasis("assumed_speed");
+            featureFuture = CompletableFuture.completedFuture(feature);
+        } else if (leg.mode() == TransportMode.ROAD) {
+            featureFuture = RoadLegs.calculate(sequence, from, to, units, request, allowProvider, inFlight);
+        } else {
+            featureFuture = CompletableFuture.completedFuture(
+                    calculateStraightLeg(from, to, leg.mode(), units, request.getSpeedsKmh()));
+        }
+
+        return featureFuture.thenAccept(feature -> {
             TradeRouterProperties properties = feature.properties();
             properties.setLeg(sequence);
             properties.setMode(leg.mode().wireString());
@@ -295,9 +423,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             applyEmissions(feature, leg.mode(), units, request);
 
             legResults.add(new LegResult(sequence, leg, from, to, feature));
-        }
-
-        return new MovementResult(legResults, units.unitString(), request.getCargoTonnes(), request.getCargoTeu());
+        });
     }
 
     /**
@@ -368,13 +494,17 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         List<Coordinate> coords = RouteNormalizer.normalizeRoute(List.of(from.coordinate(), to.coordinate()));
         double length = Haversine.calculatePathLength(coords, units);
 
-        // Reuse the sea-leg duration helper by expressing the road speed in knots.
+        // Reuse the sea-leg duration helper by expressing the configured non-sea speed in knots.
         double speedKnots = speedKmh / DistanceUnit.KM.speedCoefficient();
 
         TradeRouterProperties properties = new TradeRouterProperties()
                 .setLength(length)
                 .setUnits(units.unitString())
                 .setDurationHours(Haversine.calculateDurationHours(speedKnots, length, units))
+                .setDistanceBasis("great_circle")
+                .setDistanceSource("built_in")
+                .setDurationBasis("assumed_speed")
+                .setGeometryBasis("great_circle")
                 .setPortOrigin(from.port())
                 .setPortDest(to.port());
         return new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(coords), properties);
@@ -554,6 +684,15 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (request.getEmissions() == null) {
             throw new IllegalArgumentException("Movement emissions cannot be null.");
         }
+        if (request.getRoadDistanceEstimator() == null) {
+            throw new IllegalArgumentException("Movement road-distance estimator cannot be null.");
+        }
+        if (request.getRoadRoutingMode() == null) {
+            throw new IllegalArgumentException("Movement road-routing mode is unknown.");
+        }
+        if (request.getRoadDurationMode() == null) {
+            throw new IllegalArgumentException("Movement road-duration mode is unknown.");
+        }
         request.getEmissions().validate();
         validatePositiveOptional(request.getCargoTonnes(), "cargoTonnes");
         validatePositiveOptional(request.getCargoTeu(), "cargoTeu");
@@ -611,6 +750,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             }
             entry.getValue().validate();
         }
+
+        RoadLegs.validateOverrides(request);
     }
 
     private static void validatePositiveOptional(Double value, String name) {

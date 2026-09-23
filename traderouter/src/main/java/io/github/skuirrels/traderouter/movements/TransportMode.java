@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Transport mode of a movement leg. Only {@link #SEA} is routed on the maritime network; the other modes are
- * modelled as straight great-circle legs between their endpoints. The wire string is the single source of
+ * Transport mode of a movement leg. Only {@link #SEA} is routed on the maritime network; road uses
+ * provider-routed or estimated distance, while rail and air use great-circle distance. The wire string is the single source of
  * truth for how modes are written in leg lines and in GeoJSON.
  */
 public enum TransportMode {
     /** Ocean or coastal shipping, routed on the Marnet graph. */
     SEA("sea", "Sea", List.of("sea", "ocean", "vessel", "ship")),
-    /** Road haulage, straight-line leg. */
+    /** Road haulage, resolved by a road-network provider or fallback estimator. */
     ROAD("road", "Road", List.of("road", "truck", "lorry")),
     /** Rail, straight-line leg. */
     RAIL("rail", "Rail", List.of("rail", "train")),

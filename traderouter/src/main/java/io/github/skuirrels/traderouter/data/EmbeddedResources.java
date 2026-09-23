@@ -15,9 +15,11 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -69,6 +71,7 @@ public final class EmbeddedResources {
         List<Object> items = JsonParser.asArray(JsonParser.parse(readGzipResource("unlocode.json.gz")));
 
         Map<String, Supplement> supplement = loadUnLocodeSupplement();
+        Set<String> confirmedSeaPorts = loadSeaPortSupplement();
         List<UnLocode> entries = new ArrayList<>(items.size());
         for (Object item : items) {
             List<Object> row = JsonParser.asArray(item);
@@ -77,7 +80,12 @@ public final class EmbeddedResources {
             Coordinate coordinate = JsonParser.isNumber(row.get(2)) && JsonParser.isNumber(row.get(3))
                     ? new Coordinate(JsonParser.asDouble(row.get(2)), JsonParser.asDouble(row.get(3)))
                     : null;
-            var functions = LocationFunction.fromFlags(JsonParser.asInt(row.get(4)));
+            int flags = JsonParser.asInt(row.get(4));
+            // Codes UNECE lists without the sea-port function but that are documented deep-sea terminals.
+            if (confirmedSeaPorts.contains(code.toUpperCase(Locale.ROOT))) {
+                flags |= LocationFunction.SEA_PORT.bit();
+            }
+            var functions = LocationFunction.fromFlags(flags);
             String coordinateSource = coordinate != null ? "UNECE" : "";
 
             // The supplement only fills codes UNECE publishes without coordinates; it never overrides UNECE.
@@ -124,6 +132,48 @@ public final class EmbeddedResources {
         return result;
     }
 
+    /**
+     * Loads {@code unlocode-seaport-supplement.json}: codes that UNECE publishes without the sea-port function but
+     * that cited sources document as sea ports, so movements may declare them as ports and route sea legs.
+     */
+    private static Set<String> loadSeaPortSupplement() {
+        Set<String> result = new HashSet<>();
+        String text = readTextResource("unlocode-seaport-supplement.json");
+        if (text == null) {
+            return result;
+        }
+
+        for (Object item : JsonParser.asArray(JsonParser.parse(text))) {
+            String code = orEmpty(JsonParser.asString(JsonParser.asObject(item).get("code")));
+            if (!code.isEmpty()) {
+                result.add(code.toUpperCase(Locale.ROOT));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Loads {@code port-code-aliases.json}: official UN/LOCODE sea-port codes mapped to the differently coded record
+     * that the embedded port list holds for the same port, reviewed from name and position. Keys are upper case.
+     */
+    public static Map<String, String> loadPortCodeAliases() {
+        Map<String, String> result = new HashMap<>();
+        String text = readTextResource("port-code-aliases.json");
+        if (text == null) {
+            return Map.of();
+        }
+
+        for (Object item : JsonParser.asArray(JsonParser.parse(text))) {
+            Map<String, Object> entry = JsonParser.asObject(item);
+            String code = orEmpty(JsonParser.asString(entry.get("code")));
+            String port = orEmpty(JsonParser.asString(entry.get("port")));
+            if (!code.isEmpty() && !port.isEmpty()) {
+                result.put(code.toUpperCase(Locale.ROOT), port);
+            }
+        }
+        return Map.copyOf(result);
+    }
+
     /** Loads and builds the {@link PortDatabase} from the embedded {@code ports.json.gz} dataset. */
     public static PortDatabase loadPortDatabase() {
         List<Port> ports = new ArrayList<>();
@@ -163,6 +213,14 @@ public final class EmbeddedResources {
         }
 
         return new PortDatabase(ports);
+    }
+
+    private static String readTextResource(String name) {
+        try (InputStream stream = EmbeddedResources.class.getResourceAsStream(RESOURCE_ROOT + name)) {
+            return stream == null ? null : new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to read embedded resource '" + name + "'.", e);
+        }
     }
 
     private static String readGzipResource(String name) {

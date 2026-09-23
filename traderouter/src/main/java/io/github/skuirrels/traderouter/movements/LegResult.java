@@ -58,7 +58,7 @@ public final class LegResult {
         return properties().getLength();
     }
 
-    /** Travelling time in hours: distance divided by the mode's speed. */
+    /** Travelling time in hours, calculated according to the request's duration policy. */
     public double durationHours() {
         return properties().getDurationHours();
     }

@@ -12,6 +12,14 @@ public final class TradeRouterProperties {
     private double length;
     private String units = "km";
     private double durationHours;
+    private String distanceBasis;
+    private Double straightLineLength;
+    private String distanceSource;
+    private String routingProfile;
+    private String routingDataVersion;
+    private String durationBasis;
+    private String geometryBasis;
+    private String distanceWarning;
     private Port portOrigin;
     private Port portDest;
     private List<String> traversedPassages;
@@ -54,7 +62,7 @@ public final class TradeRouterProperties {
         return this;
     }
 
-    /** Estimated voyage duration in hours. JSON: {@code duration_hours}. */
+    /** Travelling duration in hours, derived according to the request's duration policy. JSON: {@code duration_hours}. */
     public double getDurationHours() {
         return durationHours;
     }
@@ -62,6 +70,115 @@ public final class TradeRouterProperties {
     /** Sets the duration. */
     public TradeRouterProperties setDurationHours(double durationHours) {
         this.durationHours = durationHours;
+        return this;
+    }
+
+    /**
+     * How the distance was obtained, for example "road_network", "supplied", "circuity_estimate" or
+     * "great_circle", or null. JSON: {@code distance_basis}.
+     */
+    public String getDistanceBasis() {
+        return distanceBasis;
+    }
+
+    /** Sets the distance basis. */
+    public TradeRouterProperties setDistanceBasis(String distanceBasis) {
+        this.distanceBasis = distanceBasis;
+        return this;
+    }
+
+    /**
+     * Great-circle lower bound in the requested units when a road distance was supplied, routed or estimated,
+     * or null. JSON: {@code straight_line_length}.
+     */
+    public Double getStraightLineLength() {
+        return straightLineLength;
+    }
+
+    /** Sets the straight-line length. */
+    public TradeRouterProperties setStraightLineLength(Double straightLineLength) {
+        this.straightLineLength = straightLineLength;
+        return this;
+    }
+
+    /**
+     * Provider, estimator or caller provenance for the distance, or null. JSON: {@code distance_source}.
+     */
+    public String getDistanceSource() {
+        return distanceSource;
+    }
+
+    /** Sets the distance source. */
+    public TradeRouterProperties setDistanceSource(String distanceSource) {
+        this.distanceSource = distanceSource;
+        return this;
+    }
+
+    /**
+     * Routing profile used for a road-network result, or null. JSON: {@code routing_profile}.
+     */
+    public String getRoutingProfile() {
+        return routingProfile;
+    }
+
+    /** Sets the routing profile. */
+    public TradeRouterProperties setRoutingProfile(String routingProfile) {
+        this.routingProfile = routingProfile;
+        return this;
+    }
+
+    /**
+     * Version identifier configured for the road-network dataset, or null. JSON: {@code routing_data_version}.
+     */
+    public String getRoutingDataVersion() {
+        return routingDataVersion;
+    }
+
+    /** Sets the routing data version. */
+    public TradeRouterProperties setRoutingDataVersion(String routingDataVersion) {
+        this.routingDataVersion = routingDataVersion;
+        return this;
+    }
+
+    /**
+     * How travelling duration was derived, such as "provider" or "assumed_speed", or null.
+     * JSON: {@code duration_basis}.
+     */
+    public String getDurationBasis() {
+        return durationBasis;
+    }
+
+    /** Sets the duration basis. */
+    public TradeRouterProperties setDurationBasis(String durationBasis) {
+        this.durationBasis = durationBasis;
+        return this;
+    }
+
+    /**
+     * How the emitted geometry was obtained, such as "road_network" or "great_circle", or null.
+     * JSON: {@code geometry_basis}.
+     */
+    public String getGeometryBasis() {
+        return geometryBasis;
+    }
+
+    /** Sets the geometry basis. */
+    public TradeRouterProperties setGeometryBasis(String geometryBasis) {
+        this.geometryBasis = geometryBasis;
+        return this;
+    }
+
+    /**
+     * Warning attached to an estimated road distance or provider fallback, or null.
+     * JSON: {@code distance_warning}.
+     */
+    public String getDistanceWarning() {
+        return distanceWarning;
+    }
+
+    /** Sets the distance warning. */
+    public TradeRouterProperties setDistanceWarning(String distanceWarning) {
+        this.distanceWarning = distanceWarning;
         return this;
     }
 

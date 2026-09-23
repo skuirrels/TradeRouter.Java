@@ -4,19 +4,19 @@ This document describes every kind of waypoint that can appear in a route produc
 
 ## 1. Transport modes covered
 
-TradeRouter.Java routes one transport mode, deep-sea shipping on the Eurostat Marnet network. Multi-leg movements may also contain road, rail and air legs, which are measured as straight great-circle lines rather than routed on a network.
+TradeRouter.Java routes deep-sea shipping on the Eurostat Marnet network. Multi-leg movements may also contain road, rail and air legs. Road distance comes from an optional road-network provider or a labelled built-in distance-decay circuity estimate; rail and air use great-circle distance.
 
 | Mode | Routed | Network | Leg geometry | Duration basis | Choke points |
 |---|---|---|---|---|---|
 | Sea | Yes | Marnet, 9,708 nodes, 31,950 directed edges | Network path | `speedKnots`, default 16, plus 24 h port dwell per leg end in movements | 13 tagged passages, listed in section 3 |
-| Road | No | None | Straight line, 2 points | `speedsKmh[ROAD]`, default 60 | None |
+| Road | When a `RoadRouteProvider` is configured | Configured provider, for example OSRM | Network path when returned; otherwise a straight display line | Routed or estimated distance divided by `speedsKmh[ROAD]`, default 60; provider/imported duration by explicit opt-in | None |
 | Rail | No | None | Straight line, 2 points | `speedsKmh[RAIL]`, default 80 | None |
 | Air | No | None | Straight line, 2 points | `speedsKmh[AIR]`, default 800 | None |
 | Inland waterway | No | None | Not supported as a mode | n/a | None |
 
-Two other straight-line elements exist. The leg that joins an inland origin or destination to its nearest port when `appendOriginDestination` is set, and the road, rail and air legs of a movement, whatever their kind. Neither is checked against land.
+Straight-line elements still exist where the leg joins an inland origin or destination to its nearest maritime-network point, and for rail, air, or estimated road legs without network geometry. They are display connections and are not checked against land. An estimated road leg reports its circuity-adjusted distance separately from that straight display geometry.
 
-Movement legs are normally built with the fluent `MovementPlan` API from typed `Waypoint` values and `TransportMode` constants. Each destination automatically becomes the next leg's origin, so every location code is stated once; the plan also enforces that Pickup is first and Delivery is last. `MovementParser` remains available only when an integration already supplies human-written leg lines. Known UN/LOCODE functions are checked against the declared waypoint types and against sea, rail and air modes. Location codes resolve against caller-supplied coordinates first, then the embedded port list when UN/LOCODE agrees on the name, then the embedded UN/LOCODE list where it carries coordinates, then an `LocationResolver`. The embedded list has no coordinates for about a fifth of its entries; a small supplement fills a few from cited sources, and the rest must be supplied by the caller. A sea leg with no route raises an error naming the leg.
+Movement legs are normally built with the fluent `MovementPlan` API from typed `Waypoint` values and `TransportMode` constants. Each destination automatically becomes the next leg's origin, so every location code is stated once; the plan also enforces that Pickup is first and Delivery is last. `MovementParser` remains available only when an integration already supplies human-written leg lines. Known UN/LOCODE functions are checked against the declared waypoint types and against sea, rail and air modes. Location codes resolve against caller-supplied coordinates first, then the embedded port list when UN/LOCODE agrees on the name, then the embedded UN/LOCODE list where it carries coordinates, then an `LocationResolver`. The embedded list and its coordinate supplement resolve 102,287 of 106,588 codes; the remaining 4,301 need caller coordinates or a resolver. A sea leg with no route raises an error naming the leg.
 
 ## 2. Waypoint types
 
@@ -111,7 +111,7 @@ A choke point is not a node. It is a tag on the edges that pass through a canal 
 
 - **Restriction.** Any passage named in `TradeRouterOptions.getRestrictions()` has its tagged edges removed from the search. The path then goes round, or fails if there is no alternative.
 - **Reporting.** With `setReturnPassages(true)`, the output property `traversed_passages` lists the tags of every tagged edge the route used, deduplicated.
-- **Default.** `northwest` is restricted unless the caller replaces the restriction set. Every other passage is open by default.
+- **Default.** `northwest` is closed unless `TradeRouterOptions.setAllowNorthwest(true)` is called, and replacing the restrictions does not reopen it. Every other passage is open by default. `getClosedPassages()` returns the full set the search skips.
 
 ### 3.2 Catalogue
 
@@ -130,8 +130,8 @@ Locations are the bounding box of the tagged edges in the dataset. Detours were 
 | `sunda` | `Passage.SUNDA` | Java Sea and Indian Ocean | 1 | 15 km | 105.8° to 105.9° E, 6.0° to 5.9° S | Shanghai to Colombo, Malacca also closed | 7,061 km | 9,352 km via an untagged strait further east |
 | `chili` | `Passage.CHILI` | Atlantic and Pacific round South America | 5 | 857 km | 80.0° to 68.0° W, 60.0° to 52.4° S | Buenos Aires to Valparaíso | 5,611 km | 15,080 km via Panama |
 | `south_africa` | `Passage.SOUTH_AFRICA` | Atlantic and Indian Ocean round Africa | 7 | 4,650 km | 18.0° to 30.0° E, 50.0° to 35.0° S | Singapore to Rotterdam, Suez also closed | 15,525 km | 22,787 km via Sunda and the far south |
-| `bering` | `Passage.BERING` | Pacific and Arctic Ocean | 7 | 847 km | 169.5° W to 190.9° E, 62.1° to 66.0° N | Rotterdam to Yokohama, Northwest opened | 14,055 km | 20,961 km via Suez |
-| `northwest` | `Passage.NORTHWEST` | Atlantic and Pacific through the Arctic | 12 | 1,933 km | 171.7° W to 190.9° E, 66.0° to 74.3° N | Rotterdam to Yokohama | Restricted by default | Opening it gives 14,055 km |
+| `bering` | `Passage.BERING` | Pacific and Arctic Ocean | 7 | 847 km | 169.5° W to 190.9° E, 62.1° to 66.0° N | Rotterdam to Yokohama, `allowNorthwest` | 14,055 km | 20,961 km via Suez |
+| `northwest` | `Passage.NORTHWEST` | Atlantic and Pacific through the Arctic | 12 | 1,933 km | 171.7° W to 190.9° E, 66.0° to 74.3° N | Rotterdam to Yokohama | Closed unless `allowNorthwest` | Opening it gives 14,055 km |
 
 ### 3.3 Notes on each choke point
 
@@ -157,7 +157,7 @@ Locations are the bounding box of the tagged edges in the dataset. Detours were 
 
 **Bering Strait (`bering`).** About 82 km wide between Russia and Alaska, linking the Pacific to the Arctic Ocean. In the dataset it only matters in combination with `northwest`, because every Arctic route passes through both tags.
 
-**Northwest Passage and Arctic lanes (`northwest`).** The tag covers the Arctic lanes north of 66° N between Alaska and the Canadian archipelago. These routes are seasonal and ice-dependent, so the library restricts them by default. Removing the restriction cuts Rotterdam to Yokohama from 20,961 km to 14,055 km, a saving of about a third, which is the reason the option exists.
+**Northwest Passage and Arctic lanes (`northwest`).** The tag covers the Arctic lanes north of 66° N between Alaska and the Canadian archipelago. These routes are seasonal and ice-dependent, so the library closes them unless `allowNorthwest` is true. Opening them cuts Rotterdam to Yokohama from 20,961 km to 14,055 km, a saving of about a third, which is the reason the option exists.
 
 ### 3.4 Combinations worth knowing
 
@@ -166,7 +166,8 @@ Locations are the bounding box of the tagged edges in the dataset. Detours were 
 - **Persian Gulf sealed.** `ormuz` alone: no route to or from any Gulf port.
 - **Red Sea bypassed.** `suez` or `babalmandab`: Europe to Asia traffic goes round the Cape.
 - **Indonesia bypassed.** `malacca` and `sunda`: traffic goes through an untagged strait further east, which cannot be restricted.
-- **Arctic opened.** Remove `northwest` from the restriction set: Europe to north-east Asia traffic goes over the top of Russia.
+- **Arctic opened.** Call `setAllowNorthwest(true)`: Europe to north-east Asia traffic goes over the top of Russia.
+- **Suez closed, Arctic still closed.** `setRestrictions(Passage.SUEZ)` alone keeps `northwest` shut, so Rotterdam to Yokohama goes west through Panama, 23,454 km port to port, rather than 14,051 km over the Arctic.
 
 ## 4. Reference
 
@@ -178,7 +179,7 @@ import io.github.skuirrels.traderouter.passages.Passage;
 var route = TradeRoutes.calculate(
     origin, destination,
     new TradeRouterOptions()
-        .setRestrictions(Passage.NORTHWEST, Passage.SUEZ, Passage.BABALMANDAB)
+        .setRestrictions(Passage.SUEZ, Passage.BABALMANDAB) // Northwest stays closed
         .setReturnPassages(true)
         .setIncludePorts(true)
         .setAppendOriginDestination(true));

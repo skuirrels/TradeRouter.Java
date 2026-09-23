@@ -9,6 +9,7 @@ import io.github.skuirrels.traderouter.movements.ResolvedLocation;
 import io.github.skuirrels.traderouter.ports.PortDatabase;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Service interface for maritime sea route calculation and network querying. The embedded implementation is
@@ -53,12 +54,22 @@ public interface TradeRouterEngine {
     GeoJsonFeature calculateRoute(String originPortCode, String destPortCode, TradeRouterOptions options);
 
     /**
-     * Routes a multi-leg movement. Sea legs use the maritime network; road, rail and air legs are straight
-     * great-circle lines. Implementations that predate movements keep compiling and throw
-     * {@link UnsupportedOperationException}.
+     * Routes a multi-leg movement synchronously. Sea legs use the maritime network; road legs use the configured
+     * estimator; rail and air legs are straight great-circle lines. Imported road results are also supported.
+     * Implementations that predate movements keep compiling and throw {@link UnsupportedOperationException}.
      */
     default MovementResult calculateMovement(MovementRequest request) {
         throw new UnsupportedOperationException(getClass().getSimpleName() + " does not support multi-leg movements.");
+    }
+
+    /**
+     * Routes a multi-leg movement asynchronously, allowing a configured road-network provider to be called.
+     * Cancelling the returned future stops further legs. Implementations that predate asynchronous movements
+     * keep compiling and return a future that fails with {@link UnsupportedOperationException}.
+     */
+    default CompletableFuture<MovementResult> calculateMovementAsync(MovementRequest request) {
+        return CompletableFuture.failedFuture(new UnsupportedOperationException(
+                getClass().getSimpleName() + " does not support asynchronous multi-leg movements."));
     }
 
     /**

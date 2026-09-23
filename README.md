@@ -4,7 +4,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](traderouter/pom.xml)
 
-Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library. A port of [TradeRouter.Net](https://github.com/skuirrels/TradeRouter.Net) 2.0.0 that embeds the same data and produces the same routes, GeoJSON and reports.
+Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library. A port of [TradeRouter.Net](https://github.com/skuirrels/TradeRouter.Net) 2.0.0, including its later road-routing, port-alias and coordinate-supplement changes, that embeds the same data and produces the same routes, GeoJSON and reports.
 
 Give it two UN/LOCODE port codes and it returns RFC 7946 GeoJSON with the distance, voyage duration, ports used and canals and straits passed through. Port codes are the native input; raw coordinates remain available as a fallback for custom or unresolved locations. Ordinary routes are `LineString`; antimeridian crossings are split into `MultiLineString`. The maritime network and world ports database are compressed and embedded in the jar, so there is nothing to download, configure or host.
 
@@ -53,14 +53,15 @@ String geoJson = movement.toJson(true);
 Both cargo measurements are shown together only to demonstrate the two emissions bases; real callers can provide either measurement, both when reliably known, or neither (pass `null`). When both are supplied, sea legs use TEU in preference to tonnes, while road, rail and air legs use the stated tonnes. `toText()` produces the full end-to-end report directly from the calculated movement; `toJson()` returns the same movement as GeoJSON for mapping or downstream processing. The time is labelled **modelled minimum** because it is built from documented assumptions rather than a live carrier schedule.
 
 ```text
-Leg Kind      Mode  From   To      Distance      Modelled transit time       CO2e rate  CO2e per tonne  CO2e total   Basis  Choke points
-                                                                 hours      g per t-km  kg per t cargo          kg
-1   Pickup    Road  GBLGW  GBFXT        139 km                     2.3            92.0            12.8         154  tonnes
-2   Main      Sea   GBFXT  SGSIN     15,402 km                   895.2             7.6           117.1       2,341     teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca
-3   Main      Sea   SGSIN  AUMEL      7,300 km                   391.6             7.6            55.5       1,110     teu  Sunda
-4   Delivery  Road  AUMEL  AUMRS        829 km                    13.8            92.0            76.3         915  tonnes
-Total                                23,670 km                 1,303.0                           261.6       4,520          for 12 t of cargo in 2 TEU
-Modelled minimum = 782.3 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,303.0 h (54.3 days)
+Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total   Basis  Choke points
+                                                                                   hours      g per t-km  kg per t cargo          kg
+1   Pickup    Road  GBLGW  GBFXT        183 km   circuity_estimate                     3.0            92.0            16.8         202  tonnes
+2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network                   895.2             7.6           117.1       2,341     teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca
+3   Main      Sea   SGSIN  AUMEL      7,300 km    maritime_network                   391.6             7.6            55.5       1,110     teu  Sunda
+4   Delivery  Road  AUMEL  AUMRS      1,011 km   circuity_estimate                    16.8            92.0            93.0       1,116  tonnes
+Total                                23,896 km                                     1,306.7                           282.4       4,769          for 12 t of cargo in 2 TEU
+Modelled minimum = 786.0 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,306.7 h (54.4 days)
+Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line
 Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption
 CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)
 CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg
@@ -112,7 +113,7 @@ These apply to single routes and to multi-leg movements, which are described [be
 - **Lane**: a straight link between two neighbouring lane points. Sea legs travel only along lanes.
 - **Snapping**: moving a waypoint's position to its nearest lane point so a sea leg can start or end on the map, then joining the two with a straight line so the leg still begins and ends at the waypoint.
 - **Choke point**: a lane that runs through a canal or strait, tagged with its name. Thirteen exist. Closing one makes the router route round it.
-- **Straight leg**: a road, rail or air leg. One straight line between its two waypoints, no lane points involved.
+- **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail and air legs use great-circle distance. None uses maritime lane points or choke points.
 
 Implementation notes:
 
@@ -154,7 +155,13 @@ Example output for Jebel Ali (AEJEA) to St John's, Antigua (AGSJO) with Suez clo
 |---|---|
 | `length` | Total route length in the requested unit. |
 | `units` | Unit identifier, for example `km`, `naut`, `mi`. |
-| `duration_hours` | Length divided by vessel speed, default 16 knots. |
+| `duration_hours` | Travelling duration. Road legs default to distance divided by the configured road speed; callers may explicitly opt into a provider or imported-route duration. |
+| `distance_basis` | Provenance class for the distance: `maritime_network`, `road_network`, `supplied`, `circuity_estimate` or `great_circle`. |
+| `straight_line_length` | Great-circle lower bound for a road leg, in the requested unit. |
+| `distance_source` | Provider, estimator or caller label that produced the distance. |
+| `routing_profile`, `routing_data_version` | Road-provider profile and caller-configured dataset version when known. |
+| `duration_basis`, `geometry_basis` | How travelling time and emitted geometry were obtained. |
+| `distance_warning` | Present when a road leg fell back to an estimate. |
 | `port_origin`, `port_dest` | Present when routing by port code or with `includePorts`. |
 | `traversed_passages` | Present when `returnPassages` is set. Lower-case identifiers listed below. |
 
@@ -185,7 +192,7 @@ System.out.println(route.properties().getPortOrigin().name() + " to " + route.pr
 System.out.printf("%,.0f %s%n", route.properties().getLength(), route.properties().getUnits());
 ```
 
-Some upstream port codes occur more than once. A code-only route throws when a code is ambiguous instead of choosing an arbitrary record; use `DefaultTradeRouterEngine.getDefault().ports().getByCodeCandidates(code)` to inspect those records.
+The port list holds some ports under a code UN/LOCODE does not use, such as `AGSJS` for St John's, Antigua, whose official code is `AGSJO`. A reviewed alias list, [port-code-aliases.json](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/port-code-aliases.json), maps 61 such official codes to the port list's record, which `port_dest` then reports under its own code. Some upstream port codes occur more than once. A code-only route throws when a code is ambiguous instead of choosing an arbitrary record; use `DefaultTradeRouterEngine.getDefault().ports().getByCodeCandidates(code)` to inspect those records.
 
 ### Engine or static facade
 
@@ -223,7 +230,7 @@ import io.github.skuirrels.traderouter.passages.Passage;
 
 var route = TradeRoutes.calculate(
     "AEJEA", // Jebel Ali
-    "AGSJS", // St John's, Antigua
+    "AGSJO", // St John's, Antigua
     new TradeRouterOptions()
         .setRestrictions(Passage.SUEZ)
         .setReturnPassages(true));
@@ -231,7 +238,17 @@ var route = TradeRoutes.calculate(
 // route.properties().getTraversedPassages() == ["ormuz", "south_africa"]
 ```
 
-Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `MALACCA`, `NORTHWEST` (restricted by default), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`. Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md). `setRestrictions` replaces the whole set, so include `Passage.NORTHWEST` to keep the default Arctic restriction.
+The Northwest Passage stays closed whatever you pass to `setRestrictions`. Call `setAllowNorthwest(true)` to open the seasonal Arctic lanes. Listing `Passage.NORTHWEST` in the restrictions keeps it closed even then.
+
+```java
+GeoJsonFeature arctic = TradeRoutes.calculate("NLRTM", "JPYOK", new TradeRouterOptions()
+    .setAllowNorthwest(true)
+    .setReturnPassages(true));
+
+// arctic.properties().getTraversedPassages() contains "northwest"
+```
+
+Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `MALACCA`, `NORTHWEST` (closed unless `setAllowNorthwest(true)`), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`. Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md).
 
 ### Routing with coordinates
 
@@ -284,10 +301,10 @@ var routes = DefaultTradeRouterEngine.getDefault().calculateRoutes(
 
 ### Multi-leg movements
 
-A `MovementPlan` builds a continuous route from typed waypoints and transport modes. Each destination automatically becomes the next leg's origin, so intermediate UN/LOCODEs are stated once. Declared waypoint types and sea, rail and air modes are checked against known UN/LOCODE functions. Pickup and delivery ordering is enforced while the plan is built. Sea legs are routed on the lane network. Road, rail and air legs are straight great-circle lines between their two waypoints, never touching lane points or choke points, with a configurable speed per mode: 60, 80 and 800 km/h by default.
+A `MovementPlan` builds a continuous route from typed waypoints and transport modes. Each destination automatically becomes the next leg's origin, so intermediate UN/LOCODEs are stated once. Declared waypoint types and sea, rail and air modes are checked against known UN/LOCODE functions. Pickup and delivery ordering is enforced while the plan is built. Sea legs are routed on the lane network. Road legs use an optional road-network provider or a labelled built-in estimate. Rail and air legs use great-circle distance. None of the non-sea modes touches maritime lane points or choke points. Default assumed speeds are 60, 80 and 800 km/h for road, rail and air.
 
 <p align="center">
-  <img src="docs/diagrams/movement-flow.png" alt="Movement flow: a typed MovementPlan builds continuous legs, each leg's locations are resolved, sea legs are routed on Marnet and road, rail or air legs are measured as straight great-circle lines, producing one feature per leg and a FeatureCollection with totals; worked examples show fluent plans from the UK to Melbourne by sea and by air" width="70%">
+  <img src="docs/diagrams/movement-flow.svg" alt="Movement flow: a typed MovementPlan builds continuous legs, resolves each leg's locations, routes sea legs on Marnet, resolves road distance from a road provider or fallback estimate, and measures rail and air legs by great-circle distance" width="70%">
 </p>
 
 Source: [docs/diagrams/movement-flow.svg](docs/diagrams/movement-flow.svg) (vector) and [movement-flow.html](docs/diagrams/movement-flow.html).
@@ -324,16 +341,119 @@ Codes resolve in this order:
 4. The port list anyway, for codes UN/LOCODE lacks coordinates for.
 5. A `LocationResolver`, if one is set.
 
-Each resolved location reports its `source()`. The embedded UN/LOCODE data has no coordinates for about a fifth of its entries. A small supplement file, [unlocode-supplement.json](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-supplement.json), fills a few of those from cited sources and records the source on the entry; it never overrides UNECE. Codes that neither list can place still need a caller coordinate, and the error for one names the place and its functions. An unknown code throws an `IllegalArgumentException` naming the code rather than guessing. Some port codes occur more than once in the upstream list: code-only lookup throws when ambiguous, `getByCodeCandidates` returns every record, and `getByCode(code, near)` disambiguates geographically.
+Each resolved location reports its `source()`. UNECE provides coordinates for 84,516 of the 106,588 embedded codes. The single [coordinate supplement](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-supplement.json) supplies 17,771 more: five hand-reviewed entries and 17,766 GeoNames entries selected through explicit UN/LOCODE links with matching country and place name or recorded alternate name. Every entry records its source, and GeoNames entries include their geonameId. The supplement never overrides UNECE. The remaining 4,301 codes have no verified position in these sources; see the [review list](docs/unlocode-unresolved.csv). Codes that neither list can place still need a caller coordinate or resolver, and the error for one names the place and its functions. An unknown code throws an `IllegalArgumentException` naming the code rather than guessing. Some port codes occur more than once in the upstream list: code-only lookup throws when ambiguous, `getByCodeCandidates` returns every record, and `getByCode(code, near)` disambiguates geographically.
+
+### Road routing
+
+Application and sample road legs must use a configured `RoadRouteProvider` or the built-in `RoadDistanceEstimator`. The default estimator uses a calibrated distance-decay formula, `1.6173976 × straight-line-km^0.9579701`. This makes the road-to-straight-line ratio higher on short trips, where local access and network layout are proportionally more important, and lets that ratio decline gradually with distance. It is deterministic and more realistic than one multiplier for every journey, but it remains a coarse planning assumption: it does not know the actual road network, ferries, borders, mountains or local restrictions. Its result is therefore labelled `circuity_estimate`, includes the lower bound in `straight_line_length`, and carries a `distance_warning`. The research basis, calibration procedure and held-out results are recorded in [DATA_PROVENANCE.md](DATA_PROVENANCE.md#road-distance-estimator-calibration).
+
+`getRoadRouteOverrides()` and `putRoadRouteOverride` are reserved for importing a complete route result from an authoritative upstream system. Do not put a literal distance in application or sample code to correct or force an output; use the estimator or a provider such as OSRM.
+
+CI runs [check-no-hardcoded-sample-routes.sh](scripts/check-no-hardcoded-sample-routes.sh) and fails if the sample introduces a fixed road distance or route override.
+
+Use the built-in estimate explicitly when OSRM is not configured or should not be called:
+
+```java
+MovementPlan estimatedPlan = MovementPlan
+    .from(Waypoint.place("GBLGW"))
+    .pickupTo(Waypoint.airport("GBLHR"), TransportMode.ROAD);
+MovementRequest request = MovementRequest.of(estimatedPlan)
+    .setRoadRoutingMode(RoadRoutingMode.ESTIMATE_ONLY);
+
+MovementResult movement = DefaultTradeRouterEngine.getDefault().calculateMovement(request);
+// Road legs report distance_basis "circuity_estimate" and identify the distance-decay model.
+```
+
+The default model is configurable without supplying route-specific values:
+
+```java
+request.setRoadDistanceEstimator(new DistanceDecayRoadDistanceEstimator(
+    configuration.roadDistanceCoefficient(),
+    configuration.roadDistanceExponent()));
+```
+
+`CircuityRoadDistanceEstimator` remains available when a caller deliberately wants a single configured multiplier:
+
+```java
+request.setRoadDistanceEstimator(new CircuityRoadDistanceEstimator(configuration.roadCircuityFactor()));
+```
+
+For network distance, run OSRM separately and configure the included HTTP adapter, which uses the JDK's `java.net.http.HttpClient` and adds no dependency. The library does not start, stop or download data for the OSRM service:
+
+```java
+HttpClient httpClient = HttpClient.newHttpClient();
+MovementPlan osrmPlan = MovementPlan
+    .from(Waypoint.place("GBLGW"))
+    .pickupTo(Waypoint.airport("GBLHR"), TransportMode.ROAD);
+MovementRequest request = MovementRequest.of(osrmPlan)
+    .setRoadRouteProvider(new OsrmRoadRouteProvider(
+        httpClient,
+        URI.create("http://127.0.0.1:5000"),
+        OsrmRoadRouteProvider.DEFAULT_PROFILE,
+        null,                                                    // dataVersion
+        OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
+        Duration.ofSeconds(5)))                                  // request timeout
+    .setRoadRoutingMode(RoadRoutingMode.PREFER_NETWORK_THEN_ESTIMATE);
+
+MovementResult movement = DefaultTradeRouterEngine.getDefault().calculateMovementAsync(request).join();
+```
+
+OSRM supplies the road-network distance and geometry, but road time still defaults to that distance divided by the road speed in `MovementRequest.getSpeedsKmh()` (60 km/h by default). To use OSRM's modelled duration instead, opt in explicitly:
+
+```java
+request.setRoadDurationMode(RoadDurationMode.ROUTE_DURATION_WHEN_AVAILABLE);
+```
+
+No `dataVersion` value is required to make routing work. The optional constructor argument is only a caller-defined provenance label copied to `routing_data_version` in the result; it neither selects nor loads an OSRM dataset. The sample runner fills it from the resolved extract filenames, for example `england-260914+south-africa-260914`. Pass `null` when you do not know that information.
+
+The adapter is geography-neutral. Its coverage is exactly the OSM extract loaded into your OSRM service: that may be a region, a country, several merged extracts or the planet. OSRM otherwise permits unlimited coordinate snapping, so the adapter bounds each endpoint to a road within 10 km by default; pass a different `maximumSnapDistanceMeters` when your endpoint data needs another tolerance. This prevents a coordinate outside a regional extract from silently snapping to a distant edge of that extract. See the official [OSRM HTTP API options](https://github.com/Project-OSRM/osrm-backend/blob/master/docs/http.md). The current verified multi-architecture image used below is `ghcr.io/project-osrm/osrm-backend:26.8.0-debian`; use the [OSRM backend documentation](https://github.com/Project-OSRM/osrm-backend) to select and pin the version you deploy.
+
+#### OpenStreetMap container for the sample
+
+The sample includes a runner, [run-with-osrm.sh](traderouter-sample/run-with-osrm.sh), that reuses a reachable OSRM service or prepares and starts a local OSRM container before running both the estimated and OSRM examples. It needs Docker, curl, a JDK and Maven.
+
+By default, the runner downloads only the OpenStreetMap road-network extracts needed by the OSRM-backed sample routes: England for Gatwick, Heathrow and Guildford, plus South Africa for Cape Town to Johannesburg. The air and sea legs use TradeRouter.Java rather than OSRM, so they do not need road data. The two Geofabrik extracts total about 2 GB, compared with roughly 88 GB for the complete planet.
+
+The runner resolves each `latest` URL to a dated snapshot, records the resolved URLs and resumes interrupted downloads. It then clips the regions required by the sample, merges those smaller extracts into one disconnected `traderouter-samples.osm.pbf`, and preprocesses that dataset with OSRM (`osrm-extract` with the car profile, `osrm-partition`, `osrm-customize`) before starting `osrm-routed` with the MLD algorithm on `127.0.0.1:5000`. The configurable regions are listed in [osrm-sample-regions.tsv](traderouter-sample/osrm-sample-regions.tsv). It reuses downloaded extracts, clipped regions, the merged PBF, generated OSRM files and the running container on later runs. Osmium performs the clipping and merge; when it is not installed locally, the runner builds the small helper image defined by [osmium-tool.Dockerfile](traderouter-sample/osmium-tool.Dockerfile).
+
+The default command stores all downloaded and generated files under the ignored `osrm-data` directory:
+
+```bash
+./traderouter-sample/run-with-osrm.sh
+```
+
+To deliberately use a different single extract, set both its URL and a distinct dataset name. For example, planet coverage remains available as an explicit opt-in:
+
+```bash
+TRADEROUTER_OSRM_DATA_DIR="$PWD/osrm-data/planet" TRADEROUTER_OSRM_DATASET=planet-latest TRADEROUTER_OSRM_PBF_URL=https://planet.openstreetmap.org/pbf/planet-latest.osm.pbf ./traderouter-sample/run-with-osrm.sh
+```
+
+See the Geofabrik pages for the [England](https://download.geofabrik.de/europe/united-kingdom/england.html) and [South Africa](https://download.geofabrik.de/africa/south-africa.html) extracts, and the OpenStreetMap [planet documentation](https://wiki.openstreetmap.org/wiki/Planet.osm). The runner never moves or deletes a downloaded PBF. `TRADEROUTER_OSRM_DATA_DIR`, `TRADEROUTER_OSRM_DATASET` and `TRADEROUTER_OSRM_PBF_URL` remain available when you deliberately want a different stored dataset.
+
+The script accepts `--geojson` and passes it to the sample. `TRADEROUTER_OSRM_IMAGE` and `TRADEROUTER_OSRM_CONTAINER` override the OSRM container defaults. `TRADEROUTER_OSMIUM_IMAGE` can name an existing Osmium image instead of building the included helper. `TRADEROUTER_OSRM_DATA_VERSION` optionally records an immutable provenance label; it does not select the dataset.
+
+Set `TRADEROUTER_OSRM_SAMPLE_REGIONS_FILE` to another tab-separated region file when the sample routes change. Each non-comment row contains an extract name, its download URL, an Osmium bounding box and a readiness-probe coordinate. `TRADEROUTER_OSRM_PROBE_COORDINATE` can override the probe. This keeps dataset coverage in configuration instead of embedding it in the runner.
+
+If the runner reports that the OSRM image cannot run, its local Docker layer may be corrupt. Follow the two exact `docker image rm` and `docker pull` commands printed by the runner, then rerun the script. The downloaded map files are not removed.
+
+If a service is already running at another URL, bypass local container startup with:
+
+```bash
+TRADEROUTER_OSRM_URL=https://your-osrm-service.example mvn -q -pl traderouter-sample exec:java
+```
+
+Example 13 always shows the built-in `ESTIMATE_ONLY` result. Examples 14 and 15 use `OsrmRoadRouteProvider` and `REQUIRE_NETWORK`, so they must return OSRM routes rather than silently fall back. Example 15 covers two continents: Cape Town to Johannesburg by road, Johannesburg to London Heathrow by air, and Heathrow to Guildford by road. When `TRADEROUTER_OSRM_URL` is not set, both OSRM examples are clearly reported as skipped and the rest of the sample still runs.
+
+`PREFER_NETWORK_THEN_ESTIMATE` falls back only when the provider is unavailable or an endpoint is outside its loaded coverage, and records the reason in `distance_warning`. A provider-confirmed `NO_ROUTE` is an error rather than silently inventing a distance. `REQUIRE_NETWORK` also treats unavailable or out-of-coverage results as errors. `ESTIMATE_ONLY` never calls the provider. Because provider calls are I/O, use `calculateMovementAsync`, which returns a `CompletableFuture`; cancelling it stops further legs and cancels an in-flight provider call. Synchronous `calculateMovement` is available for estimates and imported routes, and throws `IllegalStateException` when a request would need to call a provider.
 
 ### Time
 
-`duration_hours` on every route and leg is travelling time: distance divided by an assumed average speed.
+`duration_hours` on every route and leg is travelling time. Road legs use routed or estimated distance divided by the configured road speed by default, including routes whose distance and geometry came from OSRM. Set `RoadDurationMode.ROUTE_DURATION_WHEN_AVAILABLE` to prefer a provider or authoritative imported-route duration when one is present. Other non-sea legs use distance divided by their configured average speed.
 
 | Mode | Default speed | Where to change it |
 |---|---|---|
 | Sea | 16 knots, about 30 km/h | `TradeRouterOptions.setSpeedKnots` |
-| Road | 60 km/h | `MovementRequest.setSpeedKmh(TransportMode.ROAD, ...)` |
+| Road | 60 km/h | `MovementRequest.setSpeedKmh(TransportMode.ROAD, ...)`; set `RoadDurationMode.ROUTE_DURATION_WHEN_AVAILABLE` to prefer a provider or imported duration |
 | Rail | 80 km/h | `MovementRequest.setSpeedKmh(TransportMode.RAIL, ...)` |
 | Air | 800 km/h | `MovementRequest.setSpeedKmh(TransportMode.AIR, ...)` |
 
@@ -356,13 +476,16 @@ The service allowance covers what a shortest-path line cannot show: the intermed
 | `asia-mediterranean` | Malacca or Sunda and Suez, no Gibraltar | 1.33 |
 | `gulf-europe` | Hormuz and Suez | 1.57 |
 | `transpacific` | no passage, East Asia to the Americas | 0.12 |
-| `panama` | Panama | 0.24 |
+| `panama` | Panama, with one end in the Americas | 0.24 |
 | `transatlantic` | no passage, Europe or Africa to the Americas | 0.80 |
+| `asia-north-europe-cape` | no Suez, East Asia to North Europe round the Cape or through Panama | 0.22 |
+| `asia-mediterranean-cape` | no Suez, East Asia round the Cape and through Gibraltar | 0.37 |
+| `gulf-europe-cape` | no Suez, Hormuz and the Cape to Europe | 0.46 |
 | `default` | anything else | 0.20 |
 
-The fitted fractions come from observed port-to-port sailings, berth departure to berth arrival, for legs departing in 2025 and 2026 in a freight forwarder's operational data: eleven direct lanes and 8,600 sailings. Each fraction is the observed median divided by this library's travelling time at 16 knots, minus one. On those lanes the mean error fell from 11.5 days with the former flat 0.20 to 1.3 days. Corridors without observations keep 0.20. The source and method are recorded in [DATA_PROVENANCE.md](DATA_PROVENANCE.md). The connection allowance represents a normal transshipment hand-off; set it to zero for a through service.
+The fitted fractions come from observed port-to-port sailings, berth departure to berth arrival, for legs departing in 2025 and 2026 in a proprietary dataset: eleven direct lanes and 8,600 sailings. Each fraction is the observed median divided by this library's travelling time at 16 knots, minus one. On those lanes the mean error fell from 11.5 days with the former flat 0.20 to 1.3 days. The three `-cape` corridors apply the same observations to this library's Cape route, for legs where Suez is closed; Panama is used only when a caller leaves it open, and takes the North Europe Cape fraction. Corridors without observations keep 0.20. The source and method are recorded in [DATA_PROVENANCE.md](DATA_PROVENANCE.md). The connection allowance represents a normal transshipment hand-off; set it to zero for a through service.
 
-The worked UK–Singapore–Melbourne movement is therefore 782.3 hours of physical travel + 376.7 hours of sea operations (0.63 on the Felixstowe–Singapore leg, 0.20 on the unfitted Singapore–Melbourne leg) + 96 hours of port handling + 48 hours for the Singapore connection = **54.3 days modelled minimum**, against the 43 to 63 days that carriers and forwarders publish for the lane.
+The worked UK–Singapore–Melbourne movement is therefore 786.0 hours of physical travel + 376.7 hours of sea operations (0.63 on the Felixstowe–Singapore leg, 0.20 on the unfitted Singapore–Melbourne leg) + 96 hours of port handling + 48 hours for the Singapore connection = **54.4 days modelled minimum**, against the 43 to 63 days that carriers and forwarders publish for the lane.
 
 | `MovementRequest` timing option | Default | Meaning |
 |---|---:|---|
@@ -408,13 +531,15 @@ Source: Smart Freight Centre, [GLEC Framework, July 2022 edition](https://smart-
 Everything here is deliberate and documented, but each is a simplification you should know about.
 
 - **Port list versus UN/LOCODE tie-break.** When both lists know a code, the port list position is used only if the two names match or one is a prefix of the other after stripping accents and punctuation. If they disagree, UN/LOCODE's position is used and no port record is attached. Check `source()` on the resolved location when it matters.
-- **Supplemented coordinates.** Four codes have coordinates researched by hand rather than published by UNECE; the supplement file names each source.
+- **Supplemented coordinates.** Five hand-reviewed codes and 17,766 codes with unambiguous GeoNames links have coordinates from cited sources rather than UNECE. Another 4,301 codes still have no verified coordinates; use caller coordinates or a resolver for those.
+- **Sea-port function checks.** A port waypoint or sea leg is rejected when UN/LOCODE records no sea-port function, even if the port list holds the code, because that list also contains inland terminals such as Calgary. Two codes UNECE under-records, Alumar (`BRALU`) and Duncan Bay (`CADCN`), are confirmed as sea ports by [unlocode-seaport-supplement.json](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-seaport-supplement.json) with cited sources. Other affected ports need a `Waypoint.place` or a new supplement entry.
+- **Port-code aliases.** 264 port-list codes are not UN/LOCODEs. Only 61 are mapped from an official code, where the names and positions within 25 km show the same port; the rest route only by their port-list code or by coordinates. Nearest-port matching is not used, because it pairs different places such as Perth and Claremont.
 - **Duplicate port codes.** The tagged upstream list contains 38 codes with multiple records. Code-only lookup never silently chooses one; provide a nearby coordinate or inspect the candidates.
 - **UN/LOCODE edition.** The embedded import did not preserve its UNECE publication edition. Its hash and record counts are documented, but it is not claimed to be the latest release.
 - **Single routes with several area matches** return the first feature from `calculateRoute`; use `calculateRoutes` to see them all.
 - **Single routes with no path** return null geometry and zero length rather than throwing; movement legs throw.
 - **Untagged lane links.** Three internal tags in the lane data, `segment`, `segment2` and `pacific_ocean`, stitch the antimeridian and are never reported or restrictable.
-- **Straight legs.** Road, rail and air legs are great-circle lines, not routed on any network.
+- **Road estimates and non-road geometry.** Without a supplied value or provider, road distance comes from the calibrated distance-decay circuity model, not a road-network route. It is an average planning relationship and cannot reproduce barriers or the exact route between a particular pair. When no road geometry is available, the GeoJSON still joins the resolved endpoints with a straight display line and reports `geometry_basis: great_circle`; this does not change the separately reported estimated or routed distance. Rail and air use great-circle distance.
 - **Time and emissions are estimates.** Movement time is labelled modelled minimum and exposes every allowance, but it still has no carrier schedule, customs, cargo cut-off, booking availability or disruption data.
 - **A* has no usable heuristic on the embedded network.** The A* heuristic is scaled so that it never exceeds any edge's weight. The source data rounds lane weights to 0.1 km and contains zero-weight links between near-duplicate nodes, so that scale is zero on Marnet and A* degrades to one-directional Dijkstra. Prefer the default bidirectional Dijkstra; A* remains useful for custom graphs whose weights are true geodesic distances.
 - **Per-thread search buffers** hold about 300 KB for the lifetime of each thread that routes.
@@ -426,7 +551,8 @@ Everything here is deliberate and documented, but each is a simplification you s
 | `setUnits` | `KM` | `KM`, `METERS`, `MILES`, `FEET`, `INCHES`, `YARDS`, `NAUTICAL_MILES`, `DEGREES`, `RADIANS`, `CENTIMETERS`. `setUnitString("naut")` accepts the unit identifiers. |
 | `setSpeedKnots` | `16` | Vessel speed used for `duration_hours`. A typical slow-steaming service speed; the fleet averaged under 14 knots in 2023. |
 | `setAppendOriginDestination` | `false` | Prepend the exact origin and append the exact destination to the line. |
-| `setRestrictions` | `[NORTHWEST]` | Passages whose edges are excluded from the search. Replaces the set; `getRestrictions()` returns the live, case-insensitive set. |
+| `setRestrictions` | `[]` | Passages whose edges are excluded from the search. Replaces the set; `getRestrictions()` returns the live, case-insensitive set. |
+| `setAllowNorthwest` | `false` | Open the seasonal Arctic lanes tagged `NORTHWEST`. The restrictions still win when they list `NORTHWEST`. |
 | `setIncludePorts` | `false` | Route from and to the nearest ports instead of the raw points. |
 | `setPortParameters` | `null` | Terminal-only, country filters, area polygons. `strict` is true by default: a filter that matches no port yields no port rather than silently widening. |
 | `setReturnPassages` | `false` | Populate `traversed_passages`. |
@@ -476,14 +602,18 @@ traderouter/                the library, published as io.github.skuirrels:trader
     TradeRouterOptions.java request options
     TradeRoutes.java        static facade
   src/main/resources/io/github/skuirrels/traderouter/data/
-                            marnet.json.gz, ports.json.gz, unlocode.json.gz, unlocode-supplement.json
+                            marnet.json.gz, ports.json.gz, unlocode.json.gz, unlocode-supplement.json,
+                            unlocode-seaport-supplement.json, port-code-aliases.json
   src/test/java/            JUnit 5 suite: routing, passages, ports, spatial, graph, JSON and movements
-traderouter-sample/         console app exercising every entry point
+traderouter-sample/         console app exercising every entry point, plus run-with-osrm.sh, the OSRM
+                            container runner, its region list and the Osmium helper Dockerfile
+scripts/                    CI guard against hard-coded sample road routes
 traderouter-benchmarks/     JMH routing benchmarks, shaded into benchmarks.jar
 docs/
   waypoints-and-choke-points.md   every waypoint type and all 13 passages with measured detours
   diagrams/                 editable HTML diagrams with SVG and selected PNG exports
-tools/                      the Python scripts that built the embedded data from searoute-py
+  unlocode-unresolved.csv   the 4,301 UN/LOCODEs no source could place, with the reason for each
+tools/                      Python scripts that built the embedded data and review the supplements and aliases
 ```
 
 ## Building, testing and trying it out
@@ -502,7 +632,13 @@ mvn -pl traderouter test
 mvn -q install -DskipTests && mvn -q -pl traderouter-sample exec:java
 ```
 
-The sample prints twelve worked examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and three multi-leg movements printed as tables, one with an air leg. Add `-Dexec.args=--geojson` to print a full feature.
+To prepare or reuse the default local OSRM container and run the same sample:
+
+```bash
+./traderouter-sample/run-with-osrm.sh
+```
+
+The sample contains fifteen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Add `-Dexec.args=--geojson` to print a full feature.
 
 `mvn install` places `traderouter-2.0.0.jar`, with its sources and Javadoc jars, in your local Maven repository.
 
@@ -521,6 +657,10 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 | `ArgumentException`, `ArgumentOutOfRangeException` | `IllegalArgumentException` |
 | `InvalidOperationException` | `IllegalStateException` |
 | `FormatException` from the leg parser | `MovementFormatException`, an `IllegalArgumentException` |
+| `IRoadRouteProvider.RouteAsync` returning `ValueTask`, with a `CancellationToken` | `RoadRouteProvider.routeAsync` returning `CompletableFuture`; cancel the future instead of passing a token |
+| `CalculateMovementAsync(request, cancellationToken)` | `calculateMovementAsync(request)` returning a cancellable `CompletableFuture` |
+| `OsrmRoadRouteProvider(HttpClient, Uri, ...)` with `HttpClient.Timeout` | `OsrmRoadRouteProvider(java.net.http.HttpClient, URI, ...)` with an explicit per-request `Duration` timeout |
+| `IRoadDistanceEstimator`, init-only `RoadRouteResult` | `RoadDistanceEstimator`; `RoadRouteResult.builder(status, source)` |
 | `System.Text.Json` | Built-in reader and writer; integral doubles are written without a decimal point, other doubles with Java's shortest round-trip form |
 
 ## Data
@@ -528,9 +668,11 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 - **Marnet and antimeridian segments**, transformed from searoute-py 1.6.0: 9,708 nodes and 31,950 directed edges with distance and passage tags.
 - **World ports**, transformed from searoute-py 1.6.0: 3,962 records with code, name, country, terminal flag and permitted destination countries.
 - **UN/LOCODE**, the UNECE code list for trade and transport locations: 106,588 codes with name and function flags, of which 84,516 carry coordinates to one minute of arc. Used to resolve movement legs that name airports, terminals and inland places. Loaded only when a movement needs it.
-- **UN/LOCODE supplement**: a hand-maintained JSON file of coordinates for codes UNECE publishes without any, each with its source. Currently four entries: Gatwick, Shanghai Railway Station, Shanghai Hongqiao and Melrose. Applied only where UNECE has no coordinate.
+- **UN/LOCODE coordinate supplement**: one JSON file with five hand-reviewed entries (Gatwick, Shanghai Railway Station, Shanghai Hongqiao, Melrose and Guildford) and 17,766 positions from the 16 September 2026 GeoNames snapshot. Each entry records its source. The GeoNames entries have an explicit `unlc` code, matching country and name or recorded alternate name, and one unambiguous coordinate. Lightwater (`GBLGE`) is included. Applied only where UNECE has no coordinate.
+- **Port-code aliases**: a reviewed JSON file mapping 61 official UN/LOCODE sea-port codes to the port-list record held under another code. Used only when the port list lacks the requested code.
+- **UN/LOCODE sea-port supplement**: a hand-maintained JSON file of codes that UNECE publishes without the sea-port function but that cited sources document as sea ports. Currently two entries: Alumar and Duncan Bay. It only adds the sea-port function and never removes one.
 
-All datasets are embedded as gzip-compressed JSON, about 1.7 MB in total, and loaded lazily on first use. Exact input and output hashes, transformations and the known UN/LOCODE edition gap are in [DATA_PROVENANCE.md](DATA_PROVENANCE.md); licensing and attribution are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+The datasets are embedded, with compressed JSON for the large resources, and loaded lazily on first use. Exact input and output hashes, transformations and the known UN/LOCODE edition gap are in [DATA_PROVENANCE.md](DATA_PROVENANCE.md); licensing and attribution are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 ## Licence
 

@@ -6,12 +6,13 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * One entry of the UNECE UN/LOCODE list. About a fifth of entries carry no coordinates.
+ * One entry of the UNECE UN/LOCODE list, possibly enriched with an attributed coordinate.
  *
  * @param code             five-character UN/LOCODE
  * @param name             location name without diacritics
- * @param coordinate       position to one minute of arc, or null when UNECE publishes none
- * @param functions        recorded functions
+ * @param coordinate       UNECE position to one minute of arc, an attributed supplement position, or null
+ * @param functions        recorded functions, with the sea-port function added for codes listed in the sea-port
+ *                         supplement file
  * @param coordinateSource "UNECE" when the position comes from the code list, otherwise the researched source
  *                         named in the supplement file; empty when there is no position
  */

@@ -23,14 +23,14 @@ public final class TradeRouterOptions {
     private double speedKnots = 16.0;
     private boolean appendOriginDestination;
     private Set<String> restrictions = newRestrictionSet();
+    private boolean allowNorthwest;
     private boolean includePorts;
     private PortParameters portParameters;
     private boolean returnPassages;
     private String algorithm = DIJKSTRA;
 
-    /** Creates options with the defaults: kilometres, 16 knots, Northwest Passage restricted, Dijkstra. */
+    /** Creates options with the defaults: kilometres, 16 knots, no restrictions, Northwest Passage closed, Dijkstra. */
     public TradeRouterOptions() {
-        restrictions.add(Passage.NORTHWEST);
     }
 
     /** Unit for measuring route distance. Defaults to {@link DistanceUnit#KM}. */
@@ -82,8 +82,9 @@ public final class TradeRouterOptions {
     }
 
     /**
-     * Passages to avoid, for example Suez, Panama or Gibraltar, matched case-insensitively. Default is
-     * {@code [Passage.NORTHWEST]}. The set is live and may be modified.
+     * Passages to avoid, for example Suez, Panama or Gibraltar, matched case-insensitively. Default is empty.
+     * The Northwest Passage is closed separately unless {@link #isAllowNorthwest()} is true. The set is live and
+     * may be modified.
      */
     public Set<String> getRestrictions() {
         return restrictions;
@@ -108,6 +109,37 @@ public final class TradeRouterOptions {
     /** Replaces the restriction set with the given passages. */
     public TradeRouterOptions setRestrictions(String... restrictions) {
         return setRestrictions(java.util.Arrays.asList(restrictions));
+    }
+
+    /**
+     * Whether routes may use the seasonal, ice-dependent Arctic lanes tagged {@link Passage#NORTHWEST}. Default
+     * false, so replacing the restrictions never reopens the Arctic. Listing {@link Passage#NORTHWEST} in
+     * {@link #getRestrictions()} keeps it closed even when this is true.
+     */
+    public boolean isAllowNorthwest() {
+        return allowNorthwest;
+    }
+
+    /** Sets whether the Northwest Passage and other Arctic lanes are open. */
+    public TradeRouterOptions setAllowNorthwest(boolean allowNorthwest) {
+        this.allowNorthwest = allowNorthwest;
+        return this;
+    }
+
+    /**
+     * Returns every passage closed to the search: {@link #getRestrictions()}, plus {@link Passage#NORTHWEST}
+     * unless {@link #isAllowNorthwest()} is true. The returned set is a new copy.
+     */
+    public Set<String> getClosedPassages() {
+        if (restrictions == null) {
+            throw new IllegalArgumentException("Restrictions cannot be null.");
+        }
+        Set<String> closed = newRestrictionSet();
+        closed.addAll(restrictions);
+        if (!allowNorthwest) {
+            closed.add(Passage.NORTHWEST);
+        }
+        return closed;
     }
 
     /** Whether to route through the nearest ports close to origin and destination. Default false. */
@@ -164,6 +196,7 @@ public final class TradeRouterOptions {
                 .setSpeedKnots(speedKnots)
                 .setAppendOriginDestination(appendOriginDestination)
                 .setRestrictions(restrictions)
+                .setAllowNorthwest(allowNorthwest)
                 .setIncludePorts(includePorts)
                 .setPortParameters(portParameters == null ? null : portParameters.copy())
                 .setReturnPassages(returnPassages);

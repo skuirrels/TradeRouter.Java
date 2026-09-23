@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 1200 1184" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="movement-flow-title movement-flow-desc">
   <title id="movement-flow-title">TradeRouter.Net movement flow</title>
-  <desc id="movement-flow-desc">Flowchart showing a typed movement plan built into continuous legs, each leg's locations resolved, sea legs routed on the Marnet network and road, rail or air legs measured as straight great-circle lines with no lane points or choke points, each producing a leg feature, looping until all legs are done and returning a GeoJSON FeatureCollection with totals. Strips below show fluent API examples for a UK to Melbourne movement and a movement with an air leg.</desc>
+  <desc id="movement-flow-desc">Flowchart showing a typed movement plan built into continuous legs, each leg's locations resolved, sea legs routed on the Marnet network, road distances calculated by a configured provider or the internal estimator, and rail or air legs measured by great-circle distance. Each produces a leg feature before the movement returns a GeoJSON FeatureCollection with totals.</desc>
   <defs>
     <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap');</style>
     <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6472"/></marker>
@@ -16,11 +16,11 @@
   <line x1="600" y1="304" x2="600" y2="344" stroke="#5b6472" stroke-width="1.2" marker-end="url(#arrow)"/>
   <!-- Mode? -> Route on Marnet (sea, focal) -->
   <line x1="696" y1="384" x2="840" y2="384" stroke="#0a34a1" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-  <!-- Mode? -> Straight leg (road, rail, air) -->
-  <line x1="504" y1="384" x2="360" y2="384" stroke="#5b6472" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <!-- Mode? -> Resolve non-sea distance -->
+  <line x1="504" y1="384" x2="400" y2="384" stroke="#5b6472" stroke-width="1.2" marker-end="url(#arrow)"/>
   <!-- Route on Marnet -> merge -->
   <path d="M940,412 V464 Q940,472 932,472 H608" fill="none" stroke="#5b6472" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <!-- Straight leg -> merge -->
+  <!-- Non-sea leg -> merge -->
   <path d="M260,412 V464 Q260,472 268,472 H592" fill="none" stroke="#5b6472" stroke-width="1.2" marker-end="url(#arrow)"/>
   <!-- merge -> Leg feature -->
   <line x1="600" y1="476" x2="600" y2="504" stroke="#5b6472" stroke-width="1.2" marker-end="url(#arrow)"/>
@@ -70,11 +70,11 @@
   <text x="940" y="382" fill="#181818" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Route on Marnet</text>
   <text x="940" y="398" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">16 knots · 24 h port dwell each end</text>
 
-  <!-- Straight great-circle leg -->
-  <rect x="160" y="356" width="200" height="56" rx="6" fill="#f6f7f8"/>
-  <rect x="160" y="356" width="200" height="56" rx="6" fill="#ffffff" stroke="#181818" stroke-width="1"/>
-  <text x="260" y="382" fill="#181818" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Straight great-circle leg</text>
-  <text x="260" y="398" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">road 60 · rail 80 · air 800 km/h</text>
+  <!-- Resolve non-sea distance -->
+  <rect x="120" y="356" width="280" height="56" rx="6" fill="#f6f7f8"/>
+  <rect x="120" y="356" width="280" height="56" rx="6" fill="#ffffff" stroke="#181818" stroke-width="1"/>
+  <text x="260" y="382" fill="#181818" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Resolve non-sea distance</text>
+  <text x="260" y="398" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">road route/estimate · rail/air great-circle</text>
 
   <!-- Merge point -->
   <circle cx="600" cy="472" r="4" fill="#181818"/>
@@ -106,22 +106,22 @@
   <text x="40" y="908" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">  .DeliverTo(Waypoint.Place("AUMRS"), TransportMode.Road)</text>
   <text x="40" y="940" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">each UN/LOCODE appears once; continuity is carried by the plan</text>
   <text x="480" y="844" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">Leg  Kind      Mode  From   To      Distance  Transit h  CO2e kg  Choke points</text>
-  <text x="480" y="860" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">1    Pickup    Road  GBLGW  GBFXT      139 km        2.3      154</text>
-  <text x="480" y="876" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">2    Main      Sea   GBFXT  SGSIN   15,402 km      567.8    2,341  Gibraltar, Suez, Bab-el-Mandeb, Malacca</text>
-  <text x="480" y="892" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">3    Main      Sea   SGSIN  AUMEL    7,300 km      294.4    1,110  Sunda</text>
-  <text x="480" y="908" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">4    Delivery  Road  AUMEL  AUMRS      829 km       13.8      915  Melrose SA, 800 km inland</text>
-  <text x="480" y="924" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" xml:space="preserve">Total                               23,670 km      878.3    4,520  = 36.6 days</text>
-  <text x="480" y="940" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">Transit = 782.3 h travelling + 96 h in port, 24 h at each end of the two sea legs</text>
+  <text x="480" y="860" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">1    Pickup    Road  GBLGW  GBFXT      181 km        3.0      200  circuity estimate</text>
+  <text x="480" y="876" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">2    Main      Sea   GBFXT  SGSIN   15,402 km      895.2    2,341  Gibraltar, Suez, Bab-el-Mandeb, Malacca</text>
+  <text x="480" y="892" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">3    Main      Sea   SGSIN  AUMEL    7,300 km      391.6    1,110  Sunda</text>
+  <text x="480" y="908" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">4    Delivery  Road  AUMEL  AUMRS    1,078 km       18.0    1,190  circuity estimate</text>
+  <text x="480" y="924" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" xml:space="preserve">Total                               23,960 km    1,307.8    4,840  = 54.5 days</text>
+  <text x="480" y="940" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">Transit = 787.1 h travel + 376.7 h sea operations + 96 h port + 48 h connection</text>
   <text x="40" y="988" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">WORKED EXAMPLE B · A MOVEMENT WITH AN AIR LEG, 20 T</text>
   <text x="40" y="1012" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">MovementPlan.From(Waypoint.Place("GBLGW"))</text>
   <text x="40" y="1028" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">  .PickupTo(Waypoint.Airport("GBLHR"), TransportMode.Road)</text>
   <text x="40" y="1044" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">  .ThenTo(Waypoint.Airport("AUMEL"), TransportMode.Air)</text>
   <text x="40" y="1060" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">  .DeliverTo(Waypoint.Place("AUMRS"), TransportMode.Road)</text>
   <text x="480" y="1012" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">Leg  Kind      Mode  From   To      Distance  Transit h  CO2e kg  Choke points</text>
-  <text x="480" y="1028" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">1    Pickup    Road  GBLGW  GBLHR       40 km        0.7       73  none, straight line</text>
+  <text x="480" y="1028" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">1    Pickup    Road  GBLGW  GBLHR       52 km        0.9       95  circuity estimate</text>
   <text x="480" y="1044" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">2    Main      Air   GBLHR  AUMEL   16,927 km       21.2  213,280  none, straight great-circle line, no lane points</text>
-  <text x="480" y="1060" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">3    Delivery  Road  AUMEL  AUMRS      829 km       13.8    1,526  none, straight line</text>
-  <text x="480" y="1076" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" xml:space="preserve">Total                               17,796 km       35.6  214,879  no port time on road or air legs</text>
+  <text x="480" y="1060" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" xml:space="preserve">3    Delivery  Road  AUMEL  AUMRS    1,078 km       18.0    1,983  circuity estimate</text>
+  <text x="480" y="1076" fill="#181818" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" xml:space="preserve">Total                               18,057 km       40.0  215,359  distance provenance on each leg</text>
 
   <!-- Legend strip -->
   <line x1="40" y1="1120" x2="1160" y2="1120" stroke="rgba(24,24,24,0.10)" stroke-width="0.8"/>

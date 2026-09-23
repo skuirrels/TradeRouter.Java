@@ -16,16 +16,16 @@ final class MovementTextFormatter {
     static String format(MovementResult movement, boolean includeExplanations) {
         StringBuilder output = new StringBuilder();
         appendLine(output, String.format(Locale.ROOT,
-                "%-4s%-10s%-6s%-7s%-7s%9s %2s%24s%16s%16s%12s%8s  Choke points",
-                "Leg", "Kind", "Mode", "From", "To", "Distance", "", "Modelled transit time", "CO2e rate",
+                "%-4s%-10s%-6s%-7s%-7s%9s %20s%24s%16s%16s%12s%8s  Choke points",
+                "Leg", "Kind", "Mode", "From", "To", "Distance", "Distance basis", "Modelled transit time", "CO2e rate",
                 "CO2e per tonne", "CO2e total", "Basis"));
         appendLine(output, String.format(Locale.ROOT,
-                "%-34s%9s %2s%24s%16s%16s%12s",
+                "%-34s%9s %20s%24s%16s%16s%12s",
                 "", "", "", "hours", "g per t-km", "kg per t cargo", "kg"));
 
         for (LegResult leg : movement.legs()) {
             appendLine(output, String.format(Locale.ROOT,
-                    "%-4d%-10s%-6s%-7s%-7s%9s %s%24s%16s%16s%12s%8s  %s",
+                    "%-4d%-10s%-6s%-7s%-7s%9s %s%20s%24s%16s%16s%12s%8s  %s",
                     leg.sequence(),
                     leg.leg().kind().displayName(),
                     leg.leg().mode().displayName(),
@@ -33,6 +33,7 @@ final class MovementTextFormatter {
                     leg.to().label(),
                     n0(leg.length()),
                     movement.units(),
+                    orEmpty(leg.feature().properties().getDistanceBasis()),
                     n1(leg.transitHours()),
                     n1(leg.co2eGramsPerTonneKm()),
                     n1(leg.co2eKgPerTonne()),
@@ -42,10 +43,11 @@ final class MovementTextFormatter {
         }
 
         appendLine(output, String.format(Locale.ROOT,
-                "%-34s%9s %s%24s%16s%16s%12s%8s  %s",
+                "%-34s%9s %s%20s%24s%16s%16s%12s%8s  %s",
                 "Total",
                 n0(movement.totalLength()),
                 movement.units(),
+                "",
                 n1(movement.totalTransitHours()),
                 "",
                 n1(movement.totalCo2eKgPerTonne()),
@@ -62,6 +64,7 @@ final class MovementTextFormatter {
                 n1(movement.totalTransitHours() / 24.0)));
 
         if (includeExplanations) {
+            appendLine(output, formatDistanceBasisExplanation(movement));
             appendLine(output, "Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption");
             appendLine(output, "CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)");
             appendLine(output, "CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg");
@@ -90,6 +93,22 @@ final class MovementTextFormatter {
             names.add(Passage.getDisplayName(passage));
         }
         return String.join(", ", names);
+    }
+
+    private static String formatDistanceBasisExplanation(MovementResult movement) {
+        String network = "Distance basis = maritime_network/road_network are network routes";
+        String calculated = "; circuity_estimate is a planning estimate; great_circle is straight-line";
+        boolean hasExternallyProvidedRoute = false;
+        for (LegResult leg : movement.legs()) {
+            if ("supplied".equals(leg.feature().properties().getDistanceBasis())) {
+                hasExternallyProvidedRoute = true;
+                break;
+            }
+        }
+
+        return hasExternallyProvidedRoute
+                ? network + "; supplied is an externally provided route result" + calculated
+                : network + calculated;
     }
 
     private static String formatCargo(MovementResult movement) {

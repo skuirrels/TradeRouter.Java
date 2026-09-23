@@ -104,4 +104,57 @@ class PassageRestrictionTests {
         assertThat(route.properties().getTraversedPassages()).doesNotContain(Passage.SUEZ);
         assertThat(route.properties().getTraversedPassages()).contains(Passage.SOUTH_AFRICA);
     }
+
+    @Test
+    void closingSuezOnlyRotterdamToYokohamaDoesNotOpenNorthwest() {
+        GeoJsonFeature viaCodes = TradeRoutes.calculate("NLRTM", "JPYOK", new TradeRouterOptions()
+                .setRestrictions(Passage.SUEZ)
+                .setReturnPassages(true));
+        GeoJsonFeature viaCoordinates = TradeRoutes.calculate(at("NLRTM"), at("JPYOK"), new TradeRouterOptions()
+                .setRestrictions(Passage.SUEZ)
+                .setReturnPassages(true));
+
+        for (GeoJsonFeature route : List.of(viaCodes, viaCoordinates)) {
+            assertThat(route.geometry()).isNotNull();
+            assertThat(route.properties().getTraversedPassages())
+                    .doesNotContain(Passage.NORTHWEST, Passage.BERING, Passage.SUEZ)
+                    .contains(Passage.PANAMA);
+        }
+    }
+
+    @Test
+    void allowNorthwestRotterdamToYokohamaUsesArcticLanes() {
+        GeoJsonFeature route = TradeRoutes.calculate(at("NLRTM"), at("JPYOK"), new TradeRouterOptions()
+                .setReturnPassages(true)
+                .setAllowNorthwest(true));
+
+        assertThat(route.properties().getTraversedPassages()).contains(Passage.NORTHWEST);
+    }
+
+    @Test
+    void allowNorthwestWhenNorthwestIsAlsoRestrictedKeepsItClosed() {
+        GeoJsonFeature route = TradeRoutes.calculate("NLRTM", "JPYOK", new TradeRouterOptions()
+                .setRestrictions(Passage.NORTHWEST)
+                .setAllowNorthwest(true)
+                .setReturnPassages(true));
+
+        assertThat(route.properties().getTraversedPassages()).doesNotContain(Passage.NORTHWEST);
+    }
+
+    @Test
+    void getClosedPassagesAddsNorthwestUnlessAllowed() {
+        TradeRouterOptions options = new TradeRouterOptions().setRestrictions(Passage.SUEZ);
+
+        assertThat(options.getRestrictions()).containsExactly(Passage.SUEZ);
+        assertThat(options.getClosedPassages()).containsExactlyInAnyOrder(Passage.SUEZ, Passage.NORTHWEST);
+
+        options.setAllowNorthwest(true);
+        TradeRouterOptions copy = options.copy();
+        assertThat(copy.isAllowNorthwest()).isTrue();
+        assertThat(copy.getClosedPassages()).containsExactly(Passage.SUEZ);
+    }
+
+    private static Coordinate at(String code) {
+        return TradeRoutes.locate(code).coordinate();
+    }
 }

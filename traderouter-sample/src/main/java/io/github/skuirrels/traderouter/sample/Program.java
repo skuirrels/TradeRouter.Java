@@ -9,8 +9,11 @@ import io.github.skuirrels.traderouter.common.Haversine;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
 import io.github.skuirrels.traderouter.graph.MaritimeGraph;
 import io.github.skuirrels.traderouter.movements.MovementPlan;
+import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
+import io.github.skuirrels.traderouter.movements.OsrmRoadRouteProvider;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
+import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.movements.Waypoint;
 import io.github.skuirrels.traderouter.passages.Passage;
@@ -18,6 +21,10 @@ import io.github.skuirrels.traderouter.ports.AreaFeature;
 import io.github.skuirrels.traderouter.ports.PortParameters;
 import io.github.skuirrels.traderouter.ports.PortProps;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +38,8 @@ import java.util.Locale;
 public final class Program {
     private Program() {
     }
+
+    private static final String OSRM_URL_VARIABLE = "TRADEROUTER_OSRM_URL";
 
     public static void main(String[] args) {
         boolean printGeoJson = Arrays.stream(args).anyMatch(arg -> arg.equalsIgnoreCase("--geojson"));
@@ -58,6 +67,15 @@ public final class Program {
                 new TradeRouterOptions().setRestrictions(Passage.SUEZ).setReturnPassages(true));
         print("2. AEJEA Jebel Ali to AGSJO St John's avoiding Suez",
                 n0(viaCape.properties().getLength()) + " km via " + passageNames(viaCape.properties().getTraversedPassages()));
+
+        // 2b. The Northwest Passage stays closed when you replace the restrictions; setAllowNorthwest opens it.
+        GeoJsonFeature suezClosed = TradeRoutes.calculate(at("NLRTM"), at("JPYOK"),
+                new TradeRouterOptions().setRestrictions(Passage.SUEZ).setReturnPassages(true));
+        GeoJsonFeature arctic = TradeRoutes.calculate(at("NLRTM"), at("JPYOK"),
+                new TradeRouterOptions().setReturnPassages(true).setAllowNorthwest(true));
+        print("2b. NLRTM Rotterdam to JPYOK Yokohama, Suez closed, then with AllowNorthwest",
+                n0(suezClosed.properties().getLength()) + " km via " + passageNames(suezClosed.properties().getTraversedPassages()) + "; "
+                        + n0(arctic.properties().getLength()) + " km via " + passageNames(arctic.properties().getTraversedPassages()));
 
         // 3. Port codes (UN/LOCODE) straight into the port-to-port overload.
         GeoJsonFeature portToPort = TradeRoutes.calculate("FRLEH", "CNTSN");
@@ -132,8 +150,9 @@ public final class Program {
                         + n1(finished.properties().getDurationHours()) + " h" + nl
                         + "   result         GeoJSON Feature, " + n0(finished.toJson().length()) + " characters");
 
-        // 10 to 12. Multi-leg movements built with the fluent plan. Sea legs are routed; road and air legs are straight lines.
-        //    Every code resolves from the embedded port list or UN/LOCODE list, so no coordinates are supplied.
+        // 10 to 15. Multi-leg movements built with the fluent plan. Sea legs use the maritime network; road legs use a
+        //    configured provider or the labelled built-in circuity estimate. Air legs use great-circle distance.
+        //    Every code resolves from the embedded port list or UN/LOCODE list, so examples do not embed coordinates.
         //    Gatwick (GBLGW), Shanghai Railway Station (CNSHZ) and Melrose (AUMRS) have no coordinates in the UNECE
         //    list; the library's supplement file fills them from cited sources. AUMRS is Melrose, an inland South
         //    Australian town about 800 km from Melbourne, so its delivery leg is by road.
@@ -157,21 +176,82 @@ public final class Program {
                         .deliverTo(Waypoint.place("AUMRS"), TransportMode.ROAD),
                 12.0, 2.0);
 
-        printMovement(
-                "12. Movement with an air leg",
-                MovementPlan
-                        .from(Waypoint.place("GBLGW"))
-                        .pickupTo(Waypoint.airport("GBLHR"), TransportMode.ROAD)
-                        .thenTo(Waypoint.airport("AUMEL"), TransportMode.AIR)
-                        .deliverTo(Waypoint.place("AUMRS"), TransportMode.ROAD),
-                20.0, null);
+        MovementPlan airPlan = MovementPlan
+                .from(Waypoint.place("GBLGW"))
+                .pickupTo(Waypoint.airport("GBLHR"), TransportMode.ROAD)
+                .thenTo(Waypoint.airport("AUMEL"), TransportMode.AIR)
+                .deliverTo(Waypoint.place("AUMRS"), TransportMode.ROAD);
+        MovementRequest airRequest = MovementRequest.of(airPlan)
+                .setSeaOptions(new TradeRouterOptions().setReturnPassages(true))
+                .setCargoTonnes(20.0)
+                .setRoadRoutingMode(RoadRoutingMode.ESTIMATE_ONLY);
+        printMovementResult("12. Movement with an air leg using built-in road estimates", TradeRoutes.calculateMovement(airRequest));
+
+        MovementPlan roadPlan = MovementPlan
+                .from(Waypoint.place("GBLGW"))
+                .pickupTo(Waypoint.airport("GBLHR"), TransportMode.ROAD);
+        MovementRequest estimatedRoadRequest = MovementRequest.of(roadPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRoutingMode(RoadRoutingMode.ESTIMATE_ONLY);
+        printMovementResult("13. Gatwick to Heathrow using the built-in road estimate", TradeRoutes.calculateMovement(estimatedRoadRequest));
+
+        String osrmUrl = System.getenv(OSRM_URL_VARIABLE);
+        if (osrmUrl == null || osrmUrl.isBlank()) {
+            String skippedOsrm = "Skipped: set " + OSRM_URL_VARIABLE + "=http://127.0.0.1:5000 after starting OSRM as shown in the README.";
+            print("14. Gatwick to Heathrow using an OSRM container", skippedOsrm);
+            print("15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container", skippedOsrm);
+            return;
+        }
+
+        URI osrmBaseUri;
+        try {
+            osrmBaseUri = new URI(osrmUrl.trim());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(OSRM_URL_VARIABLE + " must be an absolute HTTP or HTTPS URI. Received: " + osrmUrl, e);
+        }
+        if (!osrmBaseUri.isAbsolute()) {
+            throw new IllegalArgumentException(OSRM_URL_VARIABLE + " must be an absolute HTTP or HTTPS URI. Received: " + osrmUrl);
+        }
+
+        HttpClient osrmHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+        var osrmRoadRouteProvider = new OsrmRoadRouteProvider(
+                osrmHttpClient,
+                osrmBaseUri,
+                OsrmRoadRouteProvider.DEFAULT_PROFILE,
+                System.getenv("TRADEROUTER_OSRM_DATA_VERSION"),
+                OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
+                Duration.ofSeconds(5));
+        MovementRequest osrmRoadRequest = MovementRequest.of(roadPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRouteProvider(osrmRoadRouteProvider)
+                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+        printMovementResult("14. Gatwick to Heathrow using an OSRM container", TradeRoutes.calculateMovementAsync(osrmRoadRequest).join());
+
+        MovementPlan capeTownToGuildfordPlan = MovementPlan
+                .from(Waypoint.place("ZACPT"))
+                .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
+                .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
+                .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
+        MovementRequest capeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRouteProvider(osrmRoadRouteProvider)
+                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+        printMovementResult(
+                "15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container",
+                TradeRoutes.calculateMovementAsync(capeTownToGuildfordRequest).join());
     }
 
     private static void printMovement(String title, MovementPlan plan, Double tonnes, Double teu) {
         // CO2e per leg uses GLEC well-to-wheel defaults per mode. With a TEU count, sea legs are charged per
         // container (76 g per TEU-km) rather than per tonne, so a light box is not under-counted.
-        MovementResult movement = TradeRoutes.calculateMovement(plan, new TradeRouterOptions().setReturnPassages(true), tonnes, teu);
+        MovementRequest request = MovementRequest.of(plan)
+                .setSeaOptions(new TradeRouterOptions().setReturnPassages(true))
+                .setCargoTonnes(tonnes)
+                .setCargoTeu(teu);
+        printMovementResult(title, TradeRoutes.calculateMovement(request));
+    }
 
+    private static void printMovementResult(String title, MovementResult movement) {
         System.out.println();
         System.out.println(title);
         System.out.println(movement.toText());

@@ -30,6 +30,7 @@ class MovementTextTests {
 
         assertThat(text).startsWith("Leg Kind");
         assertThat(text).contains("Modelled transit time");
+        assertThat(text).contains("Distance basis");
         assertThat(text).contains("Pickup    Road  GBLGW  GBFXT");
         assertThat(text).contains("Main      Sea   GBFXT  SGSIN");
         assertThat(text).contains("Delivery  Road  AUMEL  AUMRS");
@@ -40,6 +41,8 @@ class MovementTextTests {
         assertThat(text).contains("port handling");
         assertThat(text).contains("connections");
         assertThat(text).contains("planning lower bound");
+        assertThat(text).contains("circuity_estimate is a planning estimate");
+        assertThat(text).doesNotContain("supplied is");
         assertThat(text).contains(String.format(Locale.ROOT, "%,.0f", result.totalLength()));
         assertThat(text).contains(String.format(Locale.ROOT, "%,.1f", result.totalTransitHours()));
         assertThat(text).contains(String.format(Locale.ROOT, "%,.0f", result.totalCo2eKg()));
@@ -61,15 +64,18 @@ class MovementTextTests {
         String[] lines = result.toText().split("\n");
 
         assertThat(lines[0]).isEqualTo(
-                "Leg Kind      Mode  From   To      Distance      Modelled transit time       CO2e rate  CO2e per tonne  CO2e total   Basis  Choke points");
+                "Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total   Basis  Choke points");
         assertThat(lines[1]).isEqualTo(
-                "                                                                 hours      g per t-km  kg per t cargo          kg");
-        assertThat(lines[2]).startsWith("1   Pickup    Road  GBLGW  GBFXT        139 km");
+                "                                                                                   hours      g per t-km  kg per t cargo          kg");
+        assertThat(lines[2]).startsWith("1   Pickup    Road  GBLGW  GBFXT        183 km   circuity_estimate");
         assertThat(lines[2]).endsWith("tonnes  ");
         assertThat(lines[3]).endsWith("teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca");
-        assertThat(lines[6]).startsWith("Total                                23,670 km");
+        assertThat(lines[3]).startsWith("2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network");
+        assertThat(lines[6]).startsWith("Total                                23,896 km");
         assertThat(lines[6]).endsWith("for 12 t of cargo in 2 TEU");
-        assertThat(lines[7]).startsWith("Modelled minimum = 782.3 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,303.0 h (54.3 days)");
+        assertThat(lines[7]).startsWith("Modelled minimum = 786.0 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,306.7 h (54.4 days)");
+        assertThat(lines[8]).isEqualTo(
+                "Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line");
     }
 
     @Test

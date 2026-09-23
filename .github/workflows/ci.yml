@@ -20,6 +20,9 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Reject hard-coded sample road routes
+        run: ./scripts/check-no-hardcoded-sample-routes.sh
+
       - name: Build, test and package
         run: mvn -B --no-transfer-progress verify
 

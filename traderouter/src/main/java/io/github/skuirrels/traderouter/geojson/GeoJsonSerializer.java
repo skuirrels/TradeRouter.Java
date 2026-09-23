@@ -53,6 +53,14 @@ final class GeoJsonSerializer {
         writer.name("length").value(p.getLength());
         writer.name("units").value(p.getUnits());
         writer.name("duration_hours").value(p.getDurationHours());
+        optional(writer, "distance_basis", p.getDistanceBasis());
+        optional(writer, "straight_line_length", p.getStraightLineLength());
+        optional(writer, "distance_source", p.getDistanceSource());
+        optional(writer, "routing_profile", p.getRoutingProfile());
+        optional(writer, "routing_data_version", p.getRoutingDataVersion());
+        optional(writer, "duration_basis", p.getDurationBasis());
+        optional(writer, "geometry_basis", p.getGeometryBasis());
+        optional(writer, "distance_warning", p.getDistanceWarning());
         if (p.getPortOrigin() != null) {
             writer.name("port_origin");
             writePort(writer, p.getPortOrigin());

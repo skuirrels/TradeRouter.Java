@@ -26,6 +26,11 @@ public final class MovementRequest {
     private Double seaOperationalAllowance;
     private double transshipmentConnectionHours = 48.0;
     private final Map<TransportMode, Double> speedsKmh = new EnumMap<>(TransportMode.class);
+    private RoadRouteProvider roadRouteProvider;
+    private RoadRoutingMode roadRoutingMode = RoadRoutingMode.PREFER_NETWORK_THEN_ESTIMATE;
+    private RoadDurationMode roadDurationMode = RoadDurationMode.CONFIGURED_SPEED;
+    private RoadDistanceEstimator roadDistanceEstimator = DistanceDecayRoadDistanceEstimator.getDefault();
+    private final Map<Integer, SuppliedRoadRoute> roadRouteOverrides = new TreeMap<>();
 
     /** Creates an empty request. */
     public MovementRequest() {
@@ -204,6 +209,76 @@ public final class MovementRequest {
     /** Sets the speed for a non-sea mode. */
     public MovementRequest setSpeedKmh(TransportMode mode, double speedKmh) {
         speedsKmh.put(mode, speedKmh);
+        return this;
+    }
+
+    /**
+     * Optional road-network provider, such as {@link OsrmRoadRouteProvider}, or null. It is used only by
+     * {@code calculateMovementAsync}; synchronous movement calculation rejects a request that expects to call it.
+     */
+    public RoadRouteProvider getRoadRouteProvider() {
+        return roadRouteProvider;
+    }
+
+    /** Sets the road-network provider. */
+    public MovementRequest setRoadRouteProvider(RoadRouteProvider roadRouteProvider) {
+        this.roadRouteProvider = roadRouteProvider;
+        return this;
+    }
+
+    /** Controls provider use and fallback behaviour for road legs. */
+    public RoadRoutingMode getRoadRoutingMode() {
+        return roadRoutingMode;
+    }
+
+    /** Sets the road routing mode. */
+    public MovementRequest setRoadRoutingMode(RoadRoutingMode roadRoutingMode) {
+        this.roadRoutingMode = roadRoutingMode;
+        return this;
+    }
+
+    /**
+     * Controls road travelling-time calculation. The default uses routed or estimated distance divided by the
+     * road entry of {@link #getSpeedsKmh()}. Set {@link RoadDurationMode#ROUTE_DURATION_WHEN_AVAILABLE} to
+     * prefer a duration returned by a route provider or authoritative imported route.
+     */
+    public RoadDurationMode getRoadDurationMode() {
+        return roadDurationMode;
+    }
+
+    /** Sets the road duration mode. */
+    public MovementRequest setRoadDurationMode(RoadDurationMode roadDurationMode) {
+        this.roadDurationMode = roadDurationMode;
+        return this;
+    }
+
+    /**
+     * Deterministic fallback used when a road-network route is not configured or lies outside its coverage.
+     * Defaults to a calibrated distance-decay circuity model. Set a different implementation to override it.
+     */
+    public RoadDistanceEstimator getRoadDistanceEstimator() {
+        return roadDistanceEstimator;
+    }
+
+    /** Sets the fallback road-distance estimator. */
+    public MovementRequest setRoadDistanceEstimator(RoadDistanceEstimator roadDistanceEstimator) {
+        this.roadDistanceEstimator = roadDistanceEstimator;
+        return this;
+    }
+
+    /**
+     * Complete road results imported from an authoritative upstream routing system, keyed by one-based leg
+     * sequence. These take precedence over both a configured provider and the fallback estimator. Do not use
+     * fixed literals here to force an expected result; application and sample code should use the estimator or
+     * a configured provider. The map is live and may be modified.
+     */
+    public Map<Integer, SuppliedRoadRoute> getRoadRouteOverrides() {
+        return roadRouteOverrides;
+    }
+
+    /** Adds an imported road result for a one-based leg sequence. */
+    public MovementRequest putRoadRouteOverride(int sequence, SuppliedRoadRoute route) {
+        roadRouteOverrides.put(sequence, route);
         return this;
     }
 }

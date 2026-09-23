@@ -4,14 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.common.DistanceUnit;
+import io.github.skuirrels.traderouter.data.EmbeddedResources;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
 import io.github.skuirrels.traderouter.geojson.GeoJsonMultiLineString;
 import io.github.skuirrels.traderouter.passages.Passage;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 
 class RoutingTests {
@@ -21,7 +26,7 @@ class RoutingTests {
     void readmePortCodeRouteAcceptsOptionsWithoutCoordinateFallback() {
         GeoJsonFeature route = TradeRoutes.calculate(
                 "AEJEA",
-                "AGSJS",
+                "AGSJO",
                 new TradeRouterOptions()
                         .setRestrictions(Passage.SUEZ)
                         .setReturnPassages(true));
@@ -31,6 +36,45 @@ class RoutingTests {
         assertThat(route.properties().getTraversedPassages()).contains(Passage.ORMUZ);
         assertThat(route.properties().getTraversedPassages()).contains(Passage.SOUTH_AFRICA);
         assertThat(route.properties().getTraversedPassages()).doesNotContain(Passage.SUEZ);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "AGSJO, AGSJS", // Saint John's, Antigua
+            "JOAQJ, JOAQB"  // Aqaba
+    })
+    void portCodeRouteOfficialUnLocodeResolvesThroughItsAlias(String officialCode, String portListCode) {
+        assertThat(DefaultTradeRouterEngine.getDefault().ports().getByCode(officialCode))
+                .as("the port list holds this port under another code")
+                .isNull();
+
+        GeoJsonFeature viaAlias = TradeRoutes.calculate("AEJEA", officialCode);
+        GeoJsonFeature direct = TradeRoutes.calculate("AEJEA", portListCode);
+
+        assertThat(viaAlias.properties().getPortDest().portCode()).isEqualTo(portListCode);
+        assertThat(viaAlias.properties().getLength()).isEqualTo(direct.properties().getLength());
+    }
+
+    @Test
+    void portCodeAliasesEachNameAnOfficialSeaPortAndOneUnambiguousPortRecord() {
+        Map<String, String> aliases = EmbeddedResources.loadPortCodeAliases();
+        assertThat(aliases).hasSizeGreaterThan(50);
+        DefaultTradeRouterEngine engine = DefaultTradeRouterEngine.getDefault();
+
+        aliases.forEach((code, portCode) -> {
+            assertThat(engine.ports().getByCodeCandidates(code)).as("%s must not shadow a port-list record", code).isEmpty();
+            assertThat(engine.unLocodes().getByCode(code).isSeaPort()).as("%s must be a UN/LOCODE sea port", code).isTrue();
+            assertThat(engine.unLocodes().getByCode(portCode)).as("%s is aliased only because UN/LOCODE lacks it", portCode).isNull();
+            assertThat(engine.ports().getByCodeCandidates(portCode)).as("%s must map to one %s record", code, portCode).hasSize(1);
+        });
+    }
+
+    @Test
+    void portCodeRouteUnknownCodeStillThrows() {
+        assertThatThrownBy(() -> TradeRoutes.calculate("AEJEA", "XXZZZ"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("XXZZZ")
+                .hasMessageContaining("not found");
     }
 
     @Test

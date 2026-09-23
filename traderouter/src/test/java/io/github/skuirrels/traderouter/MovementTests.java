@@ -14,13 +14,17 @@ import io.github.skuirrels.traderouter.movements.LocationResolver;
 import io.github.skuirrels.traderouter.movements.MovementFormatException;
 import io.github.skuirrels.traderouter.movements.MovementLeg;
 import io.github.skuirrels.traderouter.movements.MovementParser;
+import io.github.skuirrels.traderouter.movements.MovementPlan;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
 import io.github.skuirrels.traderouter.movements.TransportMode;
+import io.github.skuirrels.traderouter.movements.Waypoint;
 import io.github.skuirrels.traderouter.passages.Passage;
 import io.github.skuirrels.traderouter.ports.Port;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 import java.util.Locale;
@@ -102,7 +106,8 @@ class MovementTests {
         LegResult pickup = result.legs().get(0);
         assertThat(pickup.leg().mode()).isEqualTo(TransportMode.ROAD);
         assertThat(pickup.feature().geometry().positions()).hasSize(2);
-        assertThat(pickup.length()).isBetween(120.0, 160.0);
+        assertThat(pickup.length()).isBetween(160.0, 210.0);
+        assertThat(pickup.feature().properties().getDistanceBasis()).isEqualTo("circuity_estimate");
         assertThat(pickup.durationHours()).isCloseTo(pickup.length() / 60.0, within(1e-6));
         assertThat(pickup.to().port()).isNotNull();
         assertThat(pickup.to().port().name()).isEqualTo("Felixstowe");
@@ -193,11 +198,11 @@ class MovementTests {
 
     @Test
     void movementCodeKnownToUnLocodeButUncoordinatedThrowsWithItsName() {
-        // AUDND is Dandenong: UNECE lists it without coordinates and it is not in the port list.
-        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Delivery from port AUMEL to place AUDND Road"))
+        // Khalidia has no coordinate in UNECE or a verified supplement, and is not in the port list.
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Delivery from port AEJEA to place AEKHA Road"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("AUDND")
-                .hasMessageContaining("Dandenong")
+                .hasMessageContaining("AEKHA")
+                .hasMessageContaining("Khalidia")
                 .hasMessageContaining("no coordinates");
     }
 
@@ -212,7 +217,30 @@ class MovementTests {
                 .as("Melrose is in South Australia, not near Melbourne")
                 .isCloseTo(-32.817, within(0.01));
 
+        UnLocode guildford = engine().unLocodes().getByCode("GBGDD");
+        assertThat(guildford.coordinate()).isEqualTo(new Coordinate(-0.577344, 51.234683));
+        assertThat(guildford.coordinateSource()).startsWith("OpenStreetMap Wiki");
+
+        ResolvedLocation resolvedGuildford = TradeRoutes.locate("GBGDD");
+        assertThat(resolvedGuildford.name()).isEqualTo("Guildford");
+        assertThat(resolvedGuildford.coordinate()).isEqualTo(guildford.coordinate());
+        assertThat(resolvedGuildford.source()).isEqualTo("unlocode");
+
         assertThat(engine().unLocodes().getByCode("SGSIN").coordinateSource()).isEqualTo("UNECE");
+    }
+
+    @Test
+    void movementGeoNamesSupplementResolvesLightwaterByUnLocode() {
+        var database = engine().unLocodes();
+        UnLocode lightwater = database.getByCode("GBLGE");
+        assertThat(lightwater.name()).isEqualTo("Lightwater");
+        assertThat(lightwater.coordinate()).isEqualTo(new Coordinate(-0.67147, 51.34846));
+        assertThat(lightwater.coordinateSource()).isEqualTo("GeoNames (geonameId 7116406)");
+
+        ResolvedLocation resolved = TradeRoutes.locate("GBLGE");
+        assertThat(resolved.source()).isEqualTo("unlocode");
+        assertThat(resolved.coordinate()).isEqualTo(lightwater.coordinate());
+        assertThat(database.countWithCoordinates()).isEqualTo(102_287);
     }
 
     @Test
@@ -223,6 +251,36 @@ class MovementTests {
                 .hasMessageContaining("CNTSN")
                 .hasMessageContaining("declared as Port")
                 .hasMessageContaining("airport");
+    }
+
+    @ParameterizedTest
+    // Alumar, Sao Luis and Duncan Bay, Campbell River: UN/LOCODE records only a road terminal for each.
+    @ValueSource(strings = {"BRALU", "CADCN"})
+    void movementAcceptsSeaPortConfirmedBySupplement(String code) {
+        assertThat(engine().unLocodes().getByCode(code).isSeaPort()).isTrue();
+
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.port("NLRTM"))
+                .thenTo(Waypoint.port(code), TransportMode.SEA);
+        MovementResult result = TradeRoutes.calculateMovement(plan);
+
+        ResolvedLocation destination = result.legs().get(0).to();
+        assertThat(destination.source()).isEqualTo("ports");
+        assertThat(destination.port().portCode()).isEqualTo(code);
+        assertThat(result.legs().get(0).length()).isGreaterThan(0.0);
+    }
+
+    @Test
+    void movementStillRejectsInlandPortListRecordAsSeaPort() {
+        // Calgary is in the port list as an inland terminal 650 km from the nearest lane point.
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.port("USSEA"))
+                .thenTo(Waypoint.port("CACAL"), TransportMode.SEA);
+
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement(plan))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("CACAL")
+                .hasMessageContaining("declared as Port");
     }
 
     @Test
@@ -257,7 +315,7 @@ class MovementTests {
 
         assertThat(result.legs().get(0).from().source()).isEqualTo("resolver");
         assertThat(result.legs().get(0).from().name()).isEqualTo("London");
-        assertThat(result.legs().get(0).length()).isBetween(100.0, 140.0);
+        assertThat(result.legs().get(0).length()).isBetween(130.0, 170.0);
     }
 
     @Test
@@ -345,7 +403,7 @@ class MovementTests {
         MovementResult result = engine().calculateMovement(request);
 
         assertThat(result.legs().get(0).from().source()).isEqualTo("coordinates");
-        assertThat(result.legs().get(0).length()).isBetween(100.0, 140.0);
+        assertThat(result.legs().get(0).length()).isBetween(130.0, 170.0);
     }
 
     @Test

@@ -49,6 +49,9 @@ public final class SeaServiceAllowance {
         fractions.put("transpacific", 0.12);        // no passage, East Asia to the Americas: CNSHA–USLAX, VNSGN–USLAX
         fractions.put("panama", 0.24);              // Panama: CNSHA–USNYC
         fractions.put("transatlantic", 0.80);       // no passage, Europe or Africa to the Americas: NLRTM–USNYC
+        fractions.put("asia-north-europe-cape", 0.22);  // no Suez, Asia to North Europe: the four asia-north-europe lanes on the Cape route
+        fractions.put("asia-mediterranean-cape", 0.37); // no Suez, Asia to the Mediterranean: the two asia-mediterranean lanes on the Cape route
+        fractions.put("gulf-europe-cape", 0.46);        // no Suez, Hormuz and the Cape: AEJEA–NLRTM on the Cape route
         fractions.put(DEFAULT_CORRIDOR, DEFAULT_FRACTION);
         FRACTIONS = Collections.unmodifiableMap(fractions);
     }
@@ -75,16 +78,29 @@ public final class SeaServiceAllowance {
         double lonFrom = from.withNormalizedLongitude().longitude();
         double lonTo = to.withNormalizedLongitude().longitude();
 
+        boolean panama = passages.contains(Passage.PANAMA);
+        boolean americanEnd = inAmericas(lonFrom) || inAmericas(lonTo);
+        boolean europeanEnd = inEurope(lonFrom, from.latitude()) || inEurope(lonTo, to.latitude());
+        boolean eastAsianEnd = lonFrom >= 90.0 || lonTo >= 90.0;
+
         String corridor;
-        if (passages.contains(Passage.PANAMA)) {
+        if (panama && americanEnd) {
             corridor = "panama";
         } else if (suez && passages.contains(Passage.ORMUZ)) {
             corridor = "gulf-europe";
         } else if (suez && eastOfIndia) {
             // Through Gibraltar the leg ends in North Europe, or beyond it in the Americas, which is unfitted.
             corridor = passages.contains(Passage.GIBRALTAR)
-                    ? (inAmericas(lonFrom) || inAmericas(lonTo) ? DEFAULT_CORRIDOR : "asia-north-europe")
+                    ? (americanEnd ? DEFAULT_CORRIDOR : "asia-north-europe")
                     : "asia-mediterranean";
+        } else if (!suez && europeanEnd && passages.contains(Passage.SOUTH_AFRICA) && passages.contains(Passage.ORMUZ)) {
+            corridor = "gulf-europe-cape";
+        } else if (!suez && europeanEnd && !americanEnd
+                && ((eastOfIndia && passages.contains(Passage.SOUTH_AFRICA)) || (panama && eastAsianEnd))) {
+            // Asia–Europe services that avoid Suez sail round the Cape. A leg the router sends through Panama,
+            // because the caller closed Suez but not Panama, is a similar distance and takes the same corridor.
+            // Round the Cape only the Mediterranean is reached through Gibraltar.
+            corridor = passages.contains(Passage.GIBRALTAR) ? "asia-mediterranean-cape" : "asia-north-europe-cape";
         } else if (!suez && crossesPacific(lonFrom, lonTo)) {
             corridor = "transpacific";
         } else if (!suez && crossesAtlantic(lonFrom, lonTo)) {
@@ -108,6 +124,12 @@ public final class SeaServiceAllowance {
 
     private static boolean inEuropeOrAfrica(double lon) {
         return lon >= -30.0 && lon <= 60.0;
+    }
+
+    // Europe, including the Mediterranean and Black Sea coasts, lies north of 30°N between 30°W and 42°E.
+    // The bound keeps West Africa, the Red Sea and the Gulf out.
+    private static boolean inEurope(double lon, double lat) {
+        return lat >= 30.0 && lon >= -30.0 && lon <= 42.0;
     }
 
     private static boolean inAmericas(double lon) {

@@ -1,0 +1,5 @@
+# extract-name	download-url	bounding-box-left,bottom,right,top	readiness-probe-lon,lat
+# Covers Gatwick, Heathrow, Guildford and Felixstowe.
+england-latest	https://download.geofabrik.de/europe/united-kingdom/england-latest.osm.pbf	-1.0,50.8,1.8,52.2	-0.19028,51.14806
+# Covers the Cape Town to Johannesburg road corridor.
+south-africa-latest	https://download.geofabrik.de/africa/south-africa-latest.osm.pbf	17.0,-35.0,29.5,-25.0	18.430982,-33.945702

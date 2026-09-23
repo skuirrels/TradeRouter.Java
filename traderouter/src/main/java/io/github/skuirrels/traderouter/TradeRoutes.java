@@ -13,6 +13,7 @@ import io.github.skuirrels.traderouter.movements.ResolvedLocation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Static entry point for calculating maritime sea routes between any two points on Earth. Wraps
@@ -161,6 +162,11 @@ public final class TradeRoutes {
     /** Routes a multi-leg movement request. */
     public static MovementResult calculateMovement(MovementRequest request) {
         return getEngine().calculateMovement(request);
+    }
+
+    /** Routes a multi-leg movement asynchronously, allowing a configured road-network provider to be called. */
+    public static CompletableFuture<MovementResult> calculateMovementAsync(MovementRequest request) {
+        return getEngine().calculateMovementAsync(request);
     }
 
     /** Resolves a UN/LOCODE to a position from the embedded port list and UN/LOCODE list. */
