@@ -19,7 +19,7 @@ var route = TradeRoutes.calculate(
 
 System.out.printf("%,.0f %s, %,.0f h%n",
     route.properties().getLength(), route.properties().getUnits(), route.properties().getDurationHours());
-// 10,997 km, 371 h
+// 11,000 km, 371 h
 ```
 
 ### Complete multi-leg movement
