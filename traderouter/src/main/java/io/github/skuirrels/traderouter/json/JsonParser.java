@@ -12,8 +12,15 @@ import java.util.Map;
  * and null {@code null}.
  */
 public final class JsonParser {
+    /**
+     * Deepest nesting of objects and arrays accepted, matching the System.Text.Json default used by TradeRouter.Net.
+     * Deeper input is rejected with {@link IllegalArgumentException} instead of exhausting the stack.
+     */
+    public static final int MAX_DEPTH = 64;
+
     private final String text;
     private int pos;
+    private int depth;
 
     private JsonParser(String text) {
         this.text = text;
@@ -131,10 +138,12 @@ public final class JsonParser {
 
     private Map<String, Object> readObject() {
         Map<String, Object> result = new LinkedHashMap<>();
+        enterContainer();
         pos++; // {
         skipWhitespace();
         if (peek() == '}') {
             pos++;
+            depth--;
             return result;
         }
         while (true) {
@@ -158,6 +167,7 @@ public final class JsonParser {
             }
             if (c == '}') {
                 pos++;
+                depth--;
                 return result;
             }
             throw error("Expected ',' or '}'");
@@ -166,10 +176,12 @@ public final class JsonParser {
 
     private List<Object> readArray() {
         List<Object> result = new ArrayList<>();
+        enterContainer();
         pos++; // [
         skipWhitespace();
         if (peek() == ']') {
             pos++;
+            depth--;
             return result;
         }
         while (true) {
@@ -183,9 +195,16 @@ public final class JsonParser {
             }
             if (c == ']') {
                 pos++;
+                depth--;
                 return result;
             }
             throw error("Expected ',' or ']'");
+        }
+    }
+
+    private void enterContainer() {
+        if (++depth > MAX_DEPTH) {
+            throw error("JSON nesting exceeds the maximum depth of " + MAX_DEPTH);
         }
     }
 

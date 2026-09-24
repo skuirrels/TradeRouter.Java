@@ -44,6 +44,21 @@ class JsonTests {
     }
 
     @Test
+    void parserLimitsNestingDepthInsteadOfOverflowingTheStack() {
+        int max = JsonParser.MAX_DEPTH;
+        assertThat(JsonParser.parse("[".repeat(max) + "]".repeat(max))).isInstanceOf(List.class);
+        assertThat(JsonParser.parse("{\"a\":".repeat(max) + "1" + "}".repeat(max))).isInstanceOf(Map.class);
+        assertThat(JsonParser.parse("[[1],[2],[3]]")).isInstanceOf(List.class);
+
+        assertThatThrownBy(() -> JsonParser.parse("[".repeat(max + 1) + "]".repeat(max + 1)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("maximum depth");
+        assertThatThrownBy(() -> JsonParser.parse("[".repeat(200_000)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("maximum depth");
+    }
+
+    @Test
     void writerProducesCompactAndIndentedJsonThatJacksonAccepts() throws Exception {
         String compact = sample(false);
         String indented = sample(true);

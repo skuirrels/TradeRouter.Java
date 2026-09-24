@@ -408,6 +408,18 @@ class RoadRoutingTests {
     }
 
     @Test
+    void osrmProviderReportsDeeplyNestedJsonAsUnavailable() throws IOException {
+        try (StubOsrm osrm = new StubOsrm(200, "[".repeat(200_000))) {
+            var provider = new OsrmRoadRouteProvider(HttpClient.newHttpClient(), osrm.uri());
+
+            RoadRouteResult result = provider.routeAsync(directProviderRequest()).join();
+
+            assertThat(result.status()).isEqualTo(RoadRouteStatus.UNAVAILABLE);
+            assertThat(result.message()).startsWith("OSRM returned invalid JSON").contains("maximum depth");
+        }
+    }
+
+    @Test
     void osrmProviderNormalizesLongitudesForTheHttpApi() throws IOException {
         try (StubOsrm osrm = new StubOsrm(400, "{\"code\":\"NoSegment\"}")) {
             var provider = new OsrmRoadRouteProvider(HttpClient.newHttpClient(), osrm.uri());
