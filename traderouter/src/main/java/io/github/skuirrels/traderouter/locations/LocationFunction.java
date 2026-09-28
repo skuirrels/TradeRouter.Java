@@ -51,7 +51,7 @@ public enum LocationFunction {
         return BY_FLAGS[flags & 0xFF];
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static Set<LocationFunction>[] buildFlagSets() {
         Set<LocationFunction>[] sets = new Set[256];
         for (int flags = 0; flags < sets.length; flags++) {
