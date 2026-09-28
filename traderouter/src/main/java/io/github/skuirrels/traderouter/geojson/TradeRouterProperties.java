@@ -393,7 +393,11 @@ public final class TradeRouterProperties {
         return this;
     }
 
-    /** How {@link #getCo2eKg()} was derived: "tonnes", "teu", or "teu_average_weight". JSON: {@code co2e_basis}. */
+    /**
+     * How {@link #getCo2eKg()} was derived: "tonnes", "teu", or "teu_average_weight" when the leg was charged at the
+     * GLEC average of 10 t per TEU (no weight given, or a road or rail leg whose stated weight is below that average).
+     * JSON: {@code co2e_basis}.
+     */
     public String getCo2eBasis() {
         return co2eBasis;
     }

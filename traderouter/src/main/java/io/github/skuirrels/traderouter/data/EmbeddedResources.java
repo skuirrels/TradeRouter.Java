@@ -88,13 +88,12 @@ public final class EmbeddedResources {
             var functions = LocationFunction.fromFlags(flags);
             String coordinateSource = coordinate != null ? "UNECE" : "";
 
-            // The supplement only fills codes UNECE publishes without coordinates; it never overrides UNECE.
-            if (coordinate == null) {
-                Supplement extra = supplement.get(code.toUpperCase(Locale.ROOT));
-                if (extra != null) {
-                    coordinate = extra.coordinate();
-                    coordinateSource = extra.source();
-                }
+            // The supplement fills codes UNECE publishes without coordinates; a reviewed row also replaces a UNECE
+            // coordinate its source shows to be wrong. Generated GeoNames rows exist only for missing codes.
+            Supplement extra = supplement.get(code.toUpperCase(Locale.ROOT));
+            if (extra != null) {
+                coordinate = extra.coordinate();
+                coordinateSource = extra.source();
             }
 
             entries.add(new UnLocode(code, name, coordinate, functions, coordinateSource));

@@ -13,10 +13,11 @@ final class MovementTextFormatter {
     private MovementTextFormatter() {
     }
 
+    // The Basis column fits the longest basis, "teu_average_weight", with a space before it.
     static String format(MovementResult movement, boolean includeExplanations) {
         StringBuilder output = new StringBuilder();
         appendLine(output, String.format(Locale.ROOT,
-                "%-4s%-10s%-6s%-7s%-7s%9s %20s%24s%16s%16s%12s%8s  Choke points",
+                "%-4s%-10s%-6s%-7s%-7s%9s %20s%24s%16s%16s%12s%20s  Choke points",
                 "Leg", "Kind", "Mode", "From", "To", "Distance", "Distance basis", "Modelled transit time", "CO2e rate",
                 "CO2e per tonne", "CO2e total", "Basis"));
         appendLine(output, String.format(Locale.ROOT,
@@ -25,7 +26,7 @@ final class MovementTextFormatter {
 
         for (LegResult leg : movement.legs()) {
             appendLine(output, String.format(Locale.ROOT,
-                    "%-4d%-10s%-6s%-7s%-7s%9s %s%20s%24s%16s%16s%12s%8s  %s",
+                    "%-4d%-10s%-6s%-7s%-7s%9s %s%20s%24s%16s%16s%12s%20s  %s",
                     leg.sequence(),
                     leg.leg().kind().displayName(),
                     leg.leg().mode().displayName(),
@@ -43,7 +44,7 @@ final class MovementTextFormatter {
         }
 
         appendLine(output, String.format(Locale.ROOT,
-                "%-34s%9s %s%20s%24s%16s%16s%12s%8s  %s",
+                "%-34s%9s %s%20s%24s%16s%16s%12s%20s  %s",
                 "Total",
                 n0(movement.totalLength()),
                 movement.units(),
@@ -153,7 +154,8 @@ final class MovementTextFormatter {
             }
         }
         String rate = seaRate != null ? n0(seaRate) : "the configured";
-        return "CO2e total     = kg of CO2e for this shipment: cargo weight on non-sea legs, " + rate + " g per TEU-km on sea legs";
+        return "CO2e total     = kg of CO2e for this shipment: " + rate
+                + " g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs";
     }
 
     private static void appendLine(StringBuilder output, String line) {

@@ -99,7 +99,11 @@ public final class LegResult {
         return properties().getCo2eKg();
     }
 
-    /** Basis of {@link #co2eKg()}: "tonnes", "teu" or "teu_average_weight", or null. */
+    /**
+     * Basis of {@link #co2eKg()}: "tonnes", "teu", or "teu_average_weight" when the leg was charged at the GLEC
+     * average of 10 t per TEU (no weight given, or a road or rail leg whose stated weight is below that average);
+     * null without a cargo measurement.
+     */
     public String co2eBasis() {
         return properties().getCo2eBasis();
     }

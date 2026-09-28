@@ -448,7 +448,15 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             return;
         }
 
-        if (request.getCargoTonnes() != null) {
+        // Road and rail legs of a containerised movement are charged per container too: a light box still needs a
+        // whole truck or wagon slot, and the per-tonne default factors assume an average load (GLEC Framework,
+        // road load factor guidance). The stated weight is used only when it exceeds the average for the TEU count.
+        // Air is not containerised in TEU terms and keeps the stated weight.
+        Double containerTonnes = request.getCargoTeu() != null && (mode == TransportMode.ROAD || mode == TransportMode.RAIL)
+                ? request.getCargoTeu() * factors.getAverageTonnesPerTeu()
+                : null;
+
+        if (request.getCargoTonnes() != null && !(containerTonnes != null && containerTonnes > request.getCargoTonnes())) {
             properties.setCo2eKg(kgPerTonne * request.getCargoTonnes());
             properties.setCo2eBasis("tonnes");
         } else if (request.getCargoTeu() != null) {

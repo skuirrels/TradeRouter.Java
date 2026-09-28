@@ -24,6 +24,7 @@ import io.github.skuirrels.traderouter.passages.Passage;
 import io.github.skuirrels.traderouter.ports.Port;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
@@ -240,6 +241,20 @@ class MovementTests {
         ResolvedLocation resolved = TradeRoutes.locate("GBLGE");
         assertThat(resolved.source()).isEqualTo("unlocode");
         assertThat(resolved.coordinate()).isEqualTo(lightwater.coordinate());
+        assertThat(database.countWithCoordinates()).isEqualTo(102_287);
+    }
+
+    @Test
+    void movementSupplementReplacesWrongUneceLongitude() {
+        // UNECE lists Hedehusene, Denmark at 5539N 12120E, in north-east China.
+        var database = engine().unLocodes();
+        UnLocode hedehusene = database.getByCode("DKHHS");
+        assertThat(hedehusene.coordinate()).isEqualTo(new Coordinate(12.19827, 55.64951));
+        assertThat(hedehusene.coordinateSource()).startsWith("GeoNames, Hedehusene, geonameId 2620587");
+        assertThat(TradeRoutes.locate("DKHHS").coordinate()).isEqualTo(hedehusene.coordinate());
+        // A flipped sign (Luque, Paraguay, published in the northern hemisphere) and swapped latitude and longitude.
+        assertThat(database.getByCode("PYLUQ").coordinate().latitude()).isCloseTo(-25.27, within(0.01));
+        assertThat(database.getByCode("DEGKO").coordinate().latitude()).isCloseTo(52.17, within(0.01));
         assertThat(database.countWithCoordinates()).isEqualTo(102_287);
     }
 
@@ -563,8 +578,9 @@ class MovementTests {
         assertThat(sea.co2eKg()).isCloseTo(76.0 * 2.0 * sea.length() / 1000.0, within(1e-9));
 
         LegResult road = result.legs().get(0);
-        assertThat(road.co2eBasis()).as("non-sea legs use the stated weight").isEqualTo("tonnes");
-        assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * 12.0, within(1e-9));
+        assertThat(road.co2eBasis()).as("12 t in 2 TEU is below the 20 t a pair of average containers carries")
+                .isEqualTo("teu_average_weight");
+        assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * 20.0, within(1e-9));
 
         assertThat(result.cargoTeu()).isEqualTo(2.0);
         assertThat(result.totalCo2eKg()).isCloseTo(result.legs().stream().mapToDouble(l -> l.co2eKg()).sum(), within(1e-9));
@@ -574,6 +590,63 @@ class MovementTests {
         assertThat(seaProps.get("co2e_basis").asText()).isEqualTo("teu");
         assertThat(seaProps.get("co2e_g_per_teu_km").asDouble()).isEqualTo(76.0);
         assertThat(doc.get("properties").get("cargo_teu").asDouble()).isEqualTo(2.0);
+    }
+
+    @Test
+    void emissionsLightFclContainersChargeRoadLegsPerContainer() {
+        // 100 kg in 2 TEU: each container still needs a whole truck, so the road legs are charged at 10 t per TEU.
+        MovementResult result = TradeRoutes.calculateMovement(MELBOURNE_MOVEMENT, null, 0.1, 2.0);
+
+        for (LegResult road : result.legs().stream().filter(leg -> leg.leg().mode() == TransportMode.ROAD).toList()) {
+            assertThat(road.co2eBasis()).isEqualTo("teu_average_weight");
+            assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * 20.0, within(1e-9));
+            assertThat(road.co2eKg()).as("GLEC road 92 g/t-km over 20 t, length in km")
+                    .isCloseTo(92.0 * 20.0 * road.length() / 1000.0, within(1e-9));
+        }
+        assertThat(result.legs().stream().filter(leg -> leg.leg().mode() == TransportMode.SEA))
+                .allMatch(leg -> "teu".equals(leg.co2eBasis()));
+        assertThat(result.totalCo2eKg()).isCloseTo(result.legs().stream().mapToDouble(l -> l.co2eKg()).sum(), within(1e-9));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "30.0, tonnes, 30.0",             // heavier than two average containers: the stated weight
+            "20.0, tonnes, 20.0",             // exactly the average: the stated weight
+            "19.9, teu_average_weight, 20.0"
+    })
+    void emissionsFclRoadLegsUseTheGreaterOfStatedWeightAndTeuAverage(double tonnes, String basis, double chargedTonnes) {
+        MovementResult result = TradeRoutes.calculateMovement(MELBOURNE_MOVEMENT, null, tonnes, 2.0);
+
+        LegResult road = result.legs().get(0);
+        assertThat(road.co2eBasis()).isEqualTo(basis);
+        assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * chargedTonnes, within(1e-9));
+    }
+
+    @Test
+    void emissionsFclRailLegsArePerContainerButAirLegsKeepTheStatedWeight() {
+        MovementRequest railRequest = new MovementRequest(List.of(
+                new MovementLeg(
+                        Location.fromCoordinate(EXTRA_PLACES.get("GBLON"), "London"),
+                        Location.fromCoordinate(new Coordinate(1.3108, 51.9630), "Felixstowe"),
+                        TransportMode.RAIL,
+                        LegKind.PICKUP)))
+                .setCargoTonnes(0.5)
+                .setCargoTeu(1.0);
+        LegResult rail = engine().calculateMovement(railRequest).legs().get(0);
+        assertThat(rail.co2eBasis()).isEqualTo("teu_average_weight");
+        assertThat(rail.co2eKg()).isCloseTo(rail.co2eKgPerTonne() * 10.0, within(1e-9));
+
+        LegResult air = TradeRoutes.calculateMovement("Airport GBLHR to Airport AUMEL Air", null, 0.5, 1.0).legs().get(0);
+        assertThat(air.co2eBasis()).as("air cargo is not carried in TEU slots").isEqualTo("tonnes");
+        assertThat(air.co2eKg()).isCloseTo(air.co2eKgPerTonne() * 0.5, within(1e-9));
+    }
+
+    @Test
+    void emissionsWeightOnlyIsUnchangedOnEveryLeg() {
+        MovementResult result = TradeRoutes.calculateMovement(MELBOURNE_MOVEMENT, null, 0.1, null);
+
+        assertThat(result.legs()).allMatch(leg -> "tonnes".equals(leg.co2eBasis()));
+        assertThat(result.legs()).allMatch(leg -> Math.abs(leg.co2eKg() - leg.co2eKgPerTonne() * 0.1) < 1e-9);
     }
 
     @Test
