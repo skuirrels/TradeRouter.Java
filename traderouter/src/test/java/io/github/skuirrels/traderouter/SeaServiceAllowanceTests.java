@@ -1,7 +1,7 @@
 package io.github.skuirrels.traderouter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.movements.CorridorAllowance;
 import io.github.skuirrels.traderouter.movements.LegResult;
@@ -118,7 +118,7 @@ class SeaServiceAllowanceTests {
 
         JsonNode doc = JSON.readTree(result.toJson());
         JsonNode properties = doc.get("features").get(0).get("properties");
-        assertThat(properties.get("operational_allowance_corridor").asText()).isEqualTo("asia-north-europe");
+        assertThat(properties.get("operational_allowance_corridor").asString()).isEqualTo("asia-north-europe");
         assertThat(properties.get("operational_allowance_fraction").asDouble()).isEqualTo(0.63);
         assertThat(properties.has("traversed_passages")).isFalse();
     }

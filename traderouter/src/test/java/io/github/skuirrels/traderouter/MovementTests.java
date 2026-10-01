@@ -1,7 +1,7 @@
 package io.github.skuirrels.traderouter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.common.DistanceUnit;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
@@ -145,16 +145,16 @@ class MovementTests {
 
         JsonNode root = JSON.readTree(result.toJson());
 
-        assertThat(root.get("type").asText()).isEqualTo("FeatureCollection");
+        assertThat(root.get("type").asString()).isEqualTo("FeatureCollection");
         JsonNode features = root.get("features");
         assertThat(features.size()).isEqualTo(4);
 
         JsonNode second = features.get(1).get("properties");
         assertThat(second.get("leg").asInt()).isEqualTo(2);
-        assertThat(second.get("mode").asText()).isEqualTo("sea");
-        assertThat(second.get("kind").asText()).isEqualTo("main");
-        assertThat(second.get("from").asText()).isEqualTo("GBFXT");
-        assertThat(second.get("to").asText()).isEqualTo("SGSIN");
+        assertThat(second.get("mode").asString()).isEqualTo("sea");
+        assertThat(second.get("kind").asString()).isEqualTo("main");
+        assertThat(second.get("from").asString()).isEqualTo("GBFXT");
+        assertThat(second.get("to").asString()).isEqualTo("SGSIN");
 
         assertThat(root.get("properties").get("legs").asInt()).isEqualTo(4);
         assertThat(root.get("properties").get("total_length").asDouble()).isCloseTo(result.totalLength(), within(1e-6));
@@ -587,7 +587,7 @@ class MovementTests {
 
         JsonNode doc = JSON.readTree(result.toJson());
         JsonNode seaProps = doc.get("features").get(1).get("properties");
-        assertThat(seaProps.get("co2e_basis").asText()).isEqualTo("teu");
+        assertThat(seaProps.get("co2e_basis").asString()).isEqualTo("teu");
         assertThat(seaProps.get("co2e_g_per_teu_km").asDouble()).isEqualTo(76.0);
         assertThat(doc.get("properties").get("cargo_teu").asDouble()).isEqualTo(2.0);
     }

@@ -1,7 +1,7 @@
 package io.github.skuirrels.traderouter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.common.DistanceUnit;
 import io.github.skuirrels.traderouter.data.EmbeddedResources;
@@ -164,7 +164,7 @@ class RoutingTests {
         }
 
         JsonNode document = JSON.readTree(route.toJson());
-        assertThat(document.get("geometry").get("type").asText()).isEqualTo("MultiLineString");
+        assertThat(document.get("geometry").get("type").asString()).isEqualTo("MultiLineString");
     }
 
     @Test
@@ -178,10 +178,10 @@ class RoutingTests {
         assertThat(json).isNotBlank();
         JsonNode root = JSON.readTree(json);
 
-        assertThat(root.get("type").asText()).isEqualTo("Feature");
-        assertThat(root.get("geometry").get("type").asText()).isEqualTo("LineString");
+        assertThat(root.get("type").asString()).isEqualTo("Feature");
+        assertThat(root.get("geometry").get("type").asString()).isEqualTo("LineString");
         assertThat(root.get("geometry").get("coordinates").size()).isEqualTo(61);
-        assertThat(root.get("properties").get("units").asText()).isEqualTo("km");
+        assertThat(root.get("properties").get("units").asString()).isEqualTo("km");
         assertThat(root.get("properties").get("length").asDouble()).isCloseTo(10996.763, within(1.0));
     }
 
