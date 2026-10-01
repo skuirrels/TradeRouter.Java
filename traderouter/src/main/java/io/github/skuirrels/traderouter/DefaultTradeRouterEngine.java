@@ -35,6 +35,7 @@ import io.github.skuirrels.traderouter.ports.PortParameters;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -60,6 +61,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
     private static final Set<LocationFunction> SEA_PORT_ONLY = LocationFunction.of(LocationFunction.SEA_PORT);
     private static final Set<LocationFunction> AIRPORT_ONLY = LocationFunction.of(LocationFunction.AIRPORT);
     private static final Set<LocationFunction> RAIL_TERMINAL_ONLY = LocationFunction.of(LocationFunction.RAIL_TERMINAL);
+    private static final Set<LocationFunction> RAIL_SERVED = LocationFunction.of(
+            LocationFunction.RAIL_TERMINAL, LocationFunction.MULTIMODAL);
+    private static final String ADDITIONAL_FUNCTIONS_HINT =
+            "If the UN/LOCODE record is incomplete, declare the function in MovementRequest.getAdditionalLocationFunctions().";
     private static final Set<LocationFunction> TERMINAL_FUNCTIONS = LocationFunction.of(
             LocationFunction.SEA_PORT, LocationFunction.RAIL_TERMINAL, LocationFunction.ROAD_TERMINAL, LocationFunction.MULTIMODAL);
     private static final Set<LocationFunction> DEPOT_FUNCTIONS = LocationFunction.of(
@@ -70,6 +75,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
     private final String maritimeDistanceSource;
     private final Lazy<UnLocodeDatabase> lazyUnLocodes = new Lazy<>(EmbeddedResources::loadUnLocodes);
     private final Lazy<Map<String, String>> lazyPortCodeAliases = new Lazy<>(EmbeddedResources::loadPortCodeAliases);
+    private final Lazy<MaritimeGraph> lazyRailGraph = new Lazy<>(EmbeddedResources::loadRailGraph);
 
     /** The default global instance with the embedded Marnet and ports datasets, created lazily on first use. */
     public static DefaultTradeRouterEngine getDefault() {
@@ -129,6 +135,14 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
     /** The embedded UN/LOCODE list, used to resolve movement locations that are not sea ports. */
     public UnLocodeDatabase unLocodes() {
         return lazyUnLocodes.get();
+    }
+
+    /**
+     * The embedded North American rail graph, the main line of the BTS North American Rail Network, used to route
+     * rail legs. Edge labels are the reporting marks of the railroads owning the track.
+     */
+    public MaritimeGraph railGraph() {
+        return lazyRailGraph.get();
     }
 
     @Override
@@ -364,8 +378,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         int sequence = index + 1;
         ResolvedLocation from = resolveLocation(leg.from(), request, resolvedByCode);
         ResolvedLocation to = resolveLocation(leg.to(), request, resolvedByCode);
-        validateWaypoint(sequence, "from", leg.fromKind(), leg.mode(), from);
-        validateWaypoint(sequence, "to", leg.toKind(), leg.mode(), to);
+        validateWaypoint(sequence, "from", leg.fromKind(), leg.mode(), from, request.getAdditionalLocationFunctions());
+        validateWaypoint(sequence, "to", leg.toKind(), leg.mode(), to, request.getAdditionalLocationFunctions());
 
         if (index > 0) {
             ResolvedLocation prior = legResults.get(legResults.size() - 1).to();
@@ -387,6 +401,9 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             featureFuture = CompletableFuture.completedFuture(feature);
         } else if (leg.mode() == TransportMode.ROAD) {
             featureFuture = RoadLegs.calculate(sequence, from, to, units, request, allowProvider, inFlight);
+        } else if (leg.mode() == TransportMode.RAIL) {
+            featureFuture = CompletableFuture.completedFuture(
+                    RailLegs.calculate(sequence, from, to, units, request, this::railGraph));
         } else {
             featureFuture = CompletableFuture.completedFuture(
                     calculateStraightLeg(from, to, leg.mode(), units, request.getSpeedsKmh()));
@@ -420,7 +437,9 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     + properties.getPortHours()
                     + properties.getOperationalAllowanceHours()
                     + properties.getConnectionHours());
-            applyEmissions(feature, leg.mode(), units, request);
+            boolean northAmericanRail = leg.mode() == TransportMode.RAIL
+                    && RailLegs.isNorthAmerican(from, to, request, railGraph());
+            applyEmissions(feature, leg.mode(), units, request, northAmericanRail);
 
             legResults.add(new LegResult(sequence, leg, from, to, feature));
         });
@@ -430,11 +449,18 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
      * Stamps the leg with its GLEC-style CO2e figures: intensity in g per tonne-km, kg per tonne of cargo for
      * the leg, and absolute kg when the request states a cargo weight. Length is converted to kilometres first.
      */
-    private static void applyEmissions(GeoJsonFeature feature, TransportMode mode, DistanceUnit units, MovementRequest request) {
+    private static void applyEmissions(
+            GeoJsonFeature feature,
+            TransportMode mode,
+            DistanceUnit units,
+            MovementRequest request,
+            boolean northAmericanRail) {
         var factors = request.getEmissions();
         TradeRouterProperties properties = feature.properties();
         double lengthKm = properties.getLength() / (units.conversionFactorFromMeters() * 1000.0);
-        double gramsPerTonneKm = factors.gramsPerTonneKm(mode, lengthKm);
+        double gramsPerTonneKm = northAmericanRail
+                ? factors.getRailNorthAmericaGramsPerTonneKm()
+                : factors.gramsPerTonneKm(mode, lengthKm);
         double kgPerTonne = gramsPerTonneKm * lengthKm / 1000.0;
 
         properties.setCo2eGramsPerTonneKm(gramsPerTonneKm);
@@ -487,7 +513,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         return feature;
     }
 
-    private static GeoJsonFeature calculateStraightLeg(
+    static GeoJsonFeature calculateStraightLeg(
             ResolvedLocation from,
             ResolvedLocation to,
             TransportMode mode,
@@ -701,6 +727,13 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (request.getRoadDurationMode() == null) {
             throw new IllegalArgumentException("Movement road-duration mode is unknown.");
         }
+        if (request.getRailRoutingMode() == null) {
+            throw new IllegalArgumentException("Movement rail-routing mode is unknown.");
+        }
+        if (!Double.isFinite(request.getRailNetworkSnapKm()) || request.getRailNetworkSnapKm() < 0) {
+            throw new IllegalArgumentException(
+                    "Rail network snap distance must be finite and non-negative. Received: " + request.getRailNetworkSnapKm());
+        }
         request.getEmissions().validate();
         validatePositiveOptional(request.getCargoTonnes(), "cargoTonnes");
         validatePositiveOptional(request.getCargoTeu(), "cargoTeu");
@@ -759,7 +792,17 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             entry.getValue().validate();
         }
 
-        RoadLegs.validateOverrides(request);
+        for (Map.Entry<String, Set<LocationFunction>> entry : request.getAdditionalLocationFunctions().entrySet()) {
+            if (entry.getKey() == null || entry.getKey().isBlank()) {
+                throw new IllegalArgumentException("Additional location function keys cannot be blank.");
+            }
+            if (entry.getValue() == null || entry.getValue().contains(null)) {
+                throw new IllegalArgumentException("Additional location functions for " + entry.getKey() + " cannot be null.");
+            }
+        }
+
+        RoadLegs.validateOverrides(request, request.getRoadRouteOverrides(), TransportMode.ROAD);
+        RoadLegs.validateOverrides(request, request.getRailRouteOverrides(), TransportMode.RAIL);
     }
 
     private static void validatePositiveOptional(Double value, String name) {
@@ -774,12 +817,20 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             String endpoint,
             WaypointKind waypointKind,
             TransportMode mode,
-            ResolvedLocation location) {
+            ResolvedLocation location,
+            Map<String, Set<LocationFunction>> additionalFunctions) {
         if (location.functions() == null) {
             return;
         }
 
         Set<LocationFunction> functions = location.functions();
+        Set<LocationFunction> declared = location.code() != null ? additionalFunctions.get(location.code()) : null;
+        if (declared != null && !declared.isEmpty()) {
+            Set<LocationFunction> combined = EnumSet.noneOf(LocationFunction.class);
+            combined.addAll(functions);
+            combined.addAll(declared);
+            functions = combined;
+        }
         Set<LocationFunction> requiredByKind = switch (waypointKind) {
             case UNSPECIFIED, PLACE -> LocationFunction.NONE;
             case PORT -> SEA_PORT_ONLY;
@@ -792,20 +843,22 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (!requiredByKind.isEmpty() && Collections.disjoint(functions, requiredByKind)) {
             throw new IllegalArgumentException(
                     "Leg " + sequence + " " + endpoint + " location " + location.label() + " is declared as "
-                            + waypointKind.displayName() + ", but UN/LOCODE records " + describeFunctions(functions) + ".");
+                            + waypointKind.displayName() + ", but UN/LOCODE records " + describeFunctions(functions) + ". "
+                            + ADDITIONAL_FUNCTIONS_HINT);
         }
 
         Set<LocationFunction> requiredByMode = switch (mode) {
             case SEA -> SEA_PORT_ONLY;
             case AIR -> AIRPORT_ONLY;
-            case RAIL -> RAIL_TERMINAL_ONLY;
+            // Multimodal facilities and inland container depots are commonly rail-served.
+            case RAIL -> RAIL_SERVED;
             case ROAD -> LocationFunction.NONE;
         };
         if (!requiredByMode.isEmpty() && Collections.disjoint(functions, requiredByMode)) {
             throw new IllegalArgumentException(
                     "Leg " + sequence + " uses " + mode.displayName() + ", but its " + endpoint + " location " + location.label()
                             + " is recorded as " + describeFunctions(functions) + " rather than a compatible "
-                            + mode.wireString() + " terminal.");
+                            + mode.wireString() + " terminal. " + ADDITIONAL_FUNCTIONS_HINT);
         }
     }
 }

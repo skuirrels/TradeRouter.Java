@@ -21,7 +21,7 @@ import io.github.skuirrels.traderouter.movements.RoadRouteRequest;
 import io.github.skuirrels.traderouter.movements.RoadRouteResult;
 import io.github.skuirrels.traderouter.movements.RoadRouteStatus;
 import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
-import io.github.skuirrels.traderouter.movements.SuppliedRoadRoute;
+import io.github.skuirrels.traderouter.movements.SuppliedRoute;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.ports.PortDatabase;
 import org.junit.jupiter.api.Test;
@@ -102,10 +102,10 @@ class RoadRoutingTests {
     }
 
     @Test
-    void movementSuppliedRoadRouteOverridesEstimateAndDrivesEmissions() {
+    void movementSuppliedRouteOverridesEstimateAndDrivesEmissions() {
         MovementRequest request = MovementRequest.of(GATWICK_TO_HEATHROW)
                 .setCargoTonnes(20.0)
-                .putRoadRouteOverride(1, new SuppliedRoadRoute(64.0, "known-route"));
+                .putRoadRouteOverride(1, new SuppliedRoute(64.0, "known-route"));
 
         LegResult road = engine().calculateMovement(request).legs().get(0);
 
@@ -232,10 +232,10 @@ class RoadRoutingTests {
     }
 
     @Test
-    void movementSyncSuppliedRouteTakesPrecedenceWithoutCallingConfiguredProvider() {
+    void movementSyncSuppliedRoadRouteTakesPrecedenceWithoutCallingConfiguredProvider() {
         var provider = new StubRoadProvider(success(70.0, null));
         MovementRequest request = providerRequest(provider, RoadRoutingMode.PREFER_NETWORK_THEN_ESTIMATE)
-                .putRoadRouteOverride(1, new SuppliedRoadRoute(64.0, "known-route"));
+                .putRoadRouteOverride(1, new SuppliedRoute(64.0, "known-route"));
 
         LegResult road = engine().calculateMovement(request).legs().get(0);
 

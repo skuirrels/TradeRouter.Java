@@ -68,6 +68,43 @@ CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carrie
 CO2e total     = kg of CO2e for this shipment: 76 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
 ```
 
+### Sea and rail movement
+
+Ship a heavy 40-foot container from Shanghai to Hamburg, forward it by rail to Prague and deliver it by road to Plzeň. A rail leg's endpoints must be UN/LOCODEs recorded as rail terminals or multimodal facilities; `Waypoint.station` declares the rail role and the plan is rejected if the code list disagrees. [Rail routing](#rail-routing) covers under-recorded terminals and supplied track distances.
+
+```java
+var plan = MovementPlan
+    .from(Waypoint.port("CNSHG"))
+    .thenTo(Waypoint.port("DEHAM"), TransportMode.SEA)
+    .thenTo(Waypoint.station("CZPRG"), TransportMode.RAIL)
+    .deliverTo(Waypoint.place("CZPLZ"), TransportMode.ROAD);
+
+var movement = TradeRoutes.calculateMovement(
+    plan,
+    new TradeRouterOptions().setReturnPassages(true),
+    24.0, // Heavier than 10 t per TEU, so road and rail legs are charged on the stated weight
+    2.0);
+
+System.out.println(movement.toText());
+```
+
+The container weighs more than the GLEC average of 10 t per TEU, so the rail and road legs report the `tonnes` basis while the sea leg stays per TEU. Hamburg and Prague lie outside the embedded North American rail network, so without a supplied rail route the rail leg keeps great-circle distance at the default 80 km/h and carries a `distance_warning`; its 491 km is a lower bound on the track distance. No handling or connection time is added at the rail terminals; only sea legs carry port dwell and transshipment allowances.
+
+```text
+Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total               Basis  Choke points
+                                                                                   hours      g per t-km  kg per t cargo          kg
+1   Main      Sea   CNSHG  DEHAM     19,991 km    maritime_network                 1,147.7             7.6           151.9       3,039                 teu  Malacca, Bab-el-Mandeb, Suez, Gibraltar
+2   Main      Rail  DEHAM  CZPRG        491 km        great_circle                     6.1            28.0            13.8         330              tonnes
+3   Delivery  Road  CZPRG  CZPLZ        112 km   circuity_estimate                     1.9            92.0            10.3         248              tonnes
+Total                                20,595 km                                     1,155.7                           176.0       3,617                      for 24 t of cargo in 2 TEU
+Modelled minimum = 682.7 h travel + 425.0 h sea operations + 48 h port handling + 0 h connections = 1,155.7 h (48.2 days)
+Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line
+Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption
+CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)
+CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg
+CO2e total     = kg of CO2e for this shipment: 76 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
+```
+
 ---
 
 ## Contents
@@ -113,7 +150,7 @@ These apply to single routes and to multi-leg movements, which are described [be
 - **Lane**: a straight link between two neighbouring lane points. Sea legs travel only along lanes.
 - **Snapping**: moving a waypoint's position to its nearest lane point so a sea leg can start or end on the map, then joining the two with a straight line so the leg still begins and ends at the waypoint.
 - **Choke point**: a lane that runs through a canal or strait, tagged with its name. Thirteen exist. Closing one makes the router route round it.
-- **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail and air legs use great-circle distance. None uses maritime lane points or choke points.
+- **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail legs in the United States, Canada and Mexico are routed on the embedded North American rail network; other rail legs and air legs use great-circle distance. None uses maritime lane points or choke points.
 
 Implementation notes:
 
@@ -156,8 +193,9 @@ Example output for Jebel Ali (AEJEA) to St John's, Antigua (AGSJO) with Suez clo
 | `length` | Total route length in the requested unit. |
 | `units` | Unit identifier, for example `km`, `naut`, `mi`. |
 | `duration_hours` | Travelling duration. Road legs default to distance divided by the configured road speed; callers may explicitly opt into a provider or imported-route duration. |
-| `distance_basis` | Provenance class for the distance: `maritime_network`, `road_network`, `supplied`, `circuity_estimate` or `great_circle`. |
-| `straight_line_length` | Great-circle lower bound for a road leg, in the requested unit. |
+| `distance_basis` | Provenance class for the distance: `maritime_network`, `road_network`, `rail_network`, `supplied`, `circuity_estimate` or `great_circle`. |
+| `straight_line_length` | Great-circle lower bound for a road leg, or a rail leg supplied or routed on the rail network, in the requested unit. |
+| `railroads` | Reporting marks of the railroads owning the track of a rail leg routed on the rail network, in route order. |
 | `distance_source` | Provider, estimator or caller label that produced the distance. |
 | `routing_profile`, `routing_data_version` | Road-provider profile and caller-configured dataset version when known. |
 | `duration_basis`, `geometry_basis` | How travelling time and emitted geometry were obtained. |
@@ -301,10 +339,10 @@ var routes = DefaultTradeRouterEngine.getDefault().calculateRoutes(
 
 ### Multi-leg movements
 
-A `MovementPlan` builds a continuous route from typed waypoints and transport modes. Each destination automatically becomes the next leg's origin, so intermediate UN/LOCODEs are stated once. Declared waypoint types and sea, rail and air modes are checked against known UN/LOCODE functions. Pickup and delivery ordering is enforced while the plan is built. Sea legs are routed on the lane network. Road legs use an optional road-network provider or a labelled built-in estimate. Rail and air legs use great-circle distance. None of the non-sea modes touches maritime lane points or choke points. Default assumed speeds are 60, 80 and 800 km/h for road, rail and air.
+A `MovementPlan` builds a continuous route from typed waypoints and transport modes. Each destination automatically becomes the next leg's origin, so intermediate UN/LOCODEs are stated once. Declared waypoint types and sea, rail and air modes are checked against known UN/LOCODE functions. Pickup and delivery ordering is enforced while the plan is built. Sea legs are routed on the lane network. Road legs use an optional road-network provider or a labelled built-in estimate. Rail legs use a supplied rail route when one is given, otherwise the embedded North American rail network when both ends are near it; other rail legs and air legs use great-circle distance. None of the non-sea modes touches maritime lane points or choke points. Default assumed speeds are 60, 80 and 800 km/h for road, rail and air.
 
 <p align="center">
-  <img src="docs/diagrams/movement-flow.svg" alt="Movement flow: a typed MovementPlan builds continuous legs, resolves each leg's locations, routes sea legs on Marnet, resolves road distance from a road provider or fallback estimate, and measures rail and air legs by great-circle distance" width="70%">
+  <img src="docs/diagrams/movement-flow.svg" alt="Movement flow: a typed MovementPlan builds continuous legs, resolves each leg's locations, routes sea legs on Marnet, resolves road distance from a road provider or fallback estimate, routes North American rail legs on the NARN rail network, and measures other rail legs and air legs by great-circle distance" width="70%">
 </p>
 
 Source: [docs/diagrams/movement-flow.svg](docs/diagrams/movement-flow.svg) (vector) and [movement-flow.html](docs/diagrams/movement-flow.html).
@@ -331,13 +369,13 @@ String geoJson = movement.toJson();   // FeatureCollection, one feature per leg
 
 The string overload remains available as an import convenience when a source system already supplies human-written leg lines such as `Pickup GBLGW to Port GBFXT Road`. Code-first callers should use `MovementPlan`; the strings above are only the UN/LOCODE identifiers themselves.
 
-Each leg feature carries `leg`, `mode`, `kind`, `from` and `to` in its properties, plus the time components described below. The collection carries the corresponding totals. Every leg starts and ends at its resolved locations, so consecutive legs join end to end; `appendOriginDestination` is always on for movement legs. A sea leg with no route under the given restrictions throws an `IllegalStateException` naming the leg rather than contributing zero. Build a `MovementRequest` directly when you need custom speeds, timing assumptions or emission factors.
+Each leg feature carries `leg`, `mode`, `kind`, `from` and `to` in its properties, plus the time components described below. The collection carries the corresponding totals. Every leg starts and ends at its resolved locations, so consecutive legs join end to end; `appendOriginDestination` is always on for movement legs. A sea leg with no route under the given restrictions throws an `IllegalStateException` naming the leg rather than contributing zero. Build a `MovementRequest` directly when you need road routing, supplied rail routes, declared location functions, custom speeds, timing assumptions or emission factors.
 
 Codes resolve in this order:
 
 1. A coordinate supplied by the caller in `MovementRequest.getCoordinates()`.
 2. The embedded port list, when the UN/LOCODE list agrees on the place name. Port list positions are tuned to the lane network.
-3. The embedded UN/LOCODE list, when UNECE publishes coordinates for the code. This covers airports, rail terminals and inland places, and it wins over the port list when the two disagree: the port list holds `CNSHG` as Sanshan, an inland Yangtze port, while UN/LOCODE holds it as Shanghai Pt.
+3. The embedded UN/LOCODE list, when UNECE or the coordinate supplement provides coordinates for the code. This covers airports, rail terminals and inland places, and it wins over the port list when the two disagree: the port list holds `CNSHG` as Sanshan, an inland Yangtze port, while UN/LOCODE holds it as Shanghai Pt.
 4. The port list anyway, for codes UN/LOCODE lacks coordinates for.
 5. A `LocationResolver`, if one is set.
 
@@ -446,6 +484,39 @@ Example 13 always shows the built-in `ESTIMATE_ONLY` result. Examples 14 and 15 
 
 `PREFER_NETWORK_THEN_ESTIMATE` falls back only when the provider is unavailable or an endpoint is outside its loaded coverage, and records the reason in `distance_warning`. A provider-confirmed `NO_ROUTE` is an error rather than silently inventing a distance. `REQUIRE_NETWORK` also treats unavailable or out-of-coverage results as errors. `ESTIMATE_ONLY` never calls the provider. Because provider calls are I/O, use `calculateMovementAsync`, which returns a `CompletableFuture`; cancelling it stops further legs and cancels an in-flight provider call. Synchronous `calculateMovement` is available for estimates and imported routes, and throws `IllegalStateException` when a request would need to call a provider.
 
+### Rail routing
+
+Rail legs in the United States, Canada and Mexico are routed on the embedded main line of the BTS [North American Rail Network](https://doi.org/10.21949/1528950), the federal network of every railroad line, with its owner and published track length. No service or container is needed. Each end snaps to the nearest point of the network, the gap is added as straight-line distance, and the leg reports `distance_basis: rail_network`, the track length, the line's shape and the owning railroads in `railroads`.
+
+```java
+var request = new MovementRequest(List.of(
+    new MovementLeg(
+        Location.fromCoordinate(new Coordinate(-118.2437, 34.0522), "Los Angeles"),
+        Location.fromCoordinate(new Coordinate(-87.6298, 41.8781), "Chicago"),
+        TransportMode.RAIL,
+        LegKind.MAIN)));
+var leg = DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs().get(0);
+// leg.feature().properties().getDistanceBasis() is "rail_network"; getRailroads() lists the owners, such as BNSF
+```
+
+A rail leg keeps great-circle distance, with the reason in `distance_warning`, when an end is more than `getRailNetworkSnapKm()` from the network (25 km by default, so every rail leg outside North America) or when no connected main line joins the two ends. Set `setRailRoutingMode(RailRoutingMode.GREAT_CIRCLE_ONLY)` to skip the network. Duration stays distance divided by the configured rail speed; the network carries no timetable, speed limits or train paths.
+
+Where the network has no coverage, or an upstream rail planner or operator knows the actual route, import it with `putRailRouteOverride`, keyed by one-based leg sequence. An entry takes precedence over both the network and great-circle distance:
+
+```java
+request.putRailRouteOverride(1, railPlannerResult); // a SuppliedRoute built from your upstream rail planner's response
+```
+
+The leg then reports `distance_basis: supplied`, the route's `source` as `distance_source`, and the great-circle lower bound in `straight_line_length`. A supplied `durationHours` is used as given and reported as `duration_basis: supplied`; without one, duration is the supplied distance divided by the rail speed. Supplied geometry is joined to the resolved endpoints and reported as `geometry_basis: supplied`. Like `putRoadRouteOverride`, this is for importing authoritative results, not for literal distances in application code.
+
+Rail endpoints are checked against UN/LOCODE functions: a rail leg needs a rail terminal (function 2) or a multimodal facility (function 6) at each end. The UNECE list under-records rail, most of all in North America, where Los Angeles, Chicago, Houston, Vancouver and Toronto carry no rail function. The embedded [rail supplement](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-rail-supplement.json) adds the rail-terminal function to 20 such codes, each with a cited freight terminal, so `USLAX to USCHI Rail` routes on the rail network by code. For any other location you know is rail-served, declare it on the request:
+
+```java
+request.addLocationFunctions(code, LocationFunction.RAIL_TERMINAL);
+```
+
+The declared functions are added to the recorded ones for waypoint and mode checks only; they do not change how the code resolves. Rejection messages name this option.
+
 ### Time
 
 `duration_hours` on every route and leg is travelling time. Road legs use routed or estimated distance divided by the configured road speed by default, including routes whose distance and geometry came from OSRM. Set `RoadDurationMode.ROUTE_DURATION_WHEN_AVAILABLE` to prefer a provider or authoritative imported-route duration when one is present. Other non-sea legs use distance divided by their configured average speed.
@@ -489,7 +560,7 @@ The worked UK–Singapore–Melbourne movement is therefore 786.0 hours of physi
 
 | `MovementRequest` timing option | Default | Meaning |
 |---|---:|---|
-| `setSeaOperationalAllowance` | `null` | Fraction of sea travel time added for service operations. Null takes the corridor table above; a value applies that fraction to every sea leg. |
+| `setSeaOperationalAllowance` | `null` | Fraction of sea travel time added for service operations. Null takes the corridor table above; a value applies that fraction to every sea leg, and legs then report `operational_allowance_corridor` as `override`. |
 | `setPortDwellHours` | `24` | Cargo-handling time at each end of each sea leg. |
 | `setTransshipmentConnectionHours` | `48` | Connection time before a sea leg that follows another sea leg. |
 
@@ -510,7 +581,7 @@ System.out.printf("%.1f kg CO2e per tonne, %.0f kg for %s t%n",
     movement.totalCo2eKgPerTonne(), movement.totalCo2eKg(), movement.cargoTonnes());
 ```
 
-Each leg feature gains `co2e_g_per_tonne_km`, `co2e_kg_per_tonne` and, with a cargo weight or TEU count, `co2e_kg` and `co2e_basis`; the collection gains `total_co2e_kg_per_tonne`, `cargo_tonnes`, `cargo_teu` and `total_co2e_kg`.
+Each leg feature gains `co2e_g_per_tonne_km`, `co2e_kg_per_tonne` and, with a cargo weight or TEU count, `co2e_kg` and `co2e_basis`; sea legs charged per container also carry `co2e_g_per_teu_km`. The collection gains `total_co2e_kg_per_tonne`, `cargo_tonnes`, `cargo_teu` and `total_co2e_kg`.
 
 Pass a TEU count as well for containerised freight. Sea legs are then charged per container at 76 g CO2e per TEU-km, because a light box still occupies a whole slot; a 40-foot container counts as 2 TEU and a 40-foot high cube as 2.25. Road and rail legs are charged on the greater of the gross weight and the GLEC average of 10 t per TEU: a light container still needs a whole truck or wagon slot, and the per-tonne defaults assume an average load, so charging only the cargo inside a nearly empty box would understate the leg. A container heavier than the average is charged on its stated weight. Air legs use the gross weight, and if only a TEU count is given every non-sea leg assumes 10 t per TEU. Weights are gross physical weight, not chargeable weight, as GLEC and ISO 14083 require.
 
@@ -519,31 +590,34 @@ Pass a TEU count as well for containerised freight. Sea legs are then charged pe
 | Sea, per tonne | 7.6 | Table 46, industry-average dry container, 76 g per TEU-km at the GLEC average of 10 t per TEU |
 | Sea, per container | 76 per TEU-km | Table 46, industry-average dry container, used when a TEU count is given |
 | Road | 92 | Europe starting value for an HGV over 20 t gross vehicle weight |
-| Rail | 28 | Table 38, European diesel traction, average mixed load |
+| Rail, North America | 16 | Module 2 rail, North America: US average diesel from Class I railroad fuel reporting. Used when both ends of a rail leg lie within `getRailNetworkSnapKm()` of the embedded North American rail network |
+| Rail, elsewhere | 28 | Table 38, European diesel traction, average mixed load |
 | Air, under 1,000 km | 1,130 | Table 35, ICAO/IATA RP1678 basis, aircraft type unknown |
 | Air, 1,000 to 3,700 km | 700 | Table 35, as above |
 | Air, over 3,700 km | 630 | Table 35, as above |
 
-Source: Smart Freight Centre, [GLEC Framework, July 2022 edition](https://smart-freight-centre-media.s3.amazonaws.com/documents/2019_GLEC_Framework_July_2022.pdf), Module 2. These are defaults for when carrier data is unavailable; the sea figure assumes an average dry container on an unknown trade lane, and reefer or trade-lane-specific values differ. Set `MovementRequest.setEmissions` to your own `EmissionFactors` to override any of them.
+Source: Smart Freight Centre, [GLEC Framework, July 2022 edition](https://smart-freight-centre-media.s3.amazonaws.com/documents/2019_GLEC_Framework_July_2022.pdf), Module 2. These are defaults for when carrier data is unavailable; the sea figure assumes an average dry container on an unknown trade lane, and reefer or trade-lane-specific values differ. The North American rail value is GLEC's US figure and also applies to Canadian and Mexican legs on the network, and the rail value elsewhere assumes diesel traction; GLEC's European average for unknown traction is 17 g. Set `MovementRequest.setEmissions` to your own `EmissionFactors` to override any of them; `setRailNorthAmericaGramsPerTonneKm` and `setRailGramsPerTonneKm` hold the two rail values.
 
 ## Known limitations and judgement calls
 
 Everything here is deliberate and documented, but each is a simplification you should know about.
 
 - **Port list versus UN/LOCODE tie-break.** When both lists know a code, the port list position is used only if the two names match or one is a prefix of the other after stripping accents and punctuation. If they disagree, UN/LOCODE's position is used and no port record is attached. Check `source()` on the resolved location when it matters.
-- **Supplemented coordinates.** Five hand-reviewed codes and 17,766 codes with unambiguous GeoNames links have coordinates from cited sources rather than UNECE. Another 4,301 codes still have no verified coordinates; use caller coordinates or a resolver for those.
+- **Supplemented coordinates.** 17,918 codes have coordinates from cited sources rather than UNECE: 17,771 that UNECE publishes without one (five hand-reviewed, 17,766 through unambiguous GeoNames links) and 147 whose UNECE coordinate falls far outside their country. Another 4,301 codes still have no verified coordinates; use caller coordinates or a resolver for those.
 - **Sea-port function checks.** A port waypoint or sea leg is rejected when UN/LOCODE records no sea-port function, even if the port list holds the code, because that list also contains inland terminals such as Calgary. Two codes UNECE under-records, Alumar (`BRALU`) and Duncan Bay (`CADCN`), are confirmed as sea ports by [unlocode-seaport-supplement.json](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-seaport-supplement.json) with cited sources. Other affected ports need a `Waypoint.place` or a new supplement entry.
+- **Rail function checks.** A station waypoint or rail leg is rejected unless UN/LOCODE records a rail-terminal or multimodal function. UNECE under-records rail, especially for North American cities. The [rail supplement](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-rail-supplement.json) adds the function to 20 codes with cited freight terminals, several of which sit in a neighbouring municipality of the coded city, such as Vaughan for Toronto. Other rail-served places need `MovementRequest.addLocationFunctions` or a new supplement entry.
 - **Port-code aliases.** 264 port-list codes are not UN/LOCODEs. Only 61 are mapped from an official code, where the names and positions within 25 km show the same port; the rest route only by their port-list code or by coordinates. Nearest-port matching is not used, because it pairs different places such as Perth and Claremont.
 - **Duplicate port codes.** The tagged upstream list contains 38 codes with multiple records. Code-only lookup never silently chooses one; provide a nearby coordinate or inspect the candidates.
 - **UN/LOCODE edition.** The embedded import did not preserve its UNECE publication edition. Its hash and record counts are documented, but it is not claimed to be the latest release.
 - **Single routes with several area matches** return the first feature from `calculateRoute`; use `calculateRoutes` to see them all.
 - **Single routes with no path** return null geometry and zero length rather than throwing; movement legs throw.
 - **Untagged lane links.** Three internal tags in the lane data, `segment`, `segment2` and `pacific_ocean`, stitch the antimeridian and are never reported or restrictable.
-- **Road estimates and non-road geometry.** Without a supplied value or provider, road distance comes from the calibrated distance-decay circuity model, not a road-network route. It is an average planning relationship and cannot reproduce barriers or the exact route between a particular pair. When no road geometry is available, the GeoJSON still joins the resolved endpoints with a straight display line and reports `geometry_basis: great_circle`; this does not change the separately reported estimated or routed distance. Rail and air use great-circle distance.
+- **Road estimates and non-road geometry.** Without a supplied value or provider, road distance comes from the calibrated distance-decay circuity model, not a road-network route. It is an average planning relationship and cannot reproduce barriers or the exact route between a particular pair. When no road geometry is available, the GeoJSON still joins the resolved endpoints with a straight display line and reports `geometry_basis: great_circle`; this does not change the separately reported estimated or routed distance. Rail legs outside North America and air legs use great-circle distance.
 - **Time and emissions are estimates.** Movement time is labelled modelled minimum and exposes every allowance, but it still has no carrier schedule, customs, cargo cut-off, booking availability or disruption data.
+- **Rail routing is shortest track, not a carrier's route.** North American rail legs follow the shortest main-line track whoever owns it, so a route can switch railroads where a real train would stay with one carrier, and can use commuter-owned track near a city-centre end. The network has no timetable or speed limits, so duration is distance divided by the configured rail speed. Rail legs elsewhere use great-circle distance unless `putRailRouteOverride` supplies a route.
 - **A* has no usable heuristic on the embedded network.** The A* heuristic is scaled so that it never exceeds any edge's weight. The source data rounds lane weights to 0.1 km and contains zero-weight links between near-duplicate nodes, so that scale is zero on Marnet and A* degrades to one-directional Dijkstra. Prefer the default bidirectional Dijkstra; A* remains useful for custom graphs whose weights are true geodesic distances.
 - **Containers on road and rail are charged per container.** With a TEU count, road and rail legs use at least the GLEC average of 10 t per TEU. This overstates a container of light cargo somewhat, because a truck's fuel does fall a little with its load, but it is far closer than charging only the cargo inside: 100 kg in a 20-foot box would otherwise carry 1% of the truck's emissions. Heavier containers use their stated weight.
-- **Per-thread search buffers** hold about 300 KB for the lifetime of each thread that routes.
+- **Per-thread search buffers** hold about 350 KB for the lifetime of each thread that routes.
 
 ## Options reference
 
@@ -586,15 +660,19 @@ mvn -q package -DskipTests && java -jar traderouter-benchmarks/target/benchmarks
 pom.xml                     parent build: Java 21, dependency and plugin versions
 LICENSE                     Apache-2.0
 CLAUDE.md                   contributor rules for AI-assisted changes
+AGENTS.md                   engineering principles for contributors
+DATA_PROVENANCE.md          dataset sources, hashes, transformations and calibration
+THIRD-PARTY-NOTICES.md      data licences and attribution
+.github/workflows/ci.yml    build, test and package on pushes to main and on pull requests
 traderouter/                the library, published as io.github.skuirrels:traderouter
   src/main/java/io/github/skuirrels/traderouter/
     common/                 Coordinate, Haversine, DistanceUnit, antimeridian normaliser, point-in-polygon
-    data/                   loader for the embedded marnet, ports and UN/LOCODE datasets
+    data/                   loader for the embedded marnet, ports, UN/LOCODE and rail datasets and supplements
     geojson/                Feature, FeatureCollection, LineString/MultiLineString and serializer
     graph/                  MaritimeGraph, BidirectionalDijkstra, AStar, per-thread search buffers
     json/                   dependency-free JSON reader and writer
     locations/              UN/LOCODE entry, functions and lookup
-    movements/              multi-leg movements: legs, parser, request, result, location resolution
+    movements/              multi-leg movements: plan, legs, parser, request, result, location resolution, road estimators, OSRM provider, emission factors, sea service allowance
     passages/               passage identifiers
     ports/                  Port, PortDatabase, PortParameters, AreaFeature, PortProps
     spatial/                spherical 3D KD-tree
@@ -603,8 +681,9 @@ traderouter/                the library, published as io.github.skuirrels:trader
     TradeRouterOptions.java request options
     TradeRoutes.java        static facade
   src/main/resources/io/github/skuirrels/traderouter/data/
-                            marnet.json.gz, ports.json.gz, unlocode.json.gz, unlocode-supplement.json,
-                            unlocode-seaport-supplement.json, port-code-aliases.json
+                            marnet.json.gz, ports.json.gz, unlocode.json.gz, rail-narn.json.gz,
+                            unlocode-supplement.json, unlocode-seaport-supplement.json,
+                            unlocode-rail-supplement.json, port-code-aliases.json
   src/test/java/            JUnit 5 suite: routing, passages, ports, spatial, graph, JSON and movements
 traderouter-sample/         console app exercising every entry point, plus run-with-osrm.sh, the OSRM
                             container runner, its region list and the Osmium helper Dockerfile
@@ -669,9 +748,11 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 - **Marnet and antimeridian segments**, transformed from searoute-py 1.6.0: 9,708 nodes and 31,950 directed edges with distance and passage tags.
 - **World ports**, transformed from searoute-py 1.6.0: 3,962 records with code, name, country, terminal flag and permitted destination countries.
 - **UN/LOCODE**, the UNECE code list for trade and transport locations: 106,588 codes with name and function flags, of which 84,516 carry coordinates to one minute of arc. Used to resolve movement legs that name airports, terminals and inland places. Loaded only when a movement needs it.
-- **UN/LOCODE coordinate supplement**: one JSON file with five hand-reviewed entries (Gatwick, Shanghai Railway Station, Shanghai Hongqiao, Melrose and Guildford) and 17,766 positions from the 16 September 2026 GeoNames snapshot. Each entry records its source. The GeoNames entries have an explicit `unlc` code, matching country and name or recorded alternate name, and one unambiguous coordinate. Lightwater (`GBLGE`) is included. Applied only where UNECE has no coordinate.
+- **UN/LOCODE coordinate supplement**: one JSON file of 17,918 rows, each recording its source. 17,771 fill codes UNECE publishes without a coordinate: five hand-reviewed entries (Gatwick, Shanghai Railway Station, Shanghai Hongqiao, Melrose and Guildford) and 17,766 positions from the 16 September 2026 GeoNames snapshot, each with an explicit `unlc` code, matching country and name or recorded alternate name, and one unambiguous coordinate. Lightwater (`GBLGE`) is included. The other 147 replace UNECE coordinates that fall far outside their country: 145 from GeoNames, the Akpo offshore field (`NGAKP`) from Wikipedia, and Amurang (`IDTZD`) with its longitude sign corrected. [DATA_PROVENANCE.md](DATA_PROVENANCE.md) documents the selection.
+- **North American rail network**, the main line of the BTS NTAD North American Rail Network Lines: 87,789 nodes and 91,000 track edges covering 272,068 km in the United States, Canada and Mexico, each edge with its published track length and owning railroad. Used to route rail legs. Loaded only when a movement has a rail leg.
 - **Port-code aliases**: a reviewed JSON file mapping 61 official UN/LOCODE sea-port codes to the port-list record held under another code. Used only when the port list lacks the requested code.
 - **UN/LOCODE sea-port supplement**: a hand-maintained JSON file of codes that UNECE publishes without the sea-port function but that cited sources document as sea ports. Currently two entries: Alumar and Duncan Bay. It only adds the sea-port function and never removes one.
+- **UN/LOCODE rail supplement**: a hand-maintained JSON file of 20 codes that UNECE publishes without a rail or multimodal function but where a cited source documents a freight rail terminal: 12 in the United States, five in Canada, two in Mexico and Łódź in Poland. It only adds the rail-terminal function and never removes one.
 
 The datasets are embedded, with compressed JSON for the large resources, and loaded lazily on first use. Exact input and output hashes, transformations and the known UN/LOCODE edition gap are in [DATA_PROVENANCE.md](DATA_PROVENANCE.md); licensing and attribution are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 

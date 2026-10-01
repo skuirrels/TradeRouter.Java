@@ -23,6 +23,7 @@ public final class TradeRouterProperties {
     private Port portOrigin;
     private Port portDest;
     private List<String> traversedPassages;
+    private List<String> railroads;
     private Integer leg;
     private String mode;
     private String kind;
@@ -74,8 +75,8 @@ public final class TradeRouterProperties {
     }
 
     /**
-     * How the distance was obtained, for example "road_network", "supplied", "circuity_estimate" or
-     * "great_circle", or null. JSON: {@code distance_basis}.
+     * How the distance was obtained, for example "road_network", "rail_network", "supplied", "circuity_estimate"
+     * or "great_circle", or null. JSON: {@code distance_basis}.
      */
     public String getDistanceBasis() {
         return distanceBasis;
@@ -88,8 +89,8 @@ public final class TradeRouterProperties {
     }
 
     /**
-     * Great-circle lower bound in the requested units when a road distance was supplied, routed or estimated,
-     * or null. JSON: {@code straight_line_length}.
+     * Great-circle lower bound in the requested units when a road distance was supplied, routed or estimated, or
+     * a rail leg was supplied or routed on the rail network, or null. JSON: {@code straight_line_length}.
      */
     public Double getStraightLineLength() {
         return straightLineLength;
@@ -155,7 +156,7 @@ public final class TradeRouterProperties {
     }
 
     /**
-     * How the emitted geometry was obtained, such as "road_network" or "great_circle", or null.
+     * How the emitted geometry was obtained, such as "road_network", "rail_network" or "great_circle", or null.
      * JSON: {@code geometry_basis}.
      */
     public String getGeometryBasis() {
@@ -169,7 +170,8 @@ public final class TradeRouterProperties {
     }
 
     /**
-     * Warning attached to an estimated road distance or provider fallback, or null.
+     * Warning attached to an estimated road distance, a provider fallback or a rail leg left at great-circle
+     * distance, or null.
      * JSON: {@code distance_warning}.
      */
     public String getDistanceWarning() {
@@ -212,6 +214,20 @@ public final class TradeRouterProperties {
     /** Sets the traversed passages. */
     public TradeRouterProperties setTraversedPassages(List<String> traversedPassages) {
         this.traversedPassages = traversedPassages;
+        return this;
+    }
+
+    /**
+     * Reporting marks of the railroads owning the track of a rail leg routed on the rail network, in route order,
+     * such as "BNSF" or "UP", or null. Trackage rights let other railroads run over it too. JSON: {@code railroads}.
+     */
+    public List<String> getRailroads() {
+        return railroads;
+    }
+
+    /** Sets the railroads. */
+    public TradeRouterProperties setRailroads(List<String> railroads) {
+        this.railroads = railroads;
         return this;
     }
 

@@ -16,7 +16,7 @@ import io.github.skuirrels.traderouter.movements.RoadDurationMode;
 import io.github.skuirrels.traderouter.movements.RoadRouteRequest;
 import io.github.skuirrels.traderouter.movements.RoadRouteResult;
 import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
-import io.github.skuirrels.traderouter.movements.SuppliedRoadRoute;
+import io.github.skuirrels.traderouter.movements.SuppliedRoute;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ final class RoadLegs {
             AtomicReference<CompletableFuture<?>> inFlight) {
         double straightLineKm = Haversine.distanceKm(from.coordinate(), to.coordinate());
 
-        SuppliedRoadRoute supplied = request.getRoadRouteOverrides().get(sequence);
+        SuppliedRoute supplied = request.getRoadRouteOverrides().get(sequence);
         if (supplied != null) {
             return CompletableFuture.completedFuture(createFeature(
                     from, to, units, request.getSpeedsKmh(), request.getRoadDurationMode(),
@@ -202,7 +202,7 @@ final class RoadLegs {
         return new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(RouteNormalizer.normalizeRoute(coordinates)), properties);
     }
 
-    private static List<Coordinate> buildContinuousGeometry(Coordinate from, Coordinate to, List<Coordinate> routedGeometry) {
+    static List<Coordinate> buildContinuousGeometry(Coordinate from, Coordinate to, List<Coordinate> routedGeometry) {
         List<Coordinate> coordinates = new ArrayList<>((routedGeometry == null ? 0 : routedGeometry.size()) + 2);
         addIfDifferent(coordinates, from);
         if (routedGeometry != null && routedGeometry.size() >= 2) {
@@ -212,14 +212,14 @@ final class RoadLegs {
         }
         addIfDifferent(coordinates, to);
 
-        // GeoJSON LineString requires two positions, including for a zero-length road leg.
+        // GeoJSON LineString requires two positions, including for a zero-length leg.
         if (coordinates.size() == 1) {
             coordinates.add(to);
         }
         return coordinates;
     }
 
-    private static void addIfDifferent(List<Coordinate> coordinates, Coordinate coordinate) {
+    static void addIfDifferent(List<Coordinate> coordinates, Coordinate coordinate) {
         coordinate.validate();
         if (coordinates.isEmpty() || !coordinates.get(coordinates.size() - 1).equals(coordinate)) {
             coordinates.add(coordinate);
@@ -245,38 +245,37 @@ final class RoadLegs {
         }
     }
 
-    static void validateOverrides(MovementRequest request) {
+    /** Validates imported road or rail results against the movement's legs. */
+    static void validateOverrides(MovementRequest request, Map<Integer, SuppliedRoute> overrides, TransportMode mode) {
         List<MovementLeg> legs = request.getLegs();
-        for (Map.Entry<Integer, SuppliedRoadRoute> entry : request.getRoadRouteOverrides().entrySet()) {
+        String prefix = mode.displayName() + " route override sequence ";
+        for (Map.Entry<Integer, SuppliedRoute> entry : overrides.entrySet()) {
             Integer sequence = entry.getKey();
-            SuppliedRoadRoute route = entry.getValue();
+            SuppliedRoute route = entry.getValue();
             if (sequence == null || sequence < 1 || sequence > legs.size()) {
-                throw new IllegalArgumentException(
-                        "Road route override sequence " + sequence + " is outside the movement's leg range.");
+                throw new IllegalArgumentException(prefix + sequence + " is outside the movement's leg range.");
             }
-            if (legs.get(sequence - 1).mode() != TransportMode.ROAD) {
-                throw new IllegalArgumentException("Road route override sequence " + sequence + " does not refer to a road leg.");
+            if (legs.get(sequence - 1).mode() != mode) {
+                throw new IllegalArgumentException(prefix + sequence + " does not refer to a " + mode.wireString() + " leg.");
             }
             if (route == null) {
-                throw new IllegalArgumentException("Road route override sequence " + sequence + " is null.");
+                throw new IllegalArgumentException(prefix + sequence + " is null.");
             }
             if (!Double.isFinite(route.distanceKm()) || route.distanceKm() < 0.0) {
-                throw new IllegalArgumentException("Road route override sequence " + sequence + " has an invalid distance.");
+                throw new IllegalArgumentException(prefix + sequence + " has an invalid distance.");
             }
             Double duration = route.durationHours();
             if (duration != null && (!Double.isFinite(duration) || duration < 0.0)) {
-                throw new IllegalArgumentException("Road route override sequence " + sequence + " has an invalid duration.");
+                throw new IllegalArgumentException(prefix + sequence + " has an invalid duration.");
             }
             if (route.distanceKm() > 0.0 && duration != null && duration <= 0.0) {
-                throw new IllegalArgumentException("Road route override sequence " + sequence
-                        + " has a non-positive duration for a non-zero distance.");
+                throw new IllegalArgumentException(prefix + sequence + " has a non-positive duration for a non-zero distance.");
             }
             if (route.source().isBlank()) {
-                throw new IllegalArgumentException("Road route override sequence " + sequence + " has a blank source.");
+                throw new IllegalArgumentException(prefix + sequence + " has a blank source.");
             }
             if (route.geometry() != null && route.geometry().size() == 1) {
-                throw new IllegalArgumentException(
-                        "Road route override sequence " + sequence + " geometry needs at least two positions.");
+                throw new IllegalArgumentException(prefix + sequence + " geometry needs at least two positions.");
             }
             if (route.geometry() != null) {
                 for (Coordinate coordinate : route.geometry()) {

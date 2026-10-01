@@ -76,6 +76,13 @@ final class GeoJsonSerializer {
             }
             writer.endArray();
         }
+        if (p.getRailroads() != null) {
+            writer.name("railroads").beginArray();
+            for (String railroad : p.getRailroads()) {
+                writer.value(railroad);
+            }
+            writer.endArray();
+        }
         if (p.getLeg() != null) {
             writer.name("leg").value((long) p.getLeg());
         }

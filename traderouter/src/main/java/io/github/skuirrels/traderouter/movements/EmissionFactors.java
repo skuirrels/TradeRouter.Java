@@ -11,6 +11,7 @@ public final class EmissionFactors {
     private double seaGramsPerTonneKm = 7.6;
     private double roadGramsPerTonneKm = 92.0;
     private double railGramsPerTonneKm = 28.0;
+    private double railNorthAmericaGramsPerTonneKm = 16.0;
     private double airShortHaulGramsPerTonneKm = 1130.0;
     private double airMediumHaulGramsPerTonneKm = 700.0;
     private double airLongHaulGramsPerTonneKm = 630.0;
@@ -70,7 +71,10 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Rail freight. GLEC Table 38, European diesel traction, average/mixed load, 28 g CO2e per tonne-km WTW. */
+    /**
+     * Rail freight outside North America. GLEC Table 38, European diesel traction, average/mixed load,
+     * 28 g CO2e per tonne-km WTW.
+     */
     public double getRailGramsPerTonneKm() {
         return railGramsPerTonneKm;
     }
@@ -78,6 +82,21 @@ public final class EmissionFactors {
     /** Sets the rail rate. */
     public EmissionFactors setRailGramsPerTonneKm(double value) {
         this.railGramsPerTonneKm = value;
+        return this;
+    }
+
+    /**
+     * Rail freight in North America: a rail leg whose ends both lie within
+     * {@link MovementRequest#getRailNetworkSnapKm()} of the embedded North American rail network. GLEC Module 2,
+     * North America, US average diesel, 16 g CO2e per tonne-km WTW, derived from Class I railroad fuel reporting.
+     */
+    public double getRailNorthAmericaGramsPerTonneKm() {
+        return railNorthAmericaGramsPerTonneKm;
+    }
+
+    /** Sets the North American rail rate. */
+    public EmissionFactors setRailNorthAmericaGramsPerTonneKm(double value) {
+        this.railNorthAmericaGramsPerTonneKm = value;
         return this;
     }
 
@@ -114,7 +133,11 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Returns the factor for a leg of the given mode and length. Air uses the GLEC distance bands. */
+    /**
+     * Returns the factor for a leg of the given mode and length. Air uses the GLEC distance bands. Rail returns
+     * {@link #getRailGramsPerTonneKm()}; a movement charges North American rail legs at
+     * {@link #getRailNorthAmericaGramsPerTonneKm()} instead.
+     */
     public double gramsPerTonneKm(TransportMode mode, double distanceKm) {
         return switch (mode) {
             case SEA -> seaGramsPerTonneKm;
@@ -136,6 +159,7 @@ public final class EmissionFactors {
         validateNonNegative(seaGramsPerTonneKm, "seaGramsPerTonneKm");
         validateNonNegative(roadGramsPerTonneKm, "roadGramsPerTonneKm");
         validateNonNegative(railGramsPerTonneKm, "railGramsPerTonneKm");
+        validateNonNegative(railNorthAmericaGramsPerTonneKm, "railNorthAmericaGramsPerTonneKm");
         validateNonNegative(airShortHaulGramsPerTonneKm, "airShortHaulGramsPerTonneKm");
         validateNonNegative(airMediumHaulGramsPerTonneKm, "airMediumHaulGramsPerTonneKm");
         validateNonNegative(airLongHaulGramsPerTonneKm, "airLongHaulGramsPerTonneKm");

@@ -2,12 +2,15 @@ package io.github.skuirrels.traderouter.movements;
 
 import io.github.skuirrels.traderouter.TradeRouterOptions;
 import io.github.skuirrels.traderouter.common.Coordinate;
+import io.github.skuirrels.traderouter.locations.LocationFunction;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -18,6 +21,7 @@ public final class MovementRequest {
     private List<MovementLeg> legs = new ArrayList<>();
     private final Map<String, Coordinate> coordinates = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private LocationResolver resolver;
+    private final Map<String, Set<LocationFunction>> additionalLocationFunctions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private TradeRouterOptions seaOptions;
     private EmissionFactors emissions = EmissionFactors.glecDefaults();
     private Double cargoTonnes;
@@ -27,10 +31,13 @@ public final class MovementRequest {
     private double transshipmentConnectionHours = 48.0;
     private final Map<TransportMode, Double> speedsKmh = new EnumMap<>(TransportMode.class);
     private RoadRouteProvider roadRouteProvider;
+    private RailRoutingMode railRoutingMode = RailRoutingMode.PREFER_NETWORK_THEN_GREAT_CIRCLE;
+    private double railNetworkSnapKm = 25.0;
     private RoadRoutingMode roadRoutingMode = RoadRoutingMode.PREFER_NETWORK_THEN_ESTIMATE;
     private RoadDurationMode roadDurationMode = RoadDurationMode.CONFIGURED_SPEED;
     private RoadDistanceEstimator roadDistanceEstimator = DistanceDecayRoadDistanceEstimator.getDefault();
-    private final Map<Integer, SuppliedRoadRoute> roadRouteOverrides = new TreeMap<>();
+    private final Map<Integer, SuppliedRoute> roadRouteOverrides = new TreeMap<>();
+    private final Map<Integer, SuppliedRoute> railRouteOverrides = new TreeMap<>();
 
     /** Creates an empty request. */
     public MovementRequest() {
@@ -94,6 +101,24 @@ public final class MovementRequest {
     /** Sets the resolver. */
     public MovementRequest setResolver(LocationResolver resolver) {
         this.resolver = resolver;
+        return this;
+    }
+
+    /**
+     * Functions to add to a location's recorded UN/LOCODE functions, keyed case-insensitively by code. The UNECE
+     * list under-records many terminals, and the embedded sea-port and rail supplements cover only reviewed codes,
+     * so a leg to another rail-served place can still be rejected. Declaring {@link LocationFunction#RAIL_TERMINAL}
+     * here lets the waypoint and mode checks accept it. The functions are added only for validation; they do not
+     * change how the code resolves. The map is live and may be modified.
+     */
+    public Map<String, Set<LocationFunction>> getAdditionalLocationFunctions() {
+        return additionalLocationFunctions;
+    }
+
+    /** Declares functions to add to a location code's recorded UN/LOCODE functions for validation. */
+    public MovementRequest addLocationFunctions(String code, LocationFunction first, LocationFunction... rest) {
+        additionalLocationFunctions.computeIfAbsent(code, ignored -> EnumSet.noneOf(LocationFunction.class))
+                .addAll(EnumSet.of(first, rest));
         return this;
     }
 
@@ -227,6 +252,35 @@ public final class MovementRequest {
         return this;
     }
 
+    /**
+     * Controls rail legs. By default a leg whose ends both lie near the embedded North American rail network is
+     * routed on it; any other rail leg keeps great-circle distance and carries a warning.
+     */
+    public RailRoutingMode getRailRoutingMode() {
+        return railRoutingMode;
+    }
+
+    /** Sets the rail routing mode. */
+    public MovementRequest setRailRoutingMode(RailRoutingMode railRoutingMode) {
+        this.railRoutingMode = railRoutingMode;
+        return this;
+    }
+
+    /**
+     * Furthest a rail leg's end may lie from the nearest point of the rail network, in kilometres, for the leg to
+     * be routed on it. The default is 25 km, enough for a UN/LOCODE city position to reach a line through its
+     * city. The gap at each end is added to the leg as straight-line distance.
+     */
+    public double getRailNetworkSnapKm() {
+        return railNetworkSnapKm;
+    }
+
+    /** Sets the rail network snap distance in kilometres. */
+    public MovementRequest setRailNetworkSnapKm(double railNetworkSnapKm) {
+        this.railNetworkSnapKm = railNetworkSnapKm;
+        return this;
+    }
+
     /** Controls provider use and fallback behaviour for road legs. */
     public RoadRoutingMode getRoadRoutingMode() {
         return roadRoutingMode;
@@ -273,13 +327,30 @@ public final class MovementRequest {
      * fixed literals here to force an expected result; application and sample code should use the estimator or
      * a configured provider. The map is live and may be modified.
      */
-    public Map<Integer, SuppliedRoadRoute> getRoadRouteOverrides() {
+    public Map<Integer, SuppliedRoute> getRoadRouteOverrides() {
         return roadRouteOverrides;
     }
 
     /** Adds an imported road result for a one-based leg sequence. */
-    public MovementRequest putRoadRouteOverride(int sequence, SuppliedRoadRoute route) {
+    public MovementRequest putRoadRouteOverride(int sequence, SuppliedRoute route) {
         roadRouteOverrides.put(sequence, route);
+        return this;
+    }
+
+    /**
+     * Complete rail results imported from an authoritative upstream routing system, keyed by one-based leg
+     * sequence. An entry takes precedence over the embedded rail network and great-circle distance, so use it where
+     * the network has no coverage or a rail planner knows the actual route. A supplied duration is used as given;
+     * otherwise duration is the supplied distance divided by the configured rail speed. The map is live and may be
+     * modified.
+     */
+    public Map<Integer, SuppliedRoute> getRailRouteOverrides() {
+        return railRouteOverrides;
+    }
+
+    /** Adds an imported rail result for a one-based leg sequence. */
+    public MovementRequest putRailRouteOverride(int sequence, SuppliedRoute route) {
+        railRouteOverrides.put(sequence, route);
         return this;
     }
 }

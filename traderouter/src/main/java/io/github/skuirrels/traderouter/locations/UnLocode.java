@@ -11,8 +11,8 @@ import java.util.Set;
  * @param code             five-character UN/LOCODE
  * @param name             location name without diacritics
  * @param coordinate       UNECE position to one minute of arc, an attributed supplement position, or null
- * @param functions        recorded functions, with the sea-port function added for codes listed in the sea-port
- *                         supplement file
+ * @param functions        recorded functions, with the sea-port or rail-terminal function added for codes listed in
+ *                         the sea-port or rail supplement file
  * @param coordinateSource "UNECE" when the position comes from the code list, otherwise the researched source
  *                         named in the supplement file; empty when there is no position
  */

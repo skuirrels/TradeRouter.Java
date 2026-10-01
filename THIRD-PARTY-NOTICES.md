@@ -10,6 +10,10 @@ Copyright 2024 Gent Halili. Distributed under the [Apache License 2.0](https://g
 
 searoute-py credits [Eurostat SeaRoute](https://github.com/eurostat/searoute) for the maritime network. The Eurostat repository is licensed under EUPL-1.2 and documents the earlier Oak Ridge shipping-lane and AIS-derived inputs.
 
+## North American Rail Network
+
+The embedded rail graph is transformed from the [North American Rail Network Lines](https://doi.org/10.21949/1528950) in the U.S. Department of Transportation Bureau of Transportation Statistics National Transportation Atlas Database, compiled from Federal Railroad Administration data. It is a work of the United States government under 17 U.S.C. § 101, not protected by U.S. copyright and available for unrestricted public use. The graph keeps the main line only and simplifies its geometry; see `DATA_PROVENANCE.md` and the scripts in `tools/`.
+
 ## UN/LOCODE
 
 The embedded location-code data is published by the [United Nations Economic Commission for Europe](https://unlocode.unece.org/). UNECE states that UN/CEFACT standards are free to use under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

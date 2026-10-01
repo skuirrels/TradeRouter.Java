@@ -64,6 +64,41 @@ public final class EmbeddedResources {
     }
 
     /**
+     * Loads and builds the North American rail graph from the embedded {@code rail-narn.json.gz} dataset: the main
+     * line of the BTS North American Rail Network. Each edge's label is the reporting mark of the railroad that owns
+     * the track, and its weight is the published track length in kilometres.
+     */
+    public static MaritimeGraph loadRailGraph() {
+        MaritimeGraph graph = new MaritimeGraph();
+
+        Map<String, Object> root = JsonParser.asObject(JsonParser.parse(readGzipResource("rail-narn.json.gz")));
+        List<Object> ownerItems = JsonParser.asArray(root.get("owners"));
+        String[] owners = new String[ownerItems.size()];
+        for (int i = 0; i < owners.length; i++) {
+            owners[i] = JsonParser.asString(ownerItems.get(i));
+        }
+        for (Object nodeItem : JsonParser.asArray(root.get("nodes"))) {
+            List<Object> node = JsonParser.asArray(nodeItem);
+            graph.addNode(new Coordinate(JsonParser.asDouble(node.get(0)), JsonParser.asDouble(node.get(1))));
+        }
+
+        // Track runs both ways, so each stored edge is added in both directions.
+        for (Object edgeItem : JsonParser.asArray(root.get("edges"))) {
+            List<Object> edge = JsonParser.asArray(edgeItem);
+            int u = JsonParser.asInt(edge.get(0));
+            int v = JsonParser.asInt(edge.get(1));
+            double weight = JsonParser.asDouble(edge.get(2));
+            String mark = owners[JsonParser.asInt(edge.get(3))];
+            String owner = mark != null && !mark.isEmpty() ? mark : null;
+            graph.addDirectedEdge(u, v, weight, owner);
+            graph.addDirectedEdge(v, u, weight, owner);
+        }
+
+        graph.buildIndex();
+        return graph;
+    }
+
+    /**
      * Loads the UN/LOCODE list from the embedded {@code unlocode.json.gz} dataset: arrays of
      * {@code [code, name, longitude or null, latitude or null, function flags]}.
      */
@@ -71,7 +106,8 @@ public final class EmbeddedResources {
         List<Object> items = JsonParser.asArray(JsonParser.parse(readGzipResource("unlocode.json.gz")));
 
         Map<String, Supplement> supplement = loadUnLocodeSupplement();
-        Set<String> confirmedSeaPorts = loadSeaPortSupplement();
+        Set<String> confirmedSeaPorts = loadFunctionSupplement("unlocode-seaport-supplement.json");
+        Set<String> confirmedRailTerminals = loadFunctionSupplement("unlocode-rail-supplement.json");
         List<UnLocode> entries = new ArrayList<>(items.size());
         for (Object item : items) {
             List<Object> row = JsonParser.asArray(item);
@@ -84,6 +120,10 @@ public final class EmbeddedResources {
             // Codes UNECE lists without the sea-port function but that are documented deep-sea terminals.
             if (confirmedSeaPorts.contains(code.toUpperCase(Locale.ROOT))) {
                 flags |= LocationFunction.SEA_PORT.bit();
+            }
+            // Codes UNECE lists without the rail function but that are documented freight rail terminals.
+            if (confirmedRailTerminals.contains(code.toUpperCase(Locale.ROOT))) {
+                flags |= LocationFunction.RAIL_TERMINAL.bit();
             }
             var functions = LocationFunction.fromFlags(flags);
             String coordinateSource = coordinate != null ? "UNECE" : "";
@@ -132,12 +172,13 @@ public final class EmbeddedResources {
     }
 
     /**
-     * Loads {@code unlocode-seaport-supplement.json}: codes that UNECE publishes without the sea-port function but
-     * that cited sources document as sea ports, so movements may declare them as ports and route sea legs.
+     * Loads a function supplement: {@code unlocode-seaport-supplement.json} lists codes that UNECE publishes without
+     * the sea-port function but that cited sources document as sea ports; {@code unlocode-rail-supplement.json} does
+     * the same for freight rail terminals. Each entry only adds its function and never removes one.
      */
-    private static Set<String> loadSeaPortSupplement() {
+    private static Set<String> loadFunctionSupplement(String fileName) {
         Set<String> result = new HashSet<>();
-        String text = readTextResource("unlocode-seaport-supplement.json");
+        String text = readTextResource(fileName);
         if (text == null) {
             return result;
         }
