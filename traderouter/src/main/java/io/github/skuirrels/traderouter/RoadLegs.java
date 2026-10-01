@@ -7,6 +7,7 @@ import io.github.skuirrels.traderouter.common.RouteNormalizer;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
 import io.github.skuirrels.traderouter.geojson.GeoJsonGeometry;
 import io.github.skuirrels.traderouter.geojson.TradeRouterProperties;
+import io.github.skuirrels.traderouter.json.JsonWriter;
 import io.github.skuirrels.traderouter.movements.MovementLeg;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
@@ -130,7 +131,8 @@ final class RoadLegs {
         }
         if (!Double.isFinite(estimate.distanceKm()) || estimate.distanceKm() < straightLineKm) {
             throw new IllegalStateException("Road-distance estimator '" + estimate.model() + "' returned "
-                    + estimate.distanceKm() + " km for a " + straightLineKm + " km great-circle lower bound.");
+                    + JsonWriter.formatDouble(estimate.distanceKm()) + " km for a "
+                    + JsonWriter.formatDouble(straightLineKm) + " km great-circle lower bound.");
         }
 
         String warning = providerWarning == null || providerWarning.isBlank()

@@ -62,6 +62,22 @@ class RailValidationTests {
     }
 
     @Test
+    void railAdditionalLocationFunctionsAcceptImmutableSets() {
+        // Immutable sets reject a null probe, so validation and addLocationFunctions must not mutate or probe them.
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.station("ITMLN"))
+                .thenTo(Waypoint.station("DEDUI"), TransportMode.RAIL);
+        MovementRequest request = new MovementRequest(List.copyOf(plan.legs()));
+        request.getAdditionalLocationFunctions().put("ITMLN", Set.of(LocationFunction.RAIL_TERMINAL));
+
+        assertThat(DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs()).hasSize(1);
+
+        request.addLocationFunctions("ITMLN", LocationFunction.MULTIMODAL);
+        assertThat(request.getAdditionalLocationFunctions().get("itmln"))
+                .containsExactlyInAnyOrder(LocationFunction.RAIL_TERMINAL, LocationFunction.MULTIMODAL);
+    }
+
+    @Test
     void railAdditionalLocationFunctionsDoNotAffectOtherCodes() {
         MovementRequest request = new MovementRequest(MovementParser.parse("GBFXT to DEDUI Rail"));
         request.addLocationFunctions("ITMLN", LocationFunction.RAIL_TERMINAL);

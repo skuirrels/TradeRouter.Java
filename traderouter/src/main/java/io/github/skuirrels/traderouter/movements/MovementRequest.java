@@ -117,8 +117,12 @@ public final class MovementRequest {
 
     /** Declares functions to add to a location code's recorded UN/LOCODE functions for validation. */
     public MovementRequest addLocationFunctions(String code, LocationFunction first, LocationFunction... rest) {
-        additionalLocationFunctions.computeIfAbsent(code, ignored -> EnumSet.noneOf(LocationFunction.class))
-                .addAll(EnumSet.of(first, rest));
+        // Merge into a fresh set: a caller may have stored an immutable set through the live map.
+        additionalLocationFunctions.merge(code, EnumSet.of(first, rest), (existing, added) -> {
+            Set<LocationFunction> merged = EnumSet.copyOf(added);
+            merged.addAll(existing);
+            return merged;
+        });
         return this;
     }
 

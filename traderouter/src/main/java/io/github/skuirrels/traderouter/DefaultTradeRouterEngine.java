@@ -763,7 +763,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                 throw new IllegalArgumentException("SpeedsKmh contains unsupported mode '" + mode + "'.");
             }
             if (speed == null || !Double.isFinite(speed) || speed <= 0) {
-                throw new IllegalArgumentException("Speed for " + mode + " must be finite and positive. Received: " + speed);
+                throw new IllegalArgumentException("Speed for " + mode.displayName() + " must be finite and positive. Received: " + speed);
             }
         }
 
@@ -796,7 +796,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             if (entry.getKey() == null || entry.getKey().isBlank()) {
                 throw new IllegalArgumentException("Additional location function keys cannot be blank.");
             }
-            if (entry.getValue() == null || entry.getValue().contains(null)) {
+            // Iterate rather than call contains(null): immutable sets such as Set.of reject a null probe.
+            if (entry.getValue() == null || entry.getValue().stream().anyMatch(Objects::isNull)) {
                 throw new IllegalArgumentException("Additional location functions for " + entry.getKey() + " cannot be null.");
             }
         }

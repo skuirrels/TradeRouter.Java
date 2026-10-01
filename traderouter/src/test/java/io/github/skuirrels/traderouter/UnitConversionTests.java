@@ -3,9 +3,11 @@ package io.github.skuirrels.traderouter;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.common.DistanceUnit;
 import io.github.skuirrels.traderouter.common.Haversine;
+import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
 
@@ -104,5 +106,72 @@ class UnitConversionTests {
         assertThatThrownBy(() -> Haversine.distanceKm(new Coordinate(0, 91), new Coordinate(0, 0)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Latitude");
+    }
+
+    @ParameterizedTest
+    @EnumSource(DistanceUnit.class)
+    void unitStringRoundTripsThroughParse(DistanceUnit unit) {
+        assertThat(DistanceUnit.parse(unit.unitString())).isEqualTo(unit);
+    }
+
+    @ParameterizedTest
+    @EnumSource(DistanceUnit.class)
+    void speedCoefficientMatchesOneNauticalMileInTheSameUnit(DistanceUnit unit) {
+        double oneNauticalMile = 1852.0 * unit.conversionFactorFromMeters();
+
+        assertThat(unit.speedCoefficient()).isCloseTo(oneNauticalMile, within(oneNauticalMile * 1e-5));
+    }
+
+    @ParameterizedTest
+    @CsvSource(nullValues = "null", value = {
+            "' Kilometers ', KM",
+            "METER, METERS",
+            "miles, MILES",
+            "foot, FEET",
+            "inches, INCHES",
+            "degree, DEGREES",
+            "cm, CENTIMETERS",
+            "radians, RADIANS",
+            "NauticalMiles, NAUTICAL_MILES",
+            "nautical, NAUTICAL_MILES",
+            "yard, YARDS",
+            "null, KM",
+            "'', KM",
+            "'   ', KM"
+    })
+    void parseAcceptsAliasesAndDefaultsBlankToKilometres(String unitStr, DistanceUnit expected) {
+        assertThat(DistanceUnit.parse(unitStr)).isEqualTo(expected);
+    }
+
+    @Test
+    void parseRejectsUnknownUnitAndListsValidOnes() {
+        assertThatThrownBy(() -> DistanceUnit.parse("furlong"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Unsupported distance unit: 'furlong'. Valid units:");
+    }
+
+    @Test
+    void optionsUnitStringReadsAndWritesUnits() {
+        TradeRouterOptions options = new TradeRouterOptions().setUnitString("yd");
+
+        assertThat(options.getUnits()).isEqualTo(DistanceUnit.YARDS);
+        assertThat(options.getUnitString()).isEqualTo("yd");
+        assertThatThrownBy(() -> options.setUnitString("furlong")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @EnumSource(DistanceUnit.class)
+    void routeLengthAndDurationAreConsistentAcrossUnits(DistanceUnit unit) {
+        Coordinate origin = new Coordinate(5.333333, 43.333333);
+        Coordinate destination = new Coordinate(18.366667, -33.916667);
+        GeoJsonFeature inKm = TradeRoutes.calculate(origin, destination, new TradeRouterOptions());
+
+        GeoJsonFeature inUnit = TradeRoutes.calculate(origin, destination, new TradeRouterOptions().setUnits(unit));
+
+        double expectedLength = inKm.properties().getLength() * 1000.0 * unit.conversionFactorFromMeters();
+        assertThat(inUnit.properties().getUnits()).isEqualTo(unit.unitString());
+        assertThat(inUnit.properties().getLength()).isCloseTo(expectedLength, within(expectedLength * 1e-9));
+        assertThat(inUnit.properties().getDurationHours())
+                .isCloseTo(inKm.properties().getDurationHours(), within(inKm.properties().getDurationHours() * 1e-5));
     }
 }

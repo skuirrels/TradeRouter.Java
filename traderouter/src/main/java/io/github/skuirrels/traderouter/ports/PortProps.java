@@ -80,9 +80,10 @@ public final class PortProps {
         return coordinate;
     }
 
+    // The numeric types .NET accepts: double, float, int and long. Other Number types such as BigDecimal are rejected.
     private static Double toDouble(Object obj) {
-        if (obj instanceof Number number) {
-            return number.doubleValue();
+        if (obj instanceof Double || obj instanceof Float || obj instanceof Integer || obj instanceof Long) {
+            return ((Number) obj).doubleValue();
         }
         if (obj instanceof String s) {
             try {
