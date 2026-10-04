@@ -8,7 +8,9 @@ The embedded maritime network and port list are transformed from files distribut
 
 Copyright 2024 Gent Halili. Distributed under the [Apache License 2.0](https://github.com/genthalili/searoute-py/blob/1.6.0/LICENCE.txt). The embedded files are modified into compact JSON/gzip form; see `DATA_PROVENANCE.md` and the scripts in `tools/`.
 
-searoute-py credits [Eurostat SeaRoute](https://github.com/eurostat/searoute) for the maritime network. The Eurostat repository is licensed under EUPL-1.2 and documents the earlier Oak Ridge shipping-lane and AIS-derived inputs.
+searoute-py credits [Eurostat SeaRoute](https://github.com/eurostat/searoute) for the maritime network. The Eurostat repository is licensed under the [European Union Public Licence 1.2](https://github.com/eurostat/searoute/blob/master/LICENSE) and documents the earlier Oak Ridge shipping-lane and AIS-derived inputs.
+
+The embedded Marnet network is therefore derived from material that Eurostat publishes under EUPL-1.2. searoute-py distributes its copy under Apache-2.0, and TradeRouter.Java takes the network from that distribution. The Apache-2.0 licence on TradeRouter.Java's code does not override any EUPL-1.2 terms that apply to the network. Users who redistribute the embedded maritime data should review EUPL-1.2 alongside this notice.
 
 ## North American Rail Network
 

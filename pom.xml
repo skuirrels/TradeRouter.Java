@@ -10,8 +10,21 @@
   <packaging>pom</packaging>
 
   <name>TradeRouter.Java</name>
-  <description>High-performance Java maritime shortest-path routing library based on Eurostat marnet data.</description>
+  <description>High-performance Java maritime shortest-path routing library on the Marnet network from searoute-py 1.6.0, derived from Eurostat SeaRoute, with North American rail routing on the BTS North American Rail Network.</description>
   <url>https://github.com/skuirrels/TradeRouter.Java</url>
+  <inceptionYear>2026</inceptionYear>
+
+  <!-- Copyright 2026 Tyrone Omidi; the organisation name and inception year also form the Javadoc copyright line. -->
+  <organization>
+    <name>Tyrone Omidi</name>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>skuirrels</id>
+      <name>Tyrone Omidi</name>
+    </developer>
+  </developers>
 
   <licenses>
     <license>
@@ -125,6 +138,8 @@
           <configuration>
             <doclint>none</doclint>
             <quiet>true</quiet>
+            <!-- The default footer adds "All rights reserved", which contradicts the Apache-2.0 licence. -->
+            <bottom>Copyright &#169; ${project.inceptionYear} ${project.organization.name}. Licensed under the Apache License, Version 2.0.</bottom>
           </configuration>
         </plugin>
         <plugin>
