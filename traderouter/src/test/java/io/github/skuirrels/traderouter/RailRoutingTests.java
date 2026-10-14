@@ -119,8 +119,8 @@ class RailRoutingTests {
 
         assertThat(rail.length()).isEqualTo(640.0);
         assertThat(rail.durationHours()).isCloseTo(640.0 / 80.0, within(1e-9));
-        assertThat(rail.co2eKgPerTonne()).isCloseTo(17.92, within(1e-9));
-        assertThat(rail.co2eKg()).isCloseTo(358.4, within(1e-9));
+        assertThat(rail.co2eKgPerTonne()).isCloseTo(19.648, within(1e-9));
+        assertThat(rail.co2eKg()).isCloseTo(392.96, within(1e-9));
         TradeRouterProperties properties = rail.feature().properties();
         assertThat(properties.getDistanceBasis()).isEqualTo("supplied");
         assertThat(properties.getDistanceSource()).isEqualTo("rail-planner");
@@ -182,9 +182,9 @@ class RailRoutingTests {
         LegResult leg = singleLeg(request);
 
         assertThat(leg.feature().properties().getDistanceBasis()).isEqualTo("rail_network");
-        assertThat(leg.co2eGramsPerTonneKm()).isEqualTo(16.0);
-        assertThat(leg.co2eKgPerTonne()).isCloseTo(16.0 * leg.length() / 1000.0, within(1e-9));
-        assertThat(leg.co2eKg()).isCloseTo(16.0 * leg.length() / 1000.0 * 12.0, within(1e-9));
+        assertThat(leg.co2eGramsPerTonneKm()).isEqualTo(16.1);
+        assertThat(leg.co2eKgPerTonne()).isCloseTo(16.1 * leg.length() / 1000.0, within(1e-9));
+        assertThat(leg.co2eKg()).isCloseTo(16.1 * leg.length() / 1000.0 * 12.0, within(1e-9));
     }
 
     @Test
@@ -194,15 +194,15 @@ class RailRoutingTests {
         MovementRequest greatCircle = railLeg(LOS_ANGELES, "Los Angeles", CHICAGO, "Chicago");
         greatCircle.setRailRoutingMode(RailRoutingMode.GREAT_CIRCLE_ONLY);
 
-        assertThat(singleLeg(supplied).co2eGramsPerTonneKm()).isEqualTo(16.0);
-        assertThat(singleLeg(greatCircle).co2eGramsPerTonneKm()).isEqualTo(16.0);
+        assertThat(singleLeg(supplied).co2eGramsPerTonneKm()).isEqualTo(16.1);
+        assertThat(singleLeg(greatCircle).co2eGramsPerTonneKm()).isEqualTo(16.1);
     }
 
     @Test
     void railLegOutsideNorthAmericaKeepsTheEuropeanDieselFactor() {
         LegResult leg = singleLeg(railLeg(LONDON, "London", FELIXSTOWE, "Felixstowe"));
 
-        assertThat(leg.co2eGramsPerTonneKm()).isEqualTo(28.0);
+        assertThat(leg.co2eGramsPerTonneKm()).isEqualTo(30.7);
     }
 
     @Test

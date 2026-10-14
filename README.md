@@ -55,17 +55,17 @@ Both cargo measurements are shown together only to demonstrate the two emissions
 ```text
 Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total               Basis  Choke points
                                                                                    hours      g per t-km  kg per t cargo          kg
-1   Pickup    Road  GBLGW  GBFXT        183 km   circuity_estimate                     3.0            92.0            16.8         337  teu_average_weight
-2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network                   895.2             7.6           117.1       2,341                 teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca
-3   Main      Sea   SGSIN  AUMEL      7,300 km    maritime_network                   391.6             7.6            55.5       1,110                 teu  Sunda
-4   Delivery  Road  AUMEL  AUMRS      1,011 km   circuity_estimate                    16.8            92.0            93.0       1,860  teu_average_weight
-Total                                23,896 km                                     1,306.7                           282.4       5,647                      for 12 t of cargo in 2 TEU
+1   Pickup    Road  GBLGW  GBFXT        183 km   circuity_estimate                     3.0           125.0            22.9         457  teu_average_weight
+2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network                   895.2             7.2           110.4       2,209                 teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca
+3   Main      Sea   SGSIN  AUMEL      7,300 km    maritime_network                   391.6             7.2            52.3       1,047                 teu  Sunda
+4   Delivery  Road  AUMEL  AUMRS      1,011 km   circuity_estimate                    16.8           125.0           126.4       2,527  teu_average_weight
+Total                                23,896 km                                     1,306.7                           312.0       6,240                      for 12 t of cargo in 2 TEU
 Modelled minimum = 786.0 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,306.7 h (54.4 days)
 Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line
 Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption
 CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)
 CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg
-CO2e total     = kg of CO2e for this shipment: 76 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
+CO2e total     = kg of CO2e for this shipment: 71.7 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
 ```
 
 ### Sea and rail movement
@@ -93,16 +93,16 @@ The container weighs more than the GLEC average of 10 t per TEU, so the rail and
 ```text
 Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total               Basis  Choke points
                                                                                    hours      g per t-km  kg per t cargo          kg
-1   Main      Sea   CNSHG  DEHAM     19,991 km    maritime_network                 1,147.7             7.6           151.9       3,039                 teu  Malacca, Bab-el-Mandeb, Suez, Gibraltar
-2   Main      Rail  DEHAM  CZPRG        491 km        great_circle                     6.1            28.0            13.8         330              tonnes
-3   Delivery  Road  CZPRG  CZPLZ        112 km   circuity_estimate                     1.9            92.0            10.3         248              tonnes
-Total                                20,595 km                                     1,155.7                           176.0       3,617                      for 24 t of cargo in 2 TEU
+1   Main      Sea   CNSHG  DEHAM     19,991 km    maritime_network                 1,147.7             7.2           143.3       2,867                 teu  Malacca, Bab-el-Mandeb, Suez, Gibraltar
+2   Main      Rail  DEHAM  CZPRG        491 km        great_circle                     6.1            30.7            15.1         362              tonnes
+3   Delivery  Road  CZPRG  CZPLZ        112 km   circuity_estimate                     1.9           125.0            14.1         337              tonnes
+Total                                20,595 km                                     1,155.7                           172.5       3,566                      for 24 t of cargo in 2 TEU
 Modelled minimum = 682.7 h travel + 425.0 h sea operations + 48 h port handling + 0 h connections = 1,155.7 h (48.2 days)
 Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line
 Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption
 CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)
 CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg
-CO2e total     = kg of CO2e for this shipment: 76 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
+CO2e total     = kg of CO2e for this shipment: 71.7 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
 ```
 
 ---
@@ -568,7 +568,7 @@ Set all three to zero for pure distance-divided-by-speed time. Even with the def
 
 ### Emissions
 
-Every movement leg carries a well-to-wheel CO2e estimate, and the totals add them up. The figures are intensity-based: grams of CO2e per tonne of cargo per kilometre, from the GLEC Framework defaults that ISO 14083 builds on. Pass cargo tonnes to get absolute kilograms as well.
+Every movement leg carries a well-to-wheel CO2e estimate, and the totals add them up. The figures are intensity-based: grams of CO2e per tonne of cargo per kilometre, from the GLEC Framework v3.2 defaults that ISO 14083 builds on. Pass cargo tonnes to get absolute kilograms as well.
 
 ```java
 var movement = TradeRoutes.calculateMovement(plan, null, 20.0, null);
@@ -583,20 +583,23 @@ System.out.printf("%.1f kg CO2e per tonne, %.0f kg for %s t%n",
 
 Each leg feature gains `co2e_g_per_tonne_km`, `co2e_kg_per_tonne` and, with a cargo weight or TEU count, `co2e_kg` and `co2e_basis`; sea legs charged per container also carry `co2e_g_per_teu_km`. The collection gains `total_co2e_kg_per_tonne`, `cargo_tonnes`, `cargo_teu` and `total_co2e_kg`.
 
-Pass a TEU count as well for containerised freight. Sea legs are then charged per container at 76 g CO2e per TEU-km, because a light box still occupies a whole slot; a 40-foot container counts as 2 TEU and a 40-foot high cube as 2.25. Road and rail legs are charged on the greater of the gross weight and the GLEC average of 10 t per TEU: a light container still needs a whole truck or wagon slot, and the per-tonne defaults assume an average load, so charging only the cargo inside a nearly empty box would understate the leg. A container heavier than the average is charged on its stated weight. Air legs use the gross weight, and if only a TEU count is given every non-sea leg assumes 10 t per TEU. Weights are gross physical weight, not chargeable weight, as GLEC and ISO 14083 require.
+Pass a TEU count as well for containerised freight. Sea legs are then charged per container at 71.7 g CO2e per TEU-km, because a light box still occupies a whole slot; a 40-foot container counts as 2 TEU and a 40-foot high cube as 2.25. Road and rail legs are charged on the greater of the gross weight and the GLEC average of 10 t per TEU: a light container still needs a whole truck or wagon slot, and the per-tonne defaults assume an average load, so charging only the cargo inside a nearly empty box would understate the leg. A container heavier than the average is charged on its stated weight. Air legs use the gross weight, and if only a TEU count is given every non-sea leg assumes 10 t per TEU. Weights are gross physical weight, not chargeable weight, as GLEC and ISO 14083 require.
 
 | Mode | Default, g CO2e per tonne-km, well-to-wheel | GLEC source |
 |---|---|---|
-| Sea, per tonne | 7.6 | Table 46, industry-average dry container, 76 g per TEU-km at the GLEC average of 10 t per TEU |
-| Sea, per container | 76 per TEU-km | Table 46, industry-average dry container, used when a TEU count is given |
-| Road | 92 | Europe starting value for an HGV over 20 t gross vehicle weight |
-| Rail, North America | 16 | Module 2 rail, North America: US average diesel from Class I railroad fuel reporting. Used when both ends of a rail leg lie within `getRailNetworkSnapKm()` of the embedded North American rail network |
-| Rail, elsewhere | 28 | Table 38, European diesel traction, average mixed load |
-| Air, under 1,000 km | 1,130 | Table 35, ICAO/IATA RP1678 basis, aircraft type unknown |
-| Air, 1,000 to 3,700 km | 700 | Table 35, as above |
-| Air, over 3,700 km | 630 | Table 35, as above |
+| Sea, per tonne | 7.17 | Table 18, industry-average dry container, 71.7 g per TEU-km at the GLEC average of 10 t per TEU |
+| Sea, per container | 71.7 per TEU-km | Table 18, industry-average dry container, end-user intensity, used when a TEU count is given |
+| Road | 125 | Europe starting value for an HGV over 20 t gross vehicle weight, including GLEC's +5% distance adjustment |
+| Rail, North America | 16.1 | Module 2 rail, North America: US average diesel from Class I railroad fuel reporting. Used when both ends of a rail leg lie within `getRailNetworkSnapKm()` of the embedded North American rail network |
+| Rail, elsewhere | 30.7 | Table 4, European diesel traction, average/mixed load |
+| Air freighter, under 1,500 km | 1,516 | v3.2 Table 1 |
+| Air freighter, 1,500 km and over | 608 | v3.2 Table 1 |
+| Air belly freight, under 1,500 km | 1,239 | v3.2 Table 1, passenger aircraft |
+| Air belly freight, 1,500 km and over | 936 | v3.2 Table 1, passenger aircraft |
+| Air, service unknown, under 1,500 km | 1,363 | v3.2 Table 1, 55% belly freight and 45% freighter |
+| Air, service unknown, 1,500 km and over | 788 | v3.2 Table 1, as above |
 
-Source: Smart Freight Centre, [GLEC Framework, July 2022 edition](https://smart-freight-centre-media.s3.amazonaws.com/documents/2019_GLEC_Framework_July_2022.pdf), Module 2. These are defaults for when carrier data is unavailable; the sea figure assumes an average dry container on an unknown trade lane, and reefer or trade-lane-specific values differ. The North American rail value is GLEC's US figure and also applies to Canadian and Mexican legs on the network, and the rail value elsewhere assumes diesel traction; GLEC's European average for unknown traction is 17 g. Set `MovementRequest.setEmissions` to your own `EmissionFactors` to override any of them; `setRailNorthAmericaGramsPerTonneKm` and `setRailGramsPerTonneKm` hold the two rail values.
+Source: Smart Freight Centre, [GLEC Framework v3.2, October 2025](https://smart-freight-centre-media.s3.amazonaws.com/documents/GLEC_FRAMEWORK_v3.2_21_10_25_1.pdf), Module 2: Table 1 for air, Table 4 and the North American rail text for rail, the European road starting values and Table 18 for sea. An air leg is charged for its `MovementLeg.airService()`, `FREIGHTER`, `BELLY` or `UNKNOWN` (the default), on its great-circle distance: GLEC's air factors already include its +95 km distance adjustment, so none is added. The leg reports the service it was charged for in `air_service`. These are defaults for when carrier data is unavailable; the sea figure assumes an average dry container on an unknown trade lane, and reefer or trade-lane-specific values differ. The North American rail value is GLEC's US figure and also applies to Canadian and Mexican legs on the network, and the rail value elsewhere assumes diesel traction; GLEC's European average for unknown traction is 18.4 g. The road factor includes GLEC's +5% distance adjustment, so like the air factors it applies to the leg distance as it stands. Set `MovementRequest.setEmissions` to your own `EmissionFactors` to override any of them; `setRailNorthAmericaGramsPerTonneKm` and `setRailGramsPerTonneKm` hold the two rail values.
 
 ## Known limitations and judgement calls
 

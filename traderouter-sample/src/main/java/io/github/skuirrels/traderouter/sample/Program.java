@@ -243,7 +243,7 @@ public final class Program {
 
     private static void printMovement(String title, MovementPlan plan, Double tonnes, Double teu) {
         // CO2e per leg uses GLEC well-to-wheel defaults per mode. With a TEU count, sea legs are charged per
-        // container (76 g per TEU-km) rather than per tonne, so a light box is not under-counted.
+        // container (71.7 g per TEU-km) rather than per tonne, so a light box is not under-counted.
         MovementRequest request = MovementRequest.of(plan)
                 .setSeaOptions(new TradeRouterOptions().setReturnPassages(true))
                 .setCargoTonnes(tonnes)

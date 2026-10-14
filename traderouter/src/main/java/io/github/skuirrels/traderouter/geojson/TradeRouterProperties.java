@@ -40,6 +40,7 @@ public final class TradeRouterProperties {
     private Double co2eGramsPerTeuKm;
     private Double co2eKg;
     private String co2eBasis;
+    private String airService;
 
     /** Total route length in the requested units. JSON: {@code length}. */
     public double getLength() {
@@ -421,6 +422,20 @@ public final class TradeRouterProperties {
     /** Sets the CO2e basis. */
     public TradeRouterProperties setCo2eBasis(String co2eBasis) {
         this.co2eBasis = co2eBasis;
+        return this;
+    }
+
+    /**
+     * For an air leg, the service its emission intensity was taken for: "freighter", "belly" or "unknown".
+     * JSON: {@code air_service}.
+     */
+    public String getAirService() {
+        return airService;
+    }
+
+    /** Sets the air service. */
+    public TradeRouterProperties setAirService(String airService) {
+        this.airService = airService;
         return this;
     }
 }

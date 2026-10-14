@@ -85,6 +85,12 @@ final class MovementTextFormatter {
         return String.format(Locale.ROOT, "%,.1f", value);
     }
 
+    /** Formats a number with thousands separators and at most one decimal, as the .NET "#,0.#" format does. */
+    static String groupedUpToOneDecimal(double value) {
+        String text = n1(value);
+        return text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
+    }
+
     private static String formatPassages(List<String> passages) {
         if (passages == null || passages.isEmpty()) {
             return "";
@@ -153,7 +159,7 @@ final class MovementTextFormatter {
                 break;
             }
         }
-        String rate = seaRate != null ? n0(seaRate) : "the configured";
+        String rate = seaRate != null ? groupedUpToOneDecimal(seaRate) : "the configured";
         return "CO2e total     = kg of CO2e for this shipment: " + rate
                 + " g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs";
     }

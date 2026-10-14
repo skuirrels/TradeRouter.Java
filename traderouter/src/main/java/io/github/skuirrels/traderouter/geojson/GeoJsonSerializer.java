@@ -101,6 +101,7 @@ final class GeoJsonSerializer {
         optional(writer, "co2e_g_per_teu_km", p.getCo2eGramsPerTeuKm());
         optional(writer, "co2e_kg", p.getCo2eKg());
         optional(writer, "co2e_basis", p.getCo2eBasis());
+        optional(writer, "air_service", p.getAirService());
         writer.endObject();
     }
 

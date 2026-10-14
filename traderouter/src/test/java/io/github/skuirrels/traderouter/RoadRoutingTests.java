@@ -111,8 +111,8 @@ class RoadRoutingTests {
 
         assertThat(road.length()).isEqualTo(64.0);
         assertThat(road.durationHours()).isCloseTo(64.0 / 60.0, within(1e-9));
-        assertThat(road.co2eKgPerTonne()).isCloseTo(5.888, within(1e-9));
-        assertThat(road.co2eKg()).isCloseTo(117.76, within(1e-9));
+        assertThat(road.co2eKgPerTonne()).isCloseTo(8.0, within(1e-9));
+        assertThat(road.co2eKg()).isCloseTo(160.0, within(1e-9));
         assertThat(road.feature().properties().getDistanceBasis()).isEqualTo("supplied");
         assertThat(road.feature().properties().getDistanceSource()).isEqualTo("known-route");
         assertThat(road.feature().properties().getDistanceWarning()).isNull();

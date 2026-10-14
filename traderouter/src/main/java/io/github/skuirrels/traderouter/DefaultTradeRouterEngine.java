@@ -439,7 +439,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     + properties.getConnectionHours());
             boolean northAmericanRail = leg.mode() == TransportMode.RAIL
                     && RailLegs.isNorthAmerican(from, to, request, railGraph());
-            applyEmissions(feature, leg.mode(), units, request, northAmericanRail);
+            applyEmissions(feature, leg, units, request, northAmericanRail);
 
             legResults.add(new LegResult(sequence, leg, from, to, feature));
         });
@@ -451,16 +451,20 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
      */
     private static void applyEmissions(
             GeoJsonFeature feature,
-            TransportMode mode,
+            MovementLeg leg,
             DistanceUnit units,
             MovementRequest request,
             boolean northAmericanRail) {
+        TransportMode mode = leg.mode();
         var factors = request.getEmissions();
         TradeRouterProperties properties = feature.properties();
         double lengthKm = properties.getLength() / (units.conversionFactorFromMeters() * 1000.0);
         double gramsPerTonneKm = northAmericanRail
                 ? factors.getRailNorthAmericaGramsPerTonneKm()
-                : factors.gramsPerTonneKm(mode, lengthKm);
+                : factors.gramsPerTonneKm(mode, lengthKm, leg.airService());
+        if (mode == TransportMode.AIR) {
+            properties.setAirService(leg.airService().wireString());
+        }
         double kgPerTonne = gramsPerTonneKm * lengthKm / 1000.0;
 
         properties.setCo2eGramsPerTonneKm(gramsPerTonneKm);
