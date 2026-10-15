@@ -217,6 +217,8 @@ The current version is 2.0.0. It is not yet on Maven Central, so build and insta
 
 Requires Java 21 or later. The library has no runtime dependencies: JSON is read and written by a small built-in reader and writer.
 
+Changes in each release are listed in the [changelog](CHANGELOG.md).
+
 ## Usage
 
 ### Routing by UN/LOCODE
@@ -662,6 +664,7 @@ mvn -q package -DskipTests && java -jar traderouter-benchmarks/target/benchmarks
 ```
 pom.xml                     parent build: Java 21, dependency and plugin versions
 LICENSE                     Apache-2.0
+CHANGELOG.md                notable changes per release
 CLAUDE.md                   contributor rules for AI-assisted changes
 AGENTS.md                   engineering principles for contributors
 DATA_PROVENANCE.md          dataset sources, hashes, transformations and calibration
