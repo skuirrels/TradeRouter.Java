@@ -45,6 +45,7 @@ Version 2.0.0, ported from TradeRouter.Net 2.0.0 at `de93a0e`. Not yet published
 
 - Targets Java 21 with no runtime dependencies. JSON is read and written by the built-in `io.github.skuirrels.traderouter.json` package, which rejects nesting deeper than 64 levels.
 - All data is embedded as compressed JSON, byte-identical to TradeRouter.Net, with hashes in `DATA_PROVENANCE.md`.
+- Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
 [Unreleased]: https://github.com/skuirrels/TradeRouter.Java/commits/main

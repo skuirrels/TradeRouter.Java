@@ -15,8 +15,9 @@
 
   <name>TradeRouter.Java</name>
   <description>
-    Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library.
-    Returns RFC 7946 GeoJSON with distance, voyage duration, ports used and canals and straits passed through.
+    Shortest sea route between ports identified by UN/LOCODE, and multi-leg sea, road, rail and air movements with
+    modelled transit time and GLEC v3.2 CO2e, as a single self-contained Java library with no runtime dependencies.
+    Returns RFC 7946 GeoJSON with distance, duration, ports used and canals and straits passed through.
   </description>
   <url>https://github.com/skuirrels/TradeRouter.Java</url>
 
@@ -45,7 +46,34 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <!-- The jar carries its licence and the data notices, since it embeds EUPL-1.2-derived and CC BY 4.0 data. -->
+      <resource>
+        <directory>${project.basedir}/..</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>LICENSE</include>
+          <include>THIRD-PARTY-NOTICES.md</include>
+          <include>DATA_PROVENANCE.md</include>
+        </includes>
+      </resource>
+    </resources>
+
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>io.github.skuirrels.traderouter</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>

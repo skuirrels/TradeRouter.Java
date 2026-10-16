@@ -1,5 +1,6 @@
 # TradeRouter.Java
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.skuirrels/traderouter?logo=apachemaven)](https://central.sonatype.com/artifact/io.github.skuirrels/traderouter)
 [![Java 21+](https://img.shields.io/badge/Java-21%2B-007396?logo=openjdk)](https://openjdk.org)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](traderouter/pom.xml)
@@ -670,6 +671,7 @@ AGENTS.md                   engineering principles for contributors
 DATA_PROVENANCE.md          dataset sources, hashes, transformations and calibration
 THIRD-PARTY-NOTICES.md      data licences and attribution
 .github/workflows/ci.yml    build, test and package on pushes to main and on pull requests
+.github/workflows/release.yml  sign and upload to Maven Central on a version tag; see docs/releasing.md
 traderouter/                the library, published as io.github.skuirrels:traderouter
   src/main/java/io/github/skuirrels/traderouter/
     common/                 Coordinate, Haversine, DistanceUnit, antimeridian normaliser, point-in-polygon
@@ -699,6 +701,7 @@ docs/
   waypoints-and-choke-points.md   every waypoint type and all 13 passages with measured detours
   diagrams/                 editable HTML diagrams with SVG and selected PNG exports
   unlocode-unresolved.csv   the 4,301 UN/LOCODEs no source could place, with the reason for each
+  releasing.md              Maven Central signing, secrets and release steps
 tools/                      Python scripts that built the embedded data and review the supplements and aliases
 ```
 

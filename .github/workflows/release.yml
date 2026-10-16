@@ -1,0 +1,45 @@
+name: Release
+
+# Pushing a tag such as v2.0.0 signs the parent POM and the library and uploads them to the Central Portal, where the
+# deployment waits, validated, until it is published by hand. docs/releasing.md lists the secrets this needs.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: maven-central
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          server-id: central
+          server-username: CENTRAL_TOKEN_USERNAME
+          server-password: CENTRAL_TOKEN_PASSWORD
+
+      - name: Check the tag matches the project version
+        run: |
+          version=$(mvn -B -q org.apache.maven.plugins:maven-help-plugin:3.5.1:evaluate -Dexpression=project.version -DforceStdout)
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match project version ${version}." >&2
+            exit 1
+          fi
+
+      - name: Reject hard-coded sample road routes
+        run: ./scripts/check-no-hardcoded-sample-routes.sh
+
+      - name: Build, test, sign and upload
+        run: mvn -B --no-transfer-progress -P release -Dgpg.signer=bc deploy
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

@@ -23,6 +23,7 @@
     <developer>
       <id>skuirrels</id>
       <name>Tyrone Omidi</name>
+      <url>https://github.com/skuirrels</url>
     </developer>
   </developers>
 
@@ -36,7 +37,19 @@
   <scm>
     <url>https://github.com/skuirrels/TradeRouter.Java</url>
     <connection>scm:git:https://github.com/skuirrels/TradeRouter.Java.git</connection>
+    <developerConnection>scm:git:https://github.com/skuirrels/TradeRouter.Java.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/skuirrels/TradeRouter.Java/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>GitHub Actions</system>
+    <url>https://github.com/skuirrels/TradeRouter.Java/actions</url>
+  </ciManagement>
 
   <modules>
     <module>traderouter</module>
@@ -48,6 +61,8 @@
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Fixed entry timestamps make the published jars reproducible. Move it forward for each release. -->
+    <project.build.outputTimestamp>2026-10-16T00:00:00Z</project.build.outputTimestamp>
 
     <junit.version>6.1.3</junit.version>
     <assertj.version>3.27.7</assertj.version>
@@ -195,7 +210,11 @@
   </build>
 
   <profiles>
-    <!-- Signs and uploads to Maven Central: mvn -P release deploy. Needs a GPG key and a "central" server token in settings.xml. -->
+    <!--
+      Signs and uploads to Maven Central: mvn -P release deploy. Needs a GPG key and a "central" server token in
+      settings.xml; docs/releasing.md has the steps. In CI, -Dgpg.signer=bc signs with the key in MAVEN_GPG_KEY and
+      the passphrase in MAVEN_GPG_PASSPHRASE, with no gpg agent.
+    -->
     <profile>
       <id>release</id>
       <build>
@@ -221,6 +240,9 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
+              <!-- Upload and wait for validation, then publish by hand from the Central Portal deployments page. -->
+              <autoPublish>false</autoPublish>
+              <waitUntil>validated</waitUntil>
               <!-- Only the parent POM and the library are published; the sample and benchmarks stay local. -->
               <excludeArtifacts>
                 <excludeArtifact>traderouter-sample</excludeArtifact>
