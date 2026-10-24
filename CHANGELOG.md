@@ -9,7 +9,7 @@ Ported from TradeRouter.Net 2.1.1 at `e80f054`.
 ### Sea routing
 
 - `setReturnSeaAreas(true)` reports the named sea areas a route passes through as `traversed_sea_areas`, in the order it enters them, with `enter_km` and `exit_km` from the start of the route. Each sea leg of a movement carries it too, counted from the start of the leg.
-- 42 seas, gulfs, straits and oceans from Natural Earth 1:50m marine polygons, as `SeaArea` constants with `SeaArea.getCatalogue()` listing names, Wikidata items and Natural Earth IDs. `SeaAreaInfo` and `SeaAreaTraversal` are records.
+- 42 seas, gulfs, straits and oceans from Natural Earth 1:50m marine polygons, as `SeaArea` constants with `SeaArea.getCatalogue()` listing names, Wikidata items and Natural Earth IDs. `SeaAreaInfo` and `SeaAreaTraversal` are records, and `SeaArea.traverse` finds the areas along any continuous path.
 
 ### Data
 
