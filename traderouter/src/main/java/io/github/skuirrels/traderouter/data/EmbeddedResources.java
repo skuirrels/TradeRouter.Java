@@ -8,8 +8,6 @@ import io.github.skuirrels.traderouter.locations.UnLocode;
 import io.github.skuirrels.traderouter.locations.UnLocodeDatabase;
 import io.github.skuirrels.traderouter.ports.Port;
 import io.github.skuirrels.traderouter.ports.PortDatabase;
-import io.github.skuirrels.traderouter.seaareas.SeaArea;
-import io.github.skuirrels.traderouter.seaareas.SeaAreaIndex;
 import io.github.skuirrels.traderouter.seaareas.SeaAreaInfo;
 
 import java.io.IOException;
@@ -208,16 +206,16 @@ public final class EmbeddedResources {
     }
 
     /**
-     * Loads {@code sea-area-polygons.json.gz}, the selected areas' polygons keyed by {@code ne_id}, and indexes them
-     * for the catalogue in {@link SeaArea#getCatalogue()}.
+     * Loads {@code sea-area-polygons.json.gz}: each selected area's rings keyed by Natural Earth {@code ne_id}, every
+     * ring a flat array of longitude, latitude pairs. Outer rings and holes of every part are kept alike; the
+     * even-odd rule tells them apart.
      */
-    public static SeaAreaIndex loadSeaAreaIndex() {
+    public static Map<Long, List<double[]>> loadSeaAreaPolygons() {
         Map<String, Object> root = JsonParser.asObject(JsonParser.parse(readGzipResource("sea-area-polygons.json.gz")));
 
         Map<Long, List<double[]>> ringsByNeId = new HashMap<>();
         for (Object areaItem : JsonParser.asArray(root.get("areas"))) {
             Map<String, Object> area = JsonParser.asObject(areaItem);
-            // Outer rings and holes of every part are kept alike; the even-odd rule tells them apart.
             List<double[]> rings = new ArrayList<>();
             for (Object polygon : JsonParser.asArray(area.get("polygons"))) {
                 for (Object ringItem : JsonParser.asArray(polygon)) {
@@ -232,19 +230,9 @@ public final class EmbeddedResources {
                     rings.add(flat);
                 }
             }
-            ringsByNeId.put(JsonParser.asLong(area.get("ne_id")), rings);
+            ringsByNeId.put(JsonParser.asLong(area.get("ne_id")), List.copyOf(rings));
         }
-
-        List<SeaAreaIndex.Area> areas = new ArrayList<>();
-        for (SeaAreaInfo info : SeaArea.getCatalogue()) {
-            List<double[]> rings = ringsByNeId.get(info.neId());
-            if (rings == null) {
-                throw new IllegalStateException(
-                        "No polygon for sea area '" + info.id() + "' (ne_id " + info.neId() + ").");
-            }
-            areas.add(new SeaAreaIndex.Area(info, rings));
-        }
-        return new SeaAreaIndex(areas);
+        return Map.copyOf(ringsByNeId);
     }
 
     /**

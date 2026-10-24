@@ -1,5 +1,6 @@
 package io.github.skuirrels.traderouter.seaareas;
 
+import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.data.EmbeddedResources;
 
 import java.util.Collections;
@@ -144,14 +145,16 @@ public final class SeaArea {
     /** Southern Ocean. */
     public static final String SOUTHERN_OCEAN = "southern_ocean";
 
+    private static volatile Catalogue catalogue;
+
     /** Every recognised sea area, in the order of the embedded selection. */
     public static List<SeaAreaInfo> getCatalogue() {
-        return Catalogue.AREAS;
+        return catalogue().areas();
     }
 
     /** Gets all recognised sea-area identifiers, matched case-insensitively. */
     public static Set<String> getValidSeaAreas() {
-        return Catalogue.IDS;
+        return catalogue().ids();
     }
 
     /** Returns the catalogue entry for a recognised sea-area identifier, matched case-insensitively after trimming. */
@@ -159,28 +162,49 @@ public final class SeaArea {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Sea area identifier cannot be null or blank.");
         }
-        SeaAreaInfo area = Catalogue.BY_ID.get(id.trim());
+        SeaAreaInfo area = catalogue().byId().get(id.trim());
         if (area == null) {
             throw new IllegalArgumentException("Unknown sea area identifier '" + id + "'.");
         }
         return area;
     }
 
-    /** Loads the catalogue on first use. */
-    private static final class Catalogue {
-        static final List<SeaAreaInfo> AREAS = EmbeddedResources.loadSeaAreaCatalogue();
-        static final Map<String, SeaAreaInfo> BY_ID;
-        static final Set<String> IDS;
+    /**
+     * Returns the sea areas along a path, in the order it enters them, with distances in kilometres from its start.
+     * The path is followed along great circles between its points and must be continuous: longitudes may run past
+     * ±180 as routes leave them before the antimeridian split. The polygons load on first use.
+     */
+    public static List<SeaAreaTraversal> traverse(List<Coordinate> path) {
+        return SeaAreaIndex.getDefault().traverse(path);
+    }
 
-        static {
+    /**
+     * Loads the catalogue on first use. A failed load throws its own exception and is retried on the next call,
+     * rather than leaving a broken class behind.
+     */
+    private static Catalogue catalogue() {
+        Catalogue result = catalogue;
+        if (result == null) {
+            synchronized (SeaArea.class) {
+                result = catalogue;
+                if (result == null) {
+                    result = Catalogue.of(EmbeddedResources.loadSeaAreaCatalogue());
+                    catalogue = result;
+                }
+            }
+        }
+        return result;
+    }
+
+    private record Catalogue(List<SeaAreaInfo> areas, Map<String, SeaAreaInfo> byId, Set<String> ids) {
+        static Catalogue of(List<SeaAreaInfo> areas) {
             Map<String, SeaAreaInfo> byId = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             Set<String> ids = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-            for (SeaAreaInfo area : AREAS) {
+            for (SeaAreaInfo area : areas) {
                 byId.put(area.id(), area);
                 ids.add(area.id());
             }
-            BY_ID = Collections.unmodifiableMap(byId);
-            IDS = Collections.unmodifiableSet(ids);
+            return new Catalogue(List.copyOf(areas), Collections.unmodifiableMap(byId), Collections.unmodifiableSet(ids));
         }
     }
 }

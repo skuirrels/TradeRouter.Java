@@ -116,4 +116,21 @@ class JsonTests {
         writer.endObject();
         return writer.toString();
     }
+
+    @Test
+    void asLongAcceptsIntegralNumbersBeyondIntRange() {
+        assertThat(JsonParser.asLong(JsonParser.parse("1159115521"))).isEqualTo(1159115521L);
+        assertThat(JsonParser.asLong(JsonParser.parse("4000000000"))).isEqualTo(4000000000L);
+        assertThat(JsonParser.asLong(-5L)).isEqualTo(-5L);
+        assertThat(JsonParser.asLong(3.0e12)).isEqualTo(3_000_000_000_000L);
+    }
+
+    @Test
+    void asLongRejectsFractionsOutOfRangeValuesAndNonNumbers() {
+        assertThatThrownBy(() -> JsonParser.asLong(2.5)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> JsonParser.asLong(1e19)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> JsonParser.asLong(Double.NaN)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> JsonParser.asLong("7")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> JsonParser.asLong(null)).isInstanceOf(IllegalArgumentException.class);
+    }
 }

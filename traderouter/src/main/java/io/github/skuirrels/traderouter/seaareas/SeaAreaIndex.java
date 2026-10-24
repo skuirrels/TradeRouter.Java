@@ -17,17 +17,19 @@ import java.util.Objects;
 /**
  * Finds where a route enters and leaves each named sea area. The route is followed along great circles, as its
  * length is measured, and each polygon is read as drawn in longitude and latitude, as Natural Earth draws it.
- * Instances are immutable and safe to share between threads.
+ * Instances are immutable and safe to share between threads. Callers use {@link SeaArea#traverse(List)}.
  */
-public final class SeaAreaIndex {
+final class SeaAreaIndex {
     /**
      * Longest stretch of great circle followed as one straight line in longitude and latitude. A 10 km chord
      * strays from the great circle by metres, far below the accuracy of the 1:50m polygons.
      */
-    public static final double MAX_CHORD_KM = 10.0;
+    static final double MAX_CHORD_KM = 10.0;
 
     /** Side of the square grid cells, in degrees, that index each polygon's boundary segments. */
     private static final double CELL_DEGREES = 1.0;
+
+    private static volatile SeaAreaIndex defaultIndex;
 
     private final SeaAreaInfo[] areas;
     private final AreaShape[] shapes;
@@ -38,14 +40,14 @@ public final class SeaAreaIndex {
      * @param info  catalogue entry reported for the area
      * @param rings outer rings and holes alike, each a flat array of longitude, latitude pairs
      */
-    public record Area(SeaAreaInfo info, List<double[]> rings) {
+    record Area(SeaAreaInfo info, List<double[]> rings) {
     }
 
     /**
      * Creates an index. Each area's rings are flat longitude, latitude pairs; outer rings and holes are told apart
      * by the even-odd rule, so a point is inside when a ray from it crosses the area's rings an odd number of times.
      */
-    public SeaAreaIndex(List<Area> areas) {
+    SeaAreaIndex(List<Area> areas) {
         Objects.requireNonNull(areas, "areas");
         this.areas = new SeaAreaInfo[areas.size()];
         this.shapes = new AreaShape[areas.size()];
@@ -55,18 +57,46 @@ public final class SeaAreaIndex {
         }
     }
 
-    /** Index over the embedded Natural Earth polygons, loaded on first use. */
-    public static SeaAreaIndex getDefault() {
-        return DefaultHolder.INSTANCE;
+    /**
+     * Index over the embedded Natural Earth polygons for the catalogue in {@link SeaArea#getCatalogue()}, loaded on
+     * first use. A failed load throws its own exception and is retried on the next call.
+     */
+    static SeaAreaIndex getDefault() {
+        SeaAreaIndex result = defaultIndex;
+        if (result == null) {
+            synchronized (SeaAreaIndex.class) {
+                result = defaultIndex;
+                if (result == null) {
+                    result = load();
+                    defaultIndex = result;
+                }
+            }
+        }
+        return result;
+    }
+
+    private static SeaAreaIndex load() {
+        Map<Long, List<double[]>> ringsByNeId = EmbeddedResources.loadSeaAreaPolygons();
+        List<Area> areas = new ArrayList<>();
+        for (SeaAreaInfo info : SeaArea.getCatalogue()) {
+            List<double[]> rings = ringsByNeId.get(info.neId());
+            if (rings == null) {
+                throw new IllegalStateException(
+                        "No polygon for sea area '" + info.id() + "' (ne_id " + info.neId() + ").");
+            }
+            areas.add(new Area(info, rings));
+        }
+        return new SeaAreaIndex(areas);
     }
 
     /**
      * Returns the sea areas along a path, in the order it enters them, with distances in kilometres from its start.
      * The path must be continuous: longitudes may run past ±180 as the route normaliser leaves them.
      */
-    public List<SeaAreaTraversal> traverse(List<Coordinate> path) {
+    List<SeaAreaTraversal> traverse(List<Coordinate> path) {
         Objects.requireNonNull(path, "path");
         Walk walk = new Walk(shapes);
+        double[] point = new double[2];
         double startKm = 0.0;
         for (int i = 1; i < path.size(); i++) {
             Coordinate from = path.get(i - 1);
@@ -89,7 +119,7 @@ public final class SeaAreaIndex {
                     chordEndLon = to.longitude();
                     chordEndLat = to.latitude();
                 } else {
-                    double[] point = arc.pointAt((double) k / chords);
+                    arc.pointAt((double) k / chords, point);
                     chordEndLon = point[0];
                     chordEndLat = point[1];
                 }
@@ -163,10 +193,6 @@ public final class SeaAreaIndex {
     record AreaInterval(int area, double enterKm, double exitKm) {
     }
 
-    private static final class DefaultHolder {
-        static final SeaAreaIndex INSTANCE = EmbeddedResources.loadSeaAreaIndex();
-    }
-
     /** Tracks whether the path is inside each area as it advances chord by chord. */
     private static final class Walk {
         private final AreaShape[] shapes;
@@ -190,7 +216,8 @@ public final class SeaAreaIndex {
 
         /** Advances along one chord, splitting it where it crosses the antimeridian. */
         void chord(double lon0, double lat0, double lon1, double lat1, double km0, double km1) {
-            double x0 = new Coordinate(lon0, lat0).withNormalizedLongitude().longitude();
+            // Same arithmetic as Coordinate.withNormalizedLongitude, without allocating a coordinate per chord.
+            double x0 = ((lon0 % 360.0) + 540.0) % 360.0 - 180.0;
             double x1 = x0 + PnPoly.normalizeLongitudeDelta(lon1 - lon0);
             if (x1 <= 180.0 && x1 >= -180.0) {
                 piece(x0, lat0, x1, lat1, km0, km1);
@@ -324,18 +351,16 @@ public final class SeaAreaIndex {
             angle = Math.acos(dot);
         }
 
-        /** Returns the longitude and latitude at the given fraction of the arc. */
-        double[] pointAt(double fraction) {
+        /** Writes the longitude and latitude at the given fraction of the arc into {@code point}. */
+        void pointAt(double fraction, double[] point) {
             double sinAngle = Math.sin(angle);
             double a = sinAngle > 0 ? Math.sin((1.0 - fraction) * angle) / sinAngle : 1.0 - fraction;
             double b = sinAngle > 0 ? Math.sin(fraction * angle) / sinAngle : fraction;
             double x = (a * fromX) + (b * toX);
             double y = (a * fromY) + (b * toY);
             double z = (a * fromZ) + (b * toZ);
-            return new double[] {
-                Math.atan2(y, x) * 180.0 / Math.PI,
-                Math.atan2(z, Math.sqrt((x * x) + (y * y))) * 180.0 / Math.PI
-            };
+            point[0] = Math.atan2(y, x) * 180.0 / Math.PI;
+            point[1] = Math.atan2(z, Math.sqrt((x * x) + (y * y))) * 180.0 / Math.PI;
         }
     }
 
@@ -371,6 +396,10 @@ public final class SeaAreaIndex {
             double[] sx1 = new double[total];
             double[] sy1 = new double[total];
             int segments = 0;
+            double lowX = Double.POSITIVE_INFINITY;
+            double lowY = Double.POSITIVE_INFINITY;
+            double highX = Double.NEGATIVE_INFINITY;
+            double highY = Double.NEGATIVE_INFINITY;
             for (double[] ring : rings) {
                 int count = ring.length / 2;
                 for (int i = 0; i < count; i++) {
@@ -383,6 +412,11 @@ public final class SeaAreaIndex {
                     sy0[segments] = ring[(2 * i) + 1];
                     sx1[segments] = ring[2 * j];
                     sy1[segments] = ring[(2 * j) + 1];
+                    // Each kept segment's end is the next one's start, so tracking both ends covers every vertex used.
+                    lowX = Math.min(lowX, Math.min(sx0[segments], sx1[segments]));
+                    lowY = Math.min(lowY, Math.min(sy0[segments], sy1[segments]));
+                    highX = Math.max(highX, Math.max(sx0[segments], sx1[segments]));
+                    highY = Math.max(highY, Math.max(sy0[segments], sy1[segments]));
                     segments++;
                 }
             }
@@ -395,10 +429,10 @@ public final class SeaAreaIndex {
             y0 = Arrays.copyOf(sy0, segments);
             x1 = Arrays.copyOf(sx1, segments);
             y1 = Arrays.copyOf(sy1, segments);
-            minX = Math.min(Arrays.stream(x0).min().orElseThrow(), Arrays.stream(x1).min().orElseThrow());
-            minY = Math.min(Arrays.stream(y0).min().orElseThrow(), Arrays.stream(y1).min().orElseThrow());
-            maxX = Math.max(Arrays.stream(x0).max().orElseThrow(), Arrays.stream(x1).max().orElseThrow());
-            maxY = Math.max(Arrays.stream(y0).max().orElseThrow(), Arrays.stream(y1).max().orElseThrow());
+            minX = lowX;
+            minY = lowY;
+            maxX = highX;
+            maxY = highY;
             originX = Math.floor(minX / CELL_DEGREES) * CELL_DEGREES;
             originY = Math.floor(minY / CELL_DEGREES) * CELL_DEGREES;
             columns = (int) Math.floor((maxX - originX) / CELL_DEGREES) + 1;
