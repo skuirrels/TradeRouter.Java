@@ -37,6 +37,7 @@ public class RoutingBenchmarks {
     private Coordinate tokyo;
     private TradeRouterOptions dijkstraAppend;
     private TradeRouterOptions astarAppend;
+    private TradeRouterOptions dijkstraAppendWithSeaAreas;
     private TradeRouterOptions withPorts;
 
     @Setup
@@ -49,6 +50,8 @@ public class RoutingBenchmarks {
         tokyo = new Coordinate(139.679174, 35.778467);
         dijkstraAppend = new TradeRouterOptions().setAppendOriginDestination(true).setAlgorithm(TradeRouterOptions.DIJKSTRA);
         astarAppend = new TradeRouterOptions().setAppendOriginDestination(true).setAlgorithm(TradeRouterOptions.ASTAR);
+        dijkstraAppendWithSeaAreas = new TradeRouterOptions().setAppendOriginDestination(true)
+                .setAlgorithm(TradeRouterOptions.DIJKSTRA).setReturnSeaAreas(true);
         withPorts = new TradeRouterOptions().setAppendOriginDestination(true).setIncludePorts(true);
 
         // Warm up graph and spatial indexes
@@ -73,6 +76,11 @@ public class RoutingBenchmarks {
     @Benchmark
     public GeoJsonFeature astarShanghaiToRotterdam() {
         return TradeRoutes.calculate(shanghai, rotterdam, astarAppend);
+    }
+
+    @Benchmark
+    public GeoJsonFeature dijkstraShanghaiToRotterdamWithSeaAreas() {
+        return TradeRoutes.calculate(shanghai, rotterdam, dijkstraAppendWithSeaAreas);
     }
 
     @Benchmark

@@ -2,6 +2,7 @@ package io.github.skuirrels.traderouter.geojson;
 
 import io.github.skuirrels.traderouter.json.JsonWriter;
 import io.github.skuirrels.traderouter.ports.Port;
+import io.github.skuirrels.traderouter.seaareas.SeaAreaTraversal;
 
 /**
  * Shared serializer so every GeoJSON type in the library writes the same shape. Null-valued optional
@@ -73,6 +74,19 @@ final class GeoJsonSerializer {
             writer.name("traversed_passages").beginArray();
             for (String passage : p.getTraversedPassages()) {
                 writer.value(passage);
+            }
+            writer.endArray();
+        }
+        if (p.getTraversedSeaAreas() != null) {
+            writer.name("traversed_sea_areas").beginArray();
+            for (SeaAreaTraversal area : p.getTraversedSeaAreas()) {
+                writer.beginObject();
+                writer.name("id").value(area.id());
+                writer.name("name").value(area.name());
+                writer.name("wikidata").value(area.wikidata());
+                writer.name("enter_km").value(area.enterKm());
+                writer.name("exit_km").value(area.exitKm());
+                writer.endObject();
             }
             writer.endArray();
         }

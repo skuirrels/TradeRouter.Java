@@ -8,6 +8,9 @@ import io.github.skuirrels.traderouter.locations.UnLocode;
 import io.github.skuirrels.traderouter.locations.UnLocodeDatabase;
 import io.github.skuirrels.traderouter.ports.Port;
 import io.github.skuirrels.traderouter.ports.PortDatabase;
+import io.github.skuirrels.traderouter.seaareas.SeaArea;
+import io.github.skuirrels.traderouter.seaareas.SeaAreaIndex;
+import io.github.skuirrels.traderouter.seaareas.SeaAreaInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -146,22 +149,12 @@ public final class EmbeddedResources {
     }
 
     /**
-     * Loads {@code unlocode-supplement.json}: researched coordinates for codes that UNECE publishes without any,
+     * Loads {@code unlocode-supplement.json.gz}: researched coordinates for codes that UNECE publishes without any,
      * each with the source it was taken from.
      */
     private static Map<String, Supplement> loadUnLocodeSupplement() {
         Map<String, Supplement> result = new HashMap<>();
-        String text;
-        try (InputStream stream = EmbeddedResources.class.getResourceAsStream(RESOURCE_ROOT + "unlocode-supplement.json")) {
-            if (stream == null) {
-                return result;
-            }
-            text = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Failed to read embedded resource 'unlocode-supplement.json'.", e);
-        }
-
-        for (Object item : JsonParser.asArray(JsonParser.parse(text))) {
+        for (Object item : JsonParser.asArray(JsonParser.parse(readGzipResource("unlocode-supplement.json.gz")))) {
             Map<String, Object> entry = JsonParser.asObject(item);
             String code = orEmpty(JsonParser.asString(entry.get("code")));
             Coordinate coordinate = new Coordinate(JsonParser.asDouble(entry.get("lon")), JsonParser.asDouble(entry.get("lat")));
@@ -190,6 +183,68 @@ public final class EmbeddedResources {
             }
         }
         return result;
+    }
+
+    /**
+     * Loads {@code sea-areas.json}: the selection of Natural Earth 1:50m marine polygons reported as sea areas, with
+     * each area's identifier, English name, Wikidata cross-reference and Natural Earth {@code ne_id}.
+     */
+    public static List<SeaAreaInfo> loadSeaAreaCatalogue() {
+        String text = readTextResource("sea-areas.json");
+        if (text == null) {
+            throw new IllegalStateException("Embedded resource 'sea-areas.json' not found.");
+        }
+
+        List<SeaAreaInfo> result = new ArrayList<>();
+        for (Object item : JsonParser.asArray(JsonParser.parse(text))) {
+            Map<String, Object> entry = JsonParser.asObject(item);
+            result.add(new SeaAreaInfo(
+                    required(entry, "id", "A sea area has no id."),
+                    required(entry, "name", "A sea area has no name."),
+                    required(entry, "wikidata", "A sea area has no Wikidata item."),
+                    JsonParser.asLong(entry.get("ne_id"))));
+        }
+        return List.copyOf(result);
+    }
+
+    /**
+     * Loads {@code sea-area-polygons.json.gz}, the selected areas' polygons keyed by {@code ne_id}, and indexes them
+     * for the catalogue in {@link SeaArea#getCatalogue()}.
+     */
+    public static SeaAreaIndex loadSeaAreaIndex() {
+        Map<String, Object> root = JsonParser.asObject(JsonParser.parse(readGzipResource("sea-area-polygons.json.gz")));
+
+        Map<Long, List<double[]>> ringsByNeId = new HashMap<>();
+        for (Object areaItem : JsonParser.asArray(root.get("areas"))) {
+            Map<String, Object> area = JsonParser.asObject(areaItem);
+            // Outer rings and holes of every part are kept alike; the even-odd rule tells them apart.
+            List<double[]> rings = new ArrayList<>();
+            for (Object polygon : JsonParser.asArray(area.get("polygons"))) {
+                for (Object ringItem : JsonParser.asArray(polygon)) {
+                    List<Object> ring = JsonParser.asArray(ringItem);
+                    double[] flat = new double[ring.size() * 2];
+                    int i = 0;
+                    for (Object positionItem : ring) {
+                        List<Object> position = JsonParser.asArray(positionItem);
+                        flat[i++] = JsonParser.asDouble(position.get(0));
+                        flat[i++] = JsonParser.asDouble(position.get(1));
+                    }
+                    rings.add(flat);
+                }
+            }
+            ringsByNeId.put(JsonParser.asLong(area.get("ne_id")), rings);
+        }
+
+        List<SeaAreaIndex.Area> areas = new ArrayList<>();
+        for (SeaAreaInfo info : SeaArea.getCatalogue()) {
+            List<double[]> rings = ringsByNeId.get(info.neId());
+            if (rings == null) {
+                throw new IllegalStateException(
+                        "No polygon for sea area '" + info.id() + "' (ne_id " + info.neId() + ").");
+            }
+            areas.add(new SeaAreaIndex.Area(info, rings));
+        }
+        return new SeaAreaIndex(areas);
     }
 
     /**
@@ -274,6 +329,14 @@ public final class EmbeddedResources {
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to read embedded resource '" + name + "'.", e);
         }
+    }
+
+    private static String required(Map<String, Object> entry, String key, String message) {
+        String value = JsonParser.asString(entry.get(key));
+        if (value == null) {
+            throw new IllegalStateException(message);
+        }
+        return value;
     }
 
     private static String orEmpty(String value) {

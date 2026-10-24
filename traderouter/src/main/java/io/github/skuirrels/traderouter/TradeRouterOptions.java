@@ -27,6 +27,7 @@ public final class TradeRouterOptions {
     private boolean includePorts;
     private PortParameters portParameters;
     private boolean returnPassages;
+    private boolean returnSeaAreas;
     private String algorithm = DIJKSTRA;
 
     /** Creates options with the defaults: kilometres, 16 knots, no restrictions, Northwest Passage closed, Dijkstra. */
@@ -175,6 +176,20 @@ public final class TradeRouterOptions {
         return this;
     }
 
+    /**
+     * Whether to return the named sea areas the route passes through, with where it enters and leaves each, in the
+     * route properties. Default false.
+     */
+    public boolean isReturnSeaAreas() {
+        return returnSeaAreas;
+    }
+
+    /** Sets whether traversed sea areas are reported. */
+    public TradeRouterOptions setReturnSeaAreas(boolean returnSeaAreas) {
+        this.returnSeaAreas = returnSeaAreas;
+        return this;
+    }
+
     /** Pathfinding algorithm: "dijkstra" (default) or "astar". */
     public String getAlgorithm() {
         return algorithm;
@@ -199,7 +214,8 @@ public final class TradeRouterOptions {
                 .setAllowNorthwest(allowNorthwest)
                 .setIncludePorts(includePorts)
                 .setPortParameters(portParameters == null ? null : portParameters.copy())
-                .setReturnPassages(returnPassages);
+                .setReturnPassages(returnPassages)
+                .setReturnSeaAreas(returnSeaAreas);
         copy.algorithm = algorithm;
         return copy;
     }
@@ -239,6 +255,7 @@ public final class TradeRouterOptions {
         return "TradeRouterOptions[units=" + units + ", speedKnots=" + speedKnots
                 + ", appendOriginDestination=" + appendOriginDestination + ", restrictions=" + restrictions
                 + ", includePorts=" + includePorts + ", returnPassages=" + returnPassages
+                + ", returnSeaAreas=" + returnSeaAreas
                 + ", algorithm=" + Objects.toString(algorithm) + "]";
     }
 }

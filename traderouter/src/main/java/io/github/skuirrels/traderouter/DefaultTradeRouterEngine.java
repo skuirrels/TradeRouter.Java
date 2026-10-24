@@ -31,6 +31,7 @@ import io.github.skuirrels.traderouter.ports.Port;
 import io.github.skuirrels.traderouter.ports.PortDatabase;
 import io.github.skuirrels.traderouter.ports.PortPair;
 import io.github.skuirrels.traderouter.ports.PortParameters;
+import io.github.skuirrels.traderouter.seaareas.SeaAreaIndex;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -200,6 +201,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         boolean appendOrigDest = effective.isAppendOriginDestination();
         boolean includePorts = effective.isIncludePorts();
         boolean returnPassages = effective.isReturnPassages();
+        boolean returnSeaAreas = effective.isReturnSeaAreas();
         Set<String> restrictions = effective.getClosedPassages();
         String algorithm = effective.getAlgorithm();
 
@@ -272,7 +274,9 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     .setGeometryBasis("maritime_network")
                     .setPortOrigin(includePorts ? pFrom : null)
                     .setPortDest(includePorts ? pTo : null)
-                    .setTraversedPassages(returnPassages ? Passage.filterValidPassages(processed.traversedPassages()) : null);
+                    .setTraversedPassages(returnPassages ? Passage.filterValidPassages(processed.traversedPassages()) : null)
+                    // Measured on the continuous path, connectors included, before the antimeridian split.
+                    .setTraversedSeaAreas(returnSeaAreas ? SeaAreaIndex.getDefault().traverse(normalizedCoords) : null);
 
             results.add(new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(normalizedCoords), properties));
         }

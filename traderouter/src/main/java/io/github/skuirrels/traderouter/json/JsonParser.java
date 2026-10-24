@@ -60,6 +60,17 @@ public final class JsonParser {
         throw new IllegalArgumentException("Expected a JSON integer but found " + describe(value) + ".");
     }
 
+    /** Returns the value as a long, accepting any JSON number with an integral value. */
+    public static long asLong(Object value) {
+        if (value instanceof Long l) {
+            return l;
+        }
+        if (value instanceof Double d && d == Math.rint(d) && Math.abs(d) < 0x1p63) {
+            return (long) (double) d;
+        }
+        throw new IllegalArgumentException("Expected a JSON integer but found " + describe(value) + ".");
+    }
+
     /** Returns the value as a string, or null when the value is JSON null. */
     public static String asString(Object value) {
         if (value == null) {

@@ -16,6 +16,10 @@ The embedded Marnet network is therefore derived from material that Eurostat pub
 
 The embedded rail graph is transformed from the [North American Rail Network Lines](https://doi.org/10.21949/1528950) in the U.S. Department of Transportation Bureau of Transportation Statistics National Transportation Atlas Database, compiled from Federal Railroad Administration data. It is a work of the United States government under 17 U.S.C. § 101, not protected by U.S. copyright and available for unrestricted public use. The graph keeps the main line only and simplifies its geometry; see `DATA_PROVENANCE.md` and the scripts in `tools/`.
 
+## Natural Earth
+
+The embedded sea-area polygons are taken unchanged from the [Natural Earth](https://www.naturalearthdata.com/) 1:50m `ne_50m_geography_marine_polys` layer, as published in [nvkelso/natural-earth-vector](https://github.com/nvkelso/natural-earth-vector) at commit `117488dc88`. Natural Earth is in the public domain; see its [terms of use](https://www.naturalearthdata.com/about/terms-of-use/). Only 42 features are kept; see `DATA_PROVENANCE.md` and `tools/build-sea-area-data.py`.
+
 ## UN/LOCODE
 
 The embedded location-code data is published by the [United Nations Economic Commission for Europe](https://unlocode.unece.org/). UNECE states that UN/CEFACT standards are free to use under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

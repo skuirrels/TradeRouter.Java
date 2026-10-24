@@ -48,7 +48,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("alternate_names", type=Path)
     parser.add_argument("all_countries", type=Path)
-    parser.add_argument("--output", type=Path, default=DATA / "unlocode-supplement.json")
+    parser.add_argument("--output", type=Path, default=DATA / "unlocode-supplement.json.gz")
     parser.add_argument("--unresolved", type=Path, default=DATA.parents[8] / "docs/unlocode-unresolved.csv")
     args = parser.parse_args()
     hashes = {"alternateNamesV2.zip": digest(args.alternate_names),
@@ -59,7 +59,8 @@ def main():
     with gzip.open(DATA / "unlocode.json.gz", "rt") as source:
         rows = json.load(source)
     missing = {row[0]: row for row in rows if row[2] is None}
-    existing = json.loads((DATA / "unlocode-supplement.json").read_text())
+    with gzip.open(DATA / "unlocode-supplement.json.gz", "rt") as source:
+        existing = json.load(source)
     retained = [row for row in existing if not row["source"].startswith("GeoNames (geonameId ")]
     manual = {row["code"] for row in retained}
 
@@ -112,12 +113,11 @@ def main():
 
     accepted.sort(key=lambda row: row["code"])
     combined = retained + accepted
-    with args.output.open("w") as output:
-        output.write("[\n")
-        for index, row in enumerate(combined):
-            output.write("  " + json.dumps(row, ensure_ascii=False, separators=(",", ":")))
-            output.write(",\n" if index < len(combined) - 1 else "\n")
-        output.write("]\n")
+    lines = ["  " + json.dumps(row, ensure_ascii=False, separators=(",", ":")) for row in combined]
+    encoded = ("[\n" + ",\n".join(lines) + "\n]\n").encode()
+    with args.output.open("wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as target:
+            target.write(encoded)
     with args.unresolved.open("w", newline="") as output:
         writer = csv.writer(output, lineterminator="\n")
         writer.writerow(("code", "name", "reason", "geoname_ids"))

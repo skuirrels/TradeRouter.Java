@@ -4,7 +4,21 @@ All notable changes to TradeRouter.Java are recorded here. The format follows [K
 
 ## [Unreleased]
 
-Version 2.0.0, ported from TradeRouter.Net 2.0.0 at `de93a0e`. Not yet published to Maven Central.
+Version 2.1.1, ported from TradeRouter.Net 2.1.1 at `e80f054`. Not yet published to Maven Central.
+
+### Sea routing
+
+- `setReturnSeaAreas(true)` reports the named sea areas a route passes through as `traversed_sea_areas`, in the order it enters them, with `enter_km` and `exit_km` from the start of the route. Each sea leg of a movement carries it too, counted from the start of the leg.
+- 42 seas, gulfs, straits and oceans from Natural Earth 1:50m marine polygons, as `SeaArea` constants with `SeaArea.getCatalogue()` listing names, Wikidata items and Natural Earth IDs. `SeaAreaInfo` and `SeaAreaTraversal` are records.
+
+### Data
+
+- The UN/LOCODE coordinate supplement is embedded as `unlocode-supplement.json.gz`. Its decompressed JSON is unchanged.
+- `sea-areas.json` and `sea-area-polygons.json.gz` are byte-identical to TradeRouter.Net, with hashes in `DATA_PROVENANCE.md`.
+
+## [2.0.0] - 2026-10-15
+
+First release on Maven Central, ported from TradeRouter.Net 2.0.0 at `de93a0e`.
 
 ### Sea routing
 
@@ -48,4 +62,5 @@ Version 2.0.0, ported from TradeRouter.Net 2.0.0 at `de93a0e`. Not yet published
 - Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
-[Unreleased]: https://github.com/skuirrels/TradeRouter.Java/commits/main
+[Unreleased]: https://github.com/skuirrels/TradeRouter.Java/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.0.0

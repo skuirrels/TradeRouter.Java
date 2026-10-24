@@ -1,6 +1,7 @@
 package io.github.skuirrels.traderouter.geojson;
 
 import io.github.skuirrels.traderouter.ports.Port;
+import io.github.skuirrels.traderouter.seaareas.SeaAreaTraversal;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public final class TradeRouterProperties {
     private Port portOrigin;
     private Port portDest;
     private List<String> traversedPassages;
+    private List<SeaAreaTraversal> traversedSeaAreas;
     private List<String> railroads;
     private Integer leg;
     private String mode;
@@ -215,6 +217,21 @@ public final class TradeRouterProperties {
     /** Sets the traversed passages. */
     public TradeRouterProperties setTraversedPassages(List<String> traversedPassages) {
         this.traversedPassages = traversedPassages;
+        return this;
+    }
+
+    /**
+     * Named sea areas the route passes through, in the order it enters them, with where it enters and leaves each
+     * in kilometres from the start of the route, or null. Water outside every listed area is not reported.
+     * JSON: {@code traversed_sea_areas}.
+     */
+    public List<SeaAreaTraversal> getTraversedSeaAreas() {
+        return traversedSeaAreas;
+    }
+
+    /** Sets the traversed sea areas. */
+    public TradeRouterProperties setTraversedSeaAreas(List<SeaAreaTraversal> traversedSeaAreas) {
+        this.traversedSeaAreas = traversedSeaAreas;
         return this;
     }
 

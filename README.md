@@ -5,7 +5,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](traderouter/pom.xml)
 
-Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library. A port of [TradeRouter.Net](https://github.com/skuirrels/TradeRouter.Net) 2.0.0, including its later road-routing, port-alias and coordinate-supplement changes, that embeds the same data and produces the same routes, GeoJSON and reports.
+Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library. A port of [TradeRouter.Net](https://github.com/skuirrels/TradeRouter.Net) 2.1.1 that embeds the same data and produces the same routes, GeoJSON and reports.
 
 Give it two UN/LOCODE port codes and it returns RFC 7946 GeoJSON with the distance, voyage duration, ports used and canals and straits passed through. Port codes are the native input; raw coordinates remain available as a fallback for custom or unresolved locations. Ordinary routes are `LineString`; antimeridian crossings are split into `MultiLineString`. The maritime network and world ports database are compressed and embedded in the jar, so there is nothing to download, configure or host.
 
@@ -25,7 +25,7 @@ System.out.printf("%,.0f %s, %,.0f h%n",
 
 ### Complete multi-leg movement
 
-Route pickup, two sea legs and final delivery using UN/LOCODEs throughout. The result contains every leg, totals, a modelled minimum time, emissions, choke points and a GeoJSON `FeatureCollection`.
+Route pickup, two sea legs and final delivery using UN/LOCODEs throughout. The result contains every leg, totals, a modelled minimum time, emissions, choke points and a GeoJSON `FeatureCollection`. `setReturnSeaAreas(true)` in the sea options adds the sea areas each sea leg crosses to that leg's GeoJSON properties; `toText()` does not list them.
 
 ```java
 import io.github.skuirrels.traderouter.TradeRouterOptions;
@@ -43,7 +43,7 @@ var plan = MovementPlan
 
 var movement = TradeRoutes.calculateMovement(
     plan,
-    new TradeRouterOptions().setReturnPassages(true),
+    new TradeRouterOptions().setReturnPassages(true).setReturnSeaAreas(true),
     12.0, // Optional cargo tonnes: gross weight, used on inland legs when above 10 t per TEU
     2.0); // Optional cargo TEU: one 40-foot container, charged per TEU at sea and at least 10 t per TEU inland
 
@@ -82,7 +82,7 @@ var plan = MovementPlan
 
 var movement = TradeRoutes.calculateMovement(
     plan,
-    new TradeRouterOptions().setReturnPassages(true),
+    new TradeRouterOptions().setReturnPassages(true).setReturnSeaAreas(true),
     24.0, // Heavier than 10 t per TEU, so road and rail legs are charged on the stated weight
     2.0);
 
@@ -139,7 +139,7 @@ Source: [docs/diagrams/routing-pipeline.svg](docs/diagrams/routing-pipeline.svg)
 3. **Snap to the lane network.** Each end is matched to the geographically nearest point on Marnet using a spherical KD-tree, including across the date line and near the poles. Shanghai's port position is 18 km from its lane point, London's 23 km.
 4. **Find the shortest path** along the lanes with bidirectional Dijkstra, or A* on request. Lane links through a closed canal or strait are skipped; the Northwest Passage is closed by default. Shanghai to London gives 154 lane points over 19,397 km, through Malacca, Bab-el-Mandeb, Suez and Gibraltar.
 5. **Finish the route.** With `appendOriginDestination` the real endpoints are added, and length and duration are measured: 156 points, 19,438 km, 656 hours at 16 knots.
-6. **Return a GeoJSON Feature**: a LineString, an antimeridian-split MultiLineString, or null geometry when no path exists, plus distance, units, duration, ports and passages.
+6. **Return a GeoJSON Feature**: a LineString, an antimeridian-split MultiLineString, or null geometry when no path exists, plus distance, units, duration, ports and passages, and the sea areas crossed when `returnSeaAreas` is set.
 
 ### Terms
 
@@ -151,7 +151,8 @@ These apply to single routes and to multi-leg movements, which are described [be
 - **Lane**: a straight link between two neighbouring lane points. Sea legs travel only along lanes.
 - **Snapping**: moving a waypoint's position to its nearest lane point so a sea leg can start or end on the map, then joining the two with a straight line so the leg still begins and ends at the waypoint.
 - **Choke point**: a lane that runs through a canal or strait, tagged with its name. Thirteen exist. Closing one makes the router route round it.
-- **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail legs in the United States, Canada and Mexico are routed on the embedded North American rail network; other rail legs and air legs use great-circle distance. None uses maritime lane points or choke points.
+- **Sea area**: a named sea, gulf, strait or ocean drawn as a polygon, one of 42 from Natural Earth. A route can report which ones it crosses and where it enters and leaves each. Sea areas never change the route; unlike choke points they cannot be closed.
+- **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail legs in the United States, Canada and Mexico are routed on the embedded North American rail network; other rail legs and air legs use great-circle distance. None uses maritime lane points, choke points or sea areas.
 
 Implementation notes:
 
@@ -159,6 +160,7 @@ Implementation notes:
 - **Search.** Bidirectional Dijkstra by default, A* on request. Both use per-thread, node-indexed scratch arrays with generation stamps and a primitive quaternary heap, so a query allocates only its result.
 - **No route.** A single route with no surviving path returns RFC 7946 `null` geometry and zero length. A movement leg with no path throws, so totals are never silently short.
 - **Antimeridian.** Trans-Pacific routes are split at ±180° into a `MultiLineString`, keeping every emitted longitude in the RFC 7946 range.
+- **Sea areas.** Found after the search, on the finished path: each lane is followed along its great circle in steps of at most 10 km and tested against the polygons through a 1° grid index. The polygons load on the first request that asks for sea areas.
 - **Areas.** Polygons can name several preferred ports with share weights, in which case one route per port is returned.
 
 ## What you get back
@@ -203,16 +205,17 @@ Example output for Jebel Ali (AEJEA) to St John's, Antigua (AGSJO) with Suez clo
 | `distance_warning` | Present when a road leg fell back to an estimate. |
 | `port_origin`, `port_dest` | Present when routing by port code or with `includePorts`. |
 | `traversed_passages` | Present when `returnPassages` is set. Lower-case identifiers listed below. |
+| `traversed_sea_areas` | Present when `returnSeaAreas` is set. Named sea areas in the order the route enters them, each with `id`, `name`, `wikidata`, `enter_km` and `exit_km`. |
 
 ## Installation
 
-The current version is 2.0.0. It is not yet on Maven Central, so build and install it locally (see [Building, testing and trying it out](#building-testing-and-trying-it-out)) and then depend on it:
+The current version is 2.1.1. It is not yet on Maven Central, so build and install it locally (see [Building, testing and trying it out](#building-testing-and-trying-it-out)) and then depend on it:
 
 ```xml
 <dependency>
   <groupId>io.github.skuirrels</groupId>
   <artifactId>traderouter</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.1</version>
 </dependency>
 ```
 
@@ -291,6 +294,42 @@ GeoJsonFeature arctic = TradeRoutes.calculate("NLRTM", "JPYOK", new TradeRouterO
 
 Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `MALACCA`, `NORTHWEST` (closed unless `setAllowNorthwest(true)`), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`. Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md).
 
+### Sea areas along a route
+
+Set `setReturnSeaAreas(true)` to list the named seas, gulfs, straits and oceans a route passes through, with where it enters and leaves each. Distances are kilometres from the start of the route, whatever the units are set to, measured along the same great circles as the route's length.
+
+```java
+import io.github.skuirrels.traderouter.seaareas.SeaArea;
+import io.github.skuirrels.traderouter.seaareas.SeaAreaTraversal;
+
+var route = TradeRoutes.calculate("SAJED", "PKKHI", new TradeRouterOptions() // Jeddah to Karachi
+    .setAppendOriginDestination(true)
+    .setReturnSeaAreas(true));
+
+// route.properties().getTraversedSeaAreas():
+//   red_sea        4 km to 1,160 km
+//   gulf_of_aden   1,160 km to 2,097 km
+//   arabian_sea    2,097 km to 4,116 km
+```
+
+```json
+"traversed_sea_areas": [
+  { "id": "red_sea", "name": "Red Sea", "wikidata": "Q23406", "enter_km": 4.2, "exit_km": 1160.1 },
+  { "id": "gulf_of_aden", "name": "Gulf of Aden", "wikidata": "Q41837", "enter_km": 1160.1, "exit_km": 2097.0 },
+  { "id": "arabian_sea", "name": "Arabian Sea", "wikidata": "Q58705", "enter_km": 2097.0, "exit_km": 4116.2 }
+]
+```
+
+The rules:
+
+- An area is listed once for each time the route enters it. A return with no other listed area in between is merged into one entry, so a route crossing the North Atlantic's unlisted Sargasso Sea hole shows the North Atlantic once.
+- Where listed areas overlap, each of them is listed.
+- Water outside every listed area is not reported. On the five routes in the tests this is 0.3% to 26% of the route, most on Istanbul to Port Said; the 1:50m data has no Gulf of Suez or Sea of Marmara, which the `suez`, `bosporus` and `dardanelles` passages cover.
+- Connector segments, such as port to lane, count. Areas are found on the continuous path before it is split at the antimeridian.
+- Each sea leg of a movement carries the same property, counted from the start of that leg.
+
+Recognised sea areas: `AEGEAN_SEA`, `ANDAMAN_SEA`, `ARABIAN_SEA`, `ARCTIC_OCEAN`, `BALTIC_SEA`, `BAY_OF_BENGAL`, `BAY_OF_BISCAY`, `BLACK_SEA`, `BO_HAI`, `CARIBBEAN_SEA`, `CORAL_SEA`, `EAST_CHINA_SEA`, `ENGLISH_CHANNEL`, `GULF_OF_ADEN`, `GULF_OF_GUINEA`, `GULF_OF_MEXICO`, `GULF_OF_OMAN`, `GULF_OF_THAILAND`, `INDIAN_OCEAN`, `JAVA_SEA`, `KOREA_STRAIT`, `LACCADIVE_SEA`, `MEDITERRANEAN_SEA`, `MOZAMBIQUE_CHANNEL`, `NORTH_ATLANTIC_OCEAN`, `NORTH_PACIFIC_OCEAN`, `NORTH_SEA`, `PERSIAN_GULF`, `PHILIPPINE_SEA`, `RED_SEA`, `SEA_OF_JAPAN`, `SOUTH_ATLANTIC_OCEAN`, `SOUTH_CHINA_SEA`, `SOUTH_PACIFIC_OCEAN`, `SOUTHERN_OCEAN`, `STRAIT_OF_GIBRALTAR`, `STRAIT_OF_MALACCA`, `STRAIT_OF_SINGAPORE`, `STRAITS_OF_FLORIDA`, `TAIWAN_STRAIT`, `TASMAN_SEA`, `YELLOW_SEA`. Each is a `SeaArea` constant holding the lower snake_case identifier, such as `SeaArea.RED_SEA` for `red_sea`. `SeaArea.getCatalogue()` gives each one's `id`, `name`, `wikidata` and Natural Earth `neId`, and `SeaArea.get(id)` looks one up case-insensitively. The Wikidata item is a cross-reference only: the North and South halves of an ocean share one.
+
 ### Routing with coordinates
 
 Coordinates are the fallback when an endpoint has no usable port code, when your authoritative position differs from the embedded data, or when routing to an offshore/custom point. Coordinate order is longitude, latitude.
@@ -342,7 +381,7 @@ var routes = DefaultTradeRouterEngine.getDefault().calculateRoutes(
 
 ### Multi-leg movements
 
-A `MovementPlan` builds a continuous route from typed waypoints and transport modes. Each destination automatically becomes the next leg's origin, so intermediate UN/LOCODEs are stated once. Declared waypoint types and sea, rail and air modes are checked against known UN/LOCODE functions. Pickup and delivery ordering is enforced while the plan is built. Sea legs are routed on the lane network. Road legs use an optional road-network provider or a labelled built-in estimate. Rail legs use a supplied rail route when one is given, otherwise the embedded North American rail network when both ends are near it; other rail legs and air legs use great-circle distance. None of the non-sea modes touches maritime lane points or choke points. Default assumed speeds are 60, 80 and 800 km/h for road, rail and air.
+A `MovementPlan` builds a continuous route from typed waypoints and transport modes. Each destination automatically becomes the next leg's origin, so intermediate UN/LOCODEs are stated once. Declared waypoint types and sea, rail and air modes are checked against known UN/LOCODE functions. Pickup and delivery ordering is enforced while the plan is built. Sea legs are routed on the lane network. Road legs use an optional road-network provider or a labelled built-in estimate. Rail legs use a supplied rail route when one is given, otherwise the embedded North American rail network when both ends are near it; other rail legs and air legs use great-circle distance. None of the non-sea modes touches maritime lane points, choke points or sea areas. Default assumed speeds are 60, 80 and 800 km/h for road, rail and air.
 
 <p align="center">
   <img src="docs/diagrams/movement-flow.svg" alt="Movement flow: a typed MovementPlan builds continuous legs, resolves each leg's locations, routes sea legs on Marnet, resolves road distance from a road provider or fallback estimate, routes North American rail legs on the NARN rail network, and measures other rail legs and air legs by great-circle distance" width="70%">
@@ -372,7 +411,7 @@ String geoJson = movement.toJson();   // FeatureCollection, one feature per leg
 
 The string overload remains available as an import convenience when a source system already supplies human-written leg lines such as `Pickup GBLGW to Port GBFXT Road`. Code-first callers should use `MovementPlan`; the strings above are only the UN/LOCODE identifiers themselves.
 
-Each leg feature carries `leg`, `mode`, `kind`, `from` and `to` in its properties, plus the time components described below. The collection carries the corresponding totals. Every leg starts and ends at its resolved locations, so consecutive legs join end to end; `appendOriginDestination` is always on for movement legs. A sea leg with no route under the given restrictions throws an `IllegalStateException` naming the leg rather than contributing zero. Build a `MovementRequest` directly when you need road routing, supplied rail routes, declared location functions, custom speeds, timing assumptions or emission factors.
+Each leg feature carries `leg`, `mode`, `kind`, `from` and `to` in its properties, plus the time components described below. Sea legs also carry `traversed_passages` and `traversed_sea_areas` when `setReturnPassages(true)` and `setReturnSeaAreas(true)` are set in the sea options; sea-area distances count from the start of the leg. The collection carries the corresponding totals. Every leg starts and ends at its resolved locations, so consecutive legs join end to end; `appendOriginDestination` is always on for movement legs. A sea leg with no route under the given restrictions throws an `IllegalStateException` naming the leg rather than contributing zero. Build a `MovementRequest` directly when you need road routing, supplied rail routes, declared location functions, custom speeds, timing assumptions or emission factors.
 
 Codes resolve in this order:
 
@@ -382,7 +421,7 @@ Codes resolve in this order:
 4. The port list anyway, for codes UN/LOCODE lacks coordinates for.
 5. A `LocationResolver`, if one is set.
 
-Each resolved location reports its `source()`. UNECE provides coordinates for 84,516 of the 106,588 embedded codes. The single [coordinate supplement](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-supplement.json) supplies 17,771 more: five hand-reviewed entries and 17,766 GeoNames entries selected through explicit UN/LOCODE links with matching country and place name or recorded alternate name. Every entry records its source, and GeoNames entries include their geonameId. The supplement fills codes UNECE publishes without coordinates, and 147 reviewed rows replace UNECE coordinates that fall far outside their country. The remaining 4,301 codes have no verified position in these sources; see the [review list](docs/unlocode-unresolved.csv). Codes that neither list can place still need a caller coordinate or resolver, and the error for one names the place and its functions. An unknown code throws an `IllegalArgumentException` naming the code rather than guessing. Some port codes occur more than once in the upstream list: code-only lookup throws when ambiguous, `getByCodeCandidates` returns every record, and `getByCode(code, near)` disambiguates geographically.
+Each resolved location reports its `source()`. UNECE provides coordinates for 84,516 of the 106,588 embedded codes. The single [coordinate supplement](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-supplement.json.gz) supplies 17,771 more: five hand-reviewed entries and 17,766 GeoNames entries selected through explicit UN/LOCODE links with matching country and place name or recorded alternate name. Every entry records its source, and GeoNames entries include their geonameId. The supplement fills codes UNECE publishes without coordinates, and 147 reviewed rows replace UNECE coordinates that fall far outside their country. The remaining 4,301 codes have no verified position in these sources; see the [review list](docs/unlocode-unresolved.csv). Codes that neither list can place still need a caller coordinate or resolver, and the error for one names the place and its functions. An unknown code throws an `IllegalArgumentException` naming the code rather than guessing. Some port codes occur more than once in the upstream list: code-only lookup throws when ambiguous, `getByCodeCandidates` returns every record, and `getByCode(code, near)` disambiguates geographically.
 
 ### Road routing
 
@@ -612,6 +651,7 @@ Everything here is deliberate and documented, but each is a simplification you s
 - **Supplemented coordinates.** 17,918 codes have coordinates from cited sources rather than UNECE: 17,771 that UNECE publishes without one (five hand-reviewed, 17,766 through unambiguous GeoNames links) and 147 whose UNECE coordinate falls far outside their country. Another 4,301 codes still have no verified coordinates; use caller coordinates or a resolver for those.
 - **Sea-port function checks.** A port waypoint or sea leg is rejected when UN/LOCODE records no sea-port function, even if the port list holds the code, because that list also contains inland terminals such as Calgary. Two codes UNECE under-records, Alumar (`BRALU`) and Duncan Bay (`CADCN`), are confirmed as sea ports by [unlocode-seaport-supplement.json](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-seaport-supplement.json) with cited sources. Other affected ports need a `Waypoint.place` or a new supplement entry.
 - **Rail function checks.** A station waypoint or rail leg is rejected unless UN/LOCODE records a rail-terminal or multimodal function. UNECE under-records rail, especially for North American cities. The [rail supplement](traderouter/src/main/resources/io/github/skuirrels/traderouter/data/unlocode-rail-supplement.json) adds the function to 20 codes with cited freight terminals, several of which sit in a neighbouring municipality of the coded city, such as Vaughan for Toronto. Other rail-served places need `MovementRequest.addLocationFunctions` or a new supplement entry.
+- **Sea areas are drawn at 1:50m.** Natural Earth's polygons are cartographic, not legal or IHO limits, and are accurate to a few kilometres. They leave gaps: no Gulf of Suez or Sea of Marmara, and water between neighbouring areas that belongs to none. That water is not reported, so the listed areas need not cover a whole route.
 - **Port-code aliases.** 264 port-list codes are not UN/LOCODEs. Only 61 are mapped from an official code, where the names and positions within 25 km show the same port; the rest route only by their port-list code or by coordinates. Nearest-port matching is not used, because it pairs different places such as Perth and Claremont.
 - **Duplicate port codes.** The tagged upstream list contains 38 codes with multiple records. Code-only lookup never silently chooses one; provide a nearby coordinate or inspect the candidates.
 - **UN/LOCODE edition.** The embedded import did not preserve its UNECE publication edition. Its hash and record counts are documented, but it is not claimed to be the latest release.
@@ -637,6 +677,7 @@ Everything here is deliberate and documented, but each is a simplification you s
 | `setIncludePorts` | `false` | Route from and to the nearest ports instead of the raw points. |
 | `setPortParameters` | `null` | Terminal-only, country filters, area polygons. `strict` is true by default: a filter that matches no port yields no port rather than silently widening. |
 | `setReturnPassages` | `false` | Populate `traversed_passages`. |
+| `setReturnSeaAreas` | `false` | Populate `traversed_sea_areas`. |
 | `setAlgorithm` | `"dijkstra"` | `"dijkstra"` or `"astar"`. Both return an optimal cost; equal-cost route geometry can differ. |
 
 ## Performance
@@ -653,6 +694,8 @@ JMH, Java 26 on Apple M4 Pro, one fork, five one-second iterations after three w
 | Nearest-port lookup | 45 ns |
 
 The Dijkstra figures are in line with those TradeRouter.Net reports for its 1.1.0 release on the same hardware class; the .NET benchmarks were not re-run for this port. A* is slower here because the heuristic scale is zero on the embedded network, as explained under [known limitations](#known-limitations-and-judgement-calls). Cold start, including decompressing and indexing the embedded data, is about 100 ms and happens once per process.
+
+At 2.1.1, a separate run with the GC profiler put Shanghai to Rotterdam with bidirectional Dijkstra at 352 µs and 15.7 KB allocated, and at 738 µs and 21.6 KB with `setReturnSeaAreas(true)`. Routes that do not ask for sea areas are unchanged. The first request that asks for them loads the polygons, about 34 ms once per process.
 
 Run the benchmarks yourself:
 
@@ -675,7 +718,7 @@ THIRD-PARTY-NOTICES.md      data licences and attribution
 traderouter/                the library, published as io.github.skuirrels:traderouter
   src/main/java/io/github/skuirrels/traderouter/
     common/                 Coordinate, Haversine, DistanceUnit, antimeridian normaliser, point-in-polygon
-    data/                   loader for the embedded marnet, ports, UN/LOCODE and rail datasets and supplements
+    data/                   loader for the embedded marnet, ports, UN/LOCODE, rail and sea-area datasets and supplements
     geojson/                Feature, FeatureCollection, LineString/MultiLineString and serializer
     graph/                  MaritimeGraph, BidirectionalDijkstra, AStar, per-thread search buffers
     json/                   dependency-free JSON reader and writer
@@ -683,6 +726,7 @@ traderouter/                the library, published as io.github.skuirrels:trader
     movements/              multi-leg movements: plan, legs, parser, request, result, location resolution, road estimators, OSRM provider, emission factors, sea service allowance
     passages/               passage identifiers
     ports/                  Port, PortDatabase, PortParameters, AreaFeature, PortProps
+    seaareas/               sea-area identifiers, catalogue and the index that finds them along a route
     spatial/                spherical 3D KD-tree
     TradeRouterEngine.java  engine interface
     DefaultTradeRouterEngine.java  embedded-data implementation
@@ -690,9 +734,10 @@ traderouter/                the library, published as io.github.skuirrels:trader
     TradeRoutes.java        static facade
   src/main/resources/io/github/skuirrels/traderouter/data/
                             marnet.json.gz, ports.json.gz, unlocode.json.gz, rail-narn.json.gz,
-                            unlocode-supplement.json, unlocode-seaport-supplement.json,
+                            sea-areas.json, sea-area-polygons.json.gz,
+                            unlocode-supplement.json.gz, unlocode-seaport-supplement.json,
                             unlocode-rail-supplement.json, port-code-aliases.json
-  src/test/java/            JUnit 5 suite: routing, passages, ports, spatial, graph, JSON and movements
+  src/test/java/            JUnit 5 suite: routing, passages, sea areas, ports, spatial, graph, JSON and movements
 traderouter-sample/         console app exercising every entry point, plus run-with-osrm.sh, the OSRM
                             container runner, its region list and the Osmium helper Dockerfile
 scripts/                    CI guard against hard-coded sample road routes
@@ -729,7 +774,7 @@ To prepare or reuse the default local OSRM container and run the same sample:
 
 The sample contains fifteen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Add `-Dexec.args=--geojson` to print a full feature.
 
-`mvn install` places `traderouter-2.0.0.jar`, with its sources and Javadoc jars, in your local Maven repository.
+`mvn install` places `traderouter-2.1.1.jar`, with its sources and Javadoc jars, in your local Maven repository.
 
 ## Differences from TradeRouter.Net
 
@@ -743,6 +788,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 | `Geometry.Coordinates` flattened view | `geometry().positions()`; `coordinates()` on the concrete `GeoJsonLineString` or `GeoJsonMultiLineString` |
 | `ILocationResolver.TryResolve` with `out` parameters | `LocationResolver.tryResolve` returning `Optional<Resolution>` |
 | `[Flags] LocationFunctions` | `Set<LocationFunction>` |
+| `SeaArea.RedSea`, `SeaArea.Catalogue`, `SeaArea.ValidSeaAreas` | `SeaArea.RED_SEA`, `SeaArea.getCatalogue()`, `SeaArea.getValidSeaAreas()`; `SeaAreaInfo` and `SeaAreaTraversal` are records |
 | `ArgumentException`, `ArgumentOutOfRangeException` | `IllegalArgumentException` |
 | `InvalidOperationException` | `IllegalStateException` |
 | `FormatException` from the leg parser | `MovementFormatException`, an `IllegalArgumentException` |
@@ -758,6 +804,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 - **World ports**, transformed from searoute-py 1.6.0: 3,962 records with code, name, country, terminal flag and permitted destination countries.
 - **UN/LOCODE**, the UNECE code list for trade and transport locations: 106,588 codes with name and function flags, of which 84,516 carry coordinates to one minute of arc. Used to resolve movement legs that name airports, terminals and inland places. Loaded only when a movement needs it.
 - **UN/LOCODE coordinate supplement**: one JSON file of 17,918 rows, each recording its source. 17,771 fill codes UNECE publishes without a coordinate: five hand-reviewed entries (Gatwick, Shanghai Railway Station, Shanghai Hongqiao, Melrose and Guildford) and 17,766 positions from the 16 September 2026 GeoNames snapshot, each with an explicit `unlc` code, matching country and name or recorded alternate name, and one unambiguous coordinate. Lightwater (`GBLGE`) is included. The other 147 replace UNECE coordinates that fall far outside their country: 145 from GeoNames, the Akpo offshore field (`NGAKP`) from Wikipedia, and Amurang (`IDTZD`) with its longitude sign corrected. [DATA_PROVENANCE.md](DATA_PROVENANCE.md) documents the selection.
+- **Sea areas**, from Natural Earth 1:50m marine polygons, public domain: a JSON selection of 42 seas, gulfs, straits and oceans and their polygons, 21,055 vertices. Used to report `traversed_sea_areas`. Loaded only when a route asks for sea areas.
 - **North American rail network**, the main line of the BTS NTAD North American Rail Network Lines: 87,789 nodes and 91,000 track edges covering 272,068 km in the United States, Canada and Mexico, each edge with its published track length and owning railroad. Used to route rail legs. Loaded only when a movement has a rail leg.
 - **Port-code aliases**: a reviewed JSON file mapping 61 official UN/LOCODE sea-port codes to the port-list record held under another code. Used only when the port list lacks the requested code.
 - **UN/LOCODE sea-port supplement**: a hand-maintained JSON file of codes that UNECE publishes without the sea-port function but that cited sources document as sea ports. Currently two entries: Alumar and Duncan Bay. It only adds the sea-port function and never removes one.

@@ -145,8 +145,8 @@
   <text x="896" y="200" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">[lon, lat][] · flattened</text>
 
   <!-- Entity: TradeRouterProperties -->
-  <rect x="672" y="280" width="280" height="424" rx="6" fill="#f6f7f8"/>
-  <rect x="672" y="280" width="280" height="424" rx="6" fill="#ffffff" stroke="#181818" stroke-width="1"/>
+  <rect x="672" y="280" width="280" height="444" rx="6" fill="#f6f7f8"/>
+  <rect x="672" y="280" width="280" height="444" rx="6" fill="#ffffff" stroke="#181818" stroke-width="1"/>
   <rect x="672" y="280" width="280" height="40" rx="6" fill="rgba(24,24,24,0.04)" stroke="none"/>
   <rect x="672" y="312" width="280" height="8" fill="rgba(24,24,24,0.04)"/>
   <line x1="672" y1="320" x2="952" y2="320" stroke="rgba(24,24,24,0.22)" stroke-width="1"/>
@@ -164,30 +164,32 @@
   <text x="936" y="420" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">Port?</text>
   <text x="688" y="440" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">traversed_passages</text>
   <text x="936" y="440" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">string[]?</text>
-  <line x1="688" y1="452" x2="936" y2="452" stroke="rgba(24,24,24,0.12)" stroke-width="0.8"/>
-  <text x="688" y="464" fill="#6c7484" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">MOVEMENT LEGS ONLY</text>
-  <text x="688" y="480" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">leg</text>
-  <text x="936" y="480" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">int?</text>
-  <text x="688" y="500" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">mode</text>
-  <text x="936" y="500" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">"sea" · "road" · "rail" · "air"</text>
-  <text x="688" y="520" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">kind</text>
-  <text x="936" y="520" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">"main" · "pickup" · "delivery"</text>
-  <text x="688" y="540" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">from, to</text>
-  <text x="936" y="540" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">code or name</text>
-  <text x="688" y="560" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">port_hours</text>
-  <text x="936" y="560" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · 24 h per sea-leg end</text>
-  <text x="688" y="580" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">transit_hours</text>
-  <text x="936" y="580" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · duration + port</text>
-  <text x="688" y="600" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_g_per_tonne_km</text>
-  <text x="936" y="600" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double · GLEC WTW</text>
-  <text x="688" y="620" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_kg_per_tonne</text>
-  <text x="936" y="620" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double</text>
-  <text x="688" y="640" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_kg</text>
-  <text x="936" y="640" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · with cargo</text>
-  <text x="688" y="660" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_g_per_teu_km</text>
-  <text x="936" y="660" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · TEU</text>
-  <text x="688" y="680" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_basis</text>
-  <text x="936" y="680" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">tonnes · teu · teu_avg</text>
+  <text x="688" y="460" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">traversed_sea_areas</text>
+  <text x="936" y="460" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">SeaAreaTraversal[]?</text>
+  <line x1="688" y1="472" x2="936" y2="472" stroke="rgba(24,24,24,0.12)" stroke-width="0.8"/>
+  <text x="688" y="484" fill="#6c7484" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">MOVEMENT LEGS ONLY</text>
+  <text x="688" y="500" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">leg</text>
+  <text x="936" y="500" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">int?</text>
+  <text x="688" y="520" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">mode</text>
+  <text x="936" y="520" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">"sea" · "road" · "rail" · "air"</text>
+  <text x="688" y="540" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">kind</text>
+  <text x="936" y="540" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">"main" · "pickup" · "delivery"</text>
+  <text x="688" y="560" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">from, to</text>
+  <text x="936" y="560" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">code or name</text>
+  <text x="688" y="580" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">port_hours</text>
+  <text x="936" y="580" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · 24 h per sea-leg end</text>
+  <text x="688" y="600" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">transit_hours</text>
+  <text x="936" y="600" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · duration + port</text>
+  <text x="688" y="620" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_g_per_tonne_km</text>
+  <text x="936" y="620" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double · GLEC WTW</text>
+  <text x="688" y="640" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_kg_per_tonne</text>
+  <text x="936" y="640" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double</text>
+  <text x="688" y="660" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_kg</text>
+  <text x="936" y="660" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · with cargo</text>
+  <text x="688" y="680" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_g_per_teu_km</text>
+  <text x="936" y="680" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">double? · TEU</text>
+  <text x="688" y="700" fill="#181818" font-size="10" font-family="'Geist Mono', monospace">co2e_basis</text>
+  <text x="936" y="700" fill="#5b6472" font-size="10" font-family="'Geist Mono', monospace" text-anchor="end">tonnes · teu · teu_avg</text>
 
   <!-- Entity: Port (optional, present only when ports are resolved) -->
   <rect x="1032" y="280" width="200" height="200" rx="6" fill="#f6f7f8"/>
