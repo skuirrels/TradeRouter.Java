@@ -209,7 +209,7 @@ Example output for Jebel Ali (AEJEA) to St John's, Antigua (AGSJO) with Suez clo
 
 ## Installation
 
-The current version is 2.1.1. It is not yet on Maven Central, so build and install it locally (see [Building, testing and trying it out](#building-testing-and-trying-it-out)) and then depend on it:
+The current version is 2.1.1, published on Maven Central as `io.github.skuirrels:traderouter`:
 
 ```xml
 <dependency>
