@@ -1,6 +1,5 @@
 package io.github.skuirrels.traderouter;
 
-import com.sun.net.httpserver.HttpServer;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.movements.GoogleRoutesRoadRouteProvider;
 import io.github.skuirrels.traderouter.movements.LegResult;
@@ -22,21 +21,15 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -65,7 +58,7 @@ class GoogleRoutesRoadRouteProviderTests {
 
     @Test
     void routeAsyncSendsKeyFieldMaskAndRequestBody() throws IOException {
-        try (StubGoogle google = StubGoogle.responding(200, "{}")) {
+        try (StubHttpServer google = StubHttpServer.responding(200, "{}")) {
             var provider = new GoogleRoutesRoadRouteProvider(
                     HttpClient.newHttpClient(), " " + API_KEY + " ", " drive ",
                     GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, google.uri(), null);
@@ -73,8 +66,8 @@ class GoogleRoutesRoadRouteProviderTests {
             provider.routeAsync(createRequest(new Coordinate(181, 10), new Coordinate(1, 1))).join();
 
             assertThat(google.method.get()).isEqualTo("POST");
-            assertThat(google.apiKey.get()).isEqualTo(API_KEY);
-            assertThat(google.fieldMask.get()).isEqualTo("routes.distanceMeters,routes.duration,routes.polyline.geoJsonLinestring");
+            assertThat(google.header("X-Goog-Api-Key")).isEqualTo(API_KEY);
+            assertThat(google.header("X-Goog-FieldMask")).isEqualTo("routes.distanceMeters,routes.duration,routes.polyline.geoJsonLinestring");
 
             JsonNode root = new ObjectMapper().readTree(google.body.get());
             assertThat(root.path("travelMode").asString()).isEqualTo("DRIVE");
@@ -106,7 +99,7 @@ class GoogleRoutesRoadRouteProviderTests {
 
     @Test
     void routeAsyncBuildsUriFromCustomBasePath() throws IOException {
-        try (StubGoogle google = StubGoogle.responding(200, "{}")) {
+        try (StubHttpServer google = StubHttpServer.responding(200, "{}")) {
             var provider = new GoogleRoutesRoadRouteProvider(
                     HttpClient.newHttpClient(), API_KEY, GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
                     GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, URI.create(google.uri() + "/google"), null);
@@ -128,7 +121,7 @@ class GoogleRoutesRoadRouteProviderTests {
 
     @Test
     void routeAsyncZeroLengthRouteWithOmittedFieldsSucceeds() throws IOException {
-        try (StubGoogle google = StubGoogle.responding(
+        try (StubHttpServer google = StubHttpServer.responding(
                 200, "{\"routes\":[{\"polyline\":{\"geoJsonLinestring\":{\"type\":\"LineString\",\"coordinates\":[[0,0],[0,0]]}}}]}")) {
             RoadRouteResult result = provider(google).routeAsync(createRequest(new Coordinate(0, 0), new Coordinate(0, 0))).join();
 
@@ -144,7 +137,10 @@ class GoogleRoutesRoadRouteProviderTests {
                         "Google Routes returned HTTP 403 PERMISSION_DENIED: Routes API has not been used in project 1."),
                 Arguments.of(429, "{\"error\":{\"code\":429,\"status\":\"RESOURCE_EXHAUSTED\"}}", "Google Routes returned HTTP 429 RESOURCE_EXHAUSTED"),
                 Arguments.of(502, "<html>bad gateway</html>", "Google Routes returned HTTP 502."),
-                Arguments.of(500, "{}", "Google Routes returned HTTP 500."));
+                Arguments.of(500, "{}", "Google Routes returned HTTP 500."),
+                Arguments.of(500, "{\"error\":{}}", "Google Routes returned HTTP 500"),
+                Arguments.of(500, "{\"error\":\"broken\"}", "Google Routes returned HTTP 500."),
+                Arguments.of(500, "{\"error\":{\"status\":5}}", "Google Routes returned HTTP 500."));
     }
 
     @ParameterizedTest
@@ -171,7 +167,7 @@ class GoogleRoutesRoadRouteProviderTests {
     @Test
     void routeAsyncHttpClientTimeoutIsUnavailable() throws IOException {
         // The .NET test sets HttpClient.Timeout; the JDK client takes the timeout per request via the constructor.
-        try (StubGoogle google = StubGoogle.hanging()) {
+        try (StubHttpServer google = StubHttpServer.hanging()) {
             var provider = new GoogleRoutesRoadRouteProvider(
                     HttpClient.newHttpClient(), API_KEY, GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
                     GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, google.uri(), Duration.ofMillis(100));
@@ -184,8 +180,23 @@ class GoogleRoutesRoadRouteProviderTests {
     }
 
     @Test
+    void routeAsyncStalledResponseBodyTimesOut() throws IOException {
+        // The JDK request timeout stops at the response headers, so the provider must also time out the body.
+        try (StubHttpServer google = StubHttpServer.stallingBody("{\"routes\":[")) {
+            var provider = new GoogleRoutesRoadRouteProvider(
+                    HttpClient.newHttpClient(), API_KEY, GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
+                    GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, google.uri(), Duration.ofMillis(200));
+
+            RoadRouteResult result = provider.routeAsync(createRequest()).orTimeout(10, TimeUnit.SECONDS).join();
+
+            assertThat(result.status()).isEqualTo(RoadRouteStatus.UNAVAILABLE);
+            assertThat(result.message()).isEqualTo("The Google Routes request timed out.");
+        }
+    }
+
+    @Test
     void routeAsyncCallerCancellationPropagates() throws IOException {
-        try (StubGoogle google = StubGoogle.hanging()) {
+        try (StubHttpServer google = StubHttpServer.hanging()) {
             CompletableFuture<RoadRouteResult> pending = provider(google).routeAsync(createRequest());
             CompletableFuture.delayedExecutor(50, TimeUnit.MILLISECONDS).execute(() -> pending.cancel(true));
 
@@ -212,8 +223,29 @@ class GoogleRoutesRoadRouteProviderTests {
         assertThat(result.message()).isEqualTo("Google Routes returned an empty response.");
     }
 
+    static Stream<Arguments> unexpectedJsonShapes() {
+        // .NET rejects these shapes while deserialising; Java reads untyped JSON and names the problem.
+        return Stream.of(
+                Arguments.of("[1]", RoadRouteStatus.UNAVAILABLE, "Google Routes returned invalid JSON: expected an object."),
+                Arguments.of("{\"routes\":5}", RoadRouteStatus.UNAVAILABLE, "Google Routes returned invalid JSON: routes is not an array."),
+                Arguments.of("{\"routes\":[5]}", RoadRouteStatus.UNAVAILABLE, "Google Routes returned invalid JSON: a route is not an object."),
+                Arguments.of("{\"routes\":null}", RoadRouteStatus.NO_ROUTE, "Google Routes found no route between the endpoints."),
+                Arguments.of("{\"routes\":[null]}", RoadRouteStatus.NO_ROUTE, "Google Routes found no route between the endpoints."));
+    }
+
+    @ParameterizedTest
+    @MethodSource("unexpectedJsonShapes")
+    void routeAsyncUnexpectedJsonShapeIsReported(String json, RoadRouteStatus status, String expectedMessage) throws IOException {
+        RoadRouteResult result = route(json, 200);
+
+        assertThat(result.status()).isEqualTo(status);
+        assertThat(result.message()).isEqualTo(expectedMessage);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
+            "\"distanceMeters\":\"1000\",\"duration\":\"60s\"",
+            "\"distanceMeters\":1000,\"duration\":60",
             "\"distanceMeters\":-1,\"duration\":\"60s\"",
             "\"distanceMeters\":1000,\"duration\":\"-1s\"",
             "\"distanceMeters\":1000,\"duration\":\"60\"",
@@ -240,7 +272,7 @@ class GoogleRoutesRoadRouteProviderTests {
 
     @Test
     void routeAsyncEndpointSnappedBeyondLimitIsOutsideCoverage() throws IOException {
-        try (StubGoogle google = StubGoogle.responding(
+        try (StubHttpServer google = StubHttpServer.responding(
                 200, "{\"routes\":[{\"distanceMeters\":1000,\"duration\":\"60s\",\"polyline\":{\"geoJsonLinestring\":"
                         + "{\"type\":\"LineString\",\"coordinates\":[[0,0],[1,1.1]]}}}]}")) {
             var provider = new GoogleRoutesRoadRouteProvider(
@@ -293,6 +325,8 @@ class GoogleRoutesRoadRouteProviderTests {
     static Stream<Arguments> unusableBaseUris() {
         return Stream.of(
                 Arguments.of("routes/v2", "must be absolute"),
+                Arguments.of("https:routes.example", "must name a host"),
+                Arguments.of("https:///directions", "must name a host"),
                 Arguments.of("ftp://routes.example/", "HTTP or HTTPS"),
                 Arguments.of("https://routes.example/?key=1", "query string or fragment"));
     }
@@ -320,6 +354,18 @@ class GoogleRoutesRoadRouteProviderTests {
                 .hasMessageContaining("snap distance");
     }
 
+    @ParameterizedTest
+    @ValueSource(longs = {0, -1})
+    void constructorRejectsNonPositiveRequestTimeout(long millis) {
+        HttpClient client = HttpClient.newHttpClient();
+
+        assertThatThrownBy(() -> new GoogleRoutesRoadRouteProvider(
+                client, API_KEY, GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
+                GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, null, Duration.ofMillis(millis)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("request timeout must be positive");
+    }
+
     @Test
     void constructorRejectsNullArguments() {
         HttpClient client = HttpClient.newHttpClient();
@@ -330,7 +376,7 @@ class GoogleRoutesRoadRouteProviderTests {
 
     @Test
     void calculateMovementAsyncUsesGoogleRouteForRoadLeg() throws IOException {
-        try (StubGoogle google = StubGoogle.responding(
+        try (StubHttpServer google = StubHttpServer.responding(
                 200, "{\"routes\":[{\"distanceMeters\":157000,\"duration\":\"7200s\",\"polyline\":{\"geoJsonLinestring\":" + LINE + "}}]}")) {
             MovementRequest request = new MovementRequest(List.of(new MovementLeg(
                             Location.fromCoordinate(new Coordinate(0, 0)), Location.fromCoordinate(new Coordinate(1, 1)), TransportMode.ROAD)))
@@ -356,7 +402,7 @@ class GoogleRoutesRoadRouteProviderTests {
                 new ResolvedLocation(null, null, to, null, "test"));
     }
 
-    private static GoogleRoutesRoadRouteProvider provider(StubGoogle google) {
+    private static GoogleRoutesRoadRouteProvider provider(StubHttpServer google) {
         return new GoogleRoutesRoadRouteProvider(
                 HttpClient.newHttpClient(), API_KEY, GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
                 GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, google.uri(), null);
@@ -364,71 +410,8 @@ class GoogleRoutesRoadRouteProviderTests {
 
     /** Routes the default request through a loopback server returning one canned Routes API response. */
     private static RoadRouteResult route(String json, int status) throws IOException {
-        try (StubGoogle google = StubGoogle.responding(status, json)) {
+        try (StubHttpServer google = StubHttpServer.responding(status, json)) {
             return provider(google).routeAsync(createRequest()).join();
-        }
-    }
-
-    /** A loopback HTTP server that records the request and answers with one canned response, or never answers. */
-    private static final class StubGoogle implements AutoCloseable {
-        private final HttpServer server;
-        private final ExecutorService executor = Executors.newCachedThreadPool(runnable -> {
-            Thread thread = new Thread(runnable, "stub-google");
-            thread.setDaemon(true);
-            return thread;
-        });
-        private final CountDownLatch released = new CountDownLatch(1);
-        private final AtomicReference<String> method = new AtomicReference<>();
-        private final AtomicReference<URI> requestUri = new AtomicReference<>();
-        private final AtomicReference<String> apiKey = new AtomicReference<>();
-        private final AtomicReference<String> fieldMask = new AtomicReference<>();
-        private final AtomicReference<String> body = new AtomicReference<>();
-
-        private StubGoogle(int status, String response, boolean hang) throws IOException {
-            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-            server.setExecutor(executor);
-            server.createContext("/", exchange -> {
-                method.set(exchange.getRequestMethod());
-                requestUri.set(exchange.getRequestURI());
-                apiKey.set(exchange.getRequestHeaders().getFirst("X-Goog-Api-Key"));
-                fieldMask.set(exchange.getRequestHeaders().getFirst("X-Goog-FieldMask"));
-                body.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
-                if (hang) {
-                    try {
-                        released.await();
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                    exchange.close();
-                    return;
-                }
-                byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
-                exchange.getResponseHeaders().add("Content-Type", "application/json");
-                exchange.sendResponseHeaders(status, bytes.length);
-                try (OutputStream out = exchange.getResponseBody()) {
-                    out.write(bytes);
-                }
-            });
-            server.start();
-        }
-
-        static StubGoogle responding(int status, String response) throws IOException {
-            return new StubGoogle(status, response, false);
-        }
-
-        static StubGoogle hanging() throws IOException {
-            return new StubGoogle(0, "", true);
-        }
-
-        URI uri() {
-            return URI.create("http://127.0.0.1:" + server.getAddress().getPort());
-        }
-
-        @Override
-        public void close() {
-            released.countDown();
-            server.stop(0);
-            executor.shutdownNow();
         }
     }
 }

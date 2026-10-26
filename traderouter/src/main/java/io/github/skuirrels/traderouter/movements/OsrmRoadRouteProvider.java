@@ -9,16 +9,12 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 
 /** Routes road legs through an OSRM HTTP service, including a locally hosted OSRM container. */
 public final class OsrmRoadRouteProvider implements RoadRouteProvider {
@@ -27,6 +23,8 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
 
     /** Default maximum distance from each endpoint to a routable road, in metres. */
     public static final double DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS = 10_000.0;
+
+    private static final String SERVICE_NAME = "OSRM";
 
     private final HttpClient httpClient;
     private final URI baseUri;
@@ -51,9 +49,10 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
      *                                  service, or null. It is copied to results but is not sent to OSRM and does
      *                                  not select or load a dataset.
      * @param maximumSnapDistanceMeters maximum distance from each endpoint to a routable road
-     * @param requestTimeout            per-request timeout, or null for none. A timed-out request is reported as
+     * @param requestTimeout            per-request timeout covering the whole exchange including the response
+     *                                  body, or null for none. A timed-out request is reported as
      *                                  {@link RoadRouteStatus#UNAVAILABLE}. The .NET library takes this from
-     *                                  {@code HttpClient.Timeout}; the JDK client sets it per request.
+     *                                  {@code HttpClient.Timeout}.
      */
     public OsrmRoadRouteProvider(
             HttpClient httpClient,
@@ -64,29 +63,15 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
             Duration requestTimeout) {
         Objects.requireNonNull(httpClient, "httpClient");
         Objects.requireNonNull(baseUri, "baseUri");
-        if (!baseUri.isAbsolute()) {
-            throw new IllegalArgumentException("The OSRM base URI must be absolute.");
-        }
-        if (!"http".equalsIgnoreCase(baseUri.getScheme()) && !"https".equalsIgnoreCase(baseUri.getScheme())) {
-            throw new IllegalArgumentException("The OSRM base URI must use HTTP or HTTPS.");
-        }
-        if (baseUri.getRawQuery() != null || baseUri.getRawFragment() != null) {
-            throw new IllegalArgumentException("The OSRM base URI cannot contain a query string or fragment.");
-        }
+        URI normalizedBase = RoadProviderHttp.normalizeBaseUri(baseUri, SERVICE_NAME);
         if (profile == null || profile.isBlank()) {
             throw new IllegalArgumentException("The OSRM profile cannot be blank.");
         }
-        if (!Double.isFinite(maximumSnapDistanceMeters) || maximumSnapDistanceMeters <= 0.0) {
-            throw new IllegalArgumentException(
-                    "The maximum OSRM snap distance must be finite and positive. Received: " + maximumSnapDistanceMeters);
-        }
-        if (requestTimeout != null && (requestTimeout.isNegative() || requestTimeout.isZero())) {
-            throw new IllegalArgumentException("The OSRM request timeout must be positive. Received: " + requestTimeout);
-        }
+        RoadProviderHttp.validateSnapDistance(maximumSnapDistanceMeters, SERVICE_NAME);
+        RoadProviderHttp.validateTimeout(requestTimeout, SERVICE_NAME);
 
         this.httpClient = httpClient;
-        String absolute = baseUri.toString();
-        this.baseUri = absolute.endsWith("/") ? baseUri : URI.create(absolute + "/");
+        this.baseUri = normalizedBase;
         this.profile = profile.trim();
         this.dataVersion = dataVersion == null || dataVersion.isBlank() ? null : dataVersion.trim();
         this.maximumSnapDistanceMeters = maximumSnapDistanceMeters;
@@ -102,8 +87,8 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
 
         request.from().coordinate().validate();
         request.to().coordinate().validate();
-        Coordinate from = normalizeForOsrm(request.from().coordinate());
-        Coordinate to = normalizeForOsrm(request.to().coordinate());
+        Coordinate from = RoadProviderHttp.normalizeLongitude(request.from().coordinate());
+        Coordinate to = RoadProviderHttp.normalizeLongitude(request.to().coordinate());
         String coordinates = format(from.longitude()) + "," + format(from.latitude()) + ";"
                 + format(to.longitude()) + "," + format(to.latitude());
         String radius = format(maximumSnapDistanceMeters);
@@ -111,13 +96,12 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
                 "route/v1/" + URLEncoder.encode(profile, StandardCharsets.UTF_8).replace("+", "%20") + "/" + coordinates
                         + "?overview=full&geometries=geojson&steps=false&radiuses=" + radius + ";" + radius);
 
-        HttpRequest.Builder builder = HttpRequest.newBuilder(requestUri).GET().header("Accept", "application/json");
-        if (requestTimeout != null) {
-            builder.timeout(requestTimeout);
-        }
+        HttpRequest httpRequest = HttpRequest.newBuilder(requestUri).GET().header("Accept", "application/json").build();
 
-        return httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
-                .handle((response, error) -> error == null ? read(response) : fromError(error));
+        return RoadProviderHttp.send(httpClient, httpRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8), requestTimeout)
+                .handle((response, error) -> error == null
+                        ? read(response)
+                        : unavailable(RoadProviderHttp.failureMessage(error, SERVICE_NAME)));
     }
 
     private RoadRouteResult read(HttpResponse<String> response) {
@@ -163,21 +147,10 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
         return RoadRouteResult.builder(RoadRouteStatus.SUCCESS, "osrm")
                 .distanceKm(distance / 1000.0)
                 .durationHours(duration / 3600.0)
-                .geometry(readGeometry(route.get("geometry")))
+                .geometry(RoadProviderHttp.readLineString(route.get("geometry")))
                 .profile(profile)
                 .dataVersion(dataVersion)
                 .build();
-    }
-
-    private RoadRouteResult fromError(Throwable error) {
-        Throwable cause = error instanceof CompletionException && error.getCause() != null ? error.getCause() : error;
-        if (cause instanceof CancellationException cancellation) {
-            throw cancellation;
-        }
-        if (cause instanceof HttpTimeoutException) {
-            return unavailable("The OSRM request timed out.");
-        }
-        return unavailable("OSRM was unavailable: " + (cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName()));
     }
 
     private RoadRouteResult failure(RoadRouteStatus status, String message) {
@@ -190,36 +163,6 @@ public final class OsrmRoadRouteProvider implements RoadRouteProvider {
 
     private RoadRouteResult unavailable(String message) {
         return failure(RoadRouteStatus.UNAVAILABLE, message);
-    }
-
-    private static Coordinate normalizeForOsrm(Coordinate coordinate) {
-        return coordinate.longitude() >= -180.0 && coordinate.longitude() <= 180.0
-                ? coordinate
-                : coordinate.withNormalizedLongitude();
-    }
-
-    private static List<Coordinate> readGeometry(Object geometry) {
-        if (!(geometry instanceof Map<?, ?>)) {
-            return null;
-        }
-        if (!(JsonParser.asObject(geometry).get("coordinates") instanceof List<?> positions) || positions.size() < 2) {
-            return null;
-        }
-
-        List<Coordinate> coordinates = new ArrayList<>(positions.size());
-        for (Object position : positions) {
-            if (!(position instanceof List<?> pair) || pair.size() < 2
-                    || !JsonParser.isNumber(pair.get(0)) || !JsonParser.isNumber(pair.get(1))) {
-                return null;
-            }
-            double lon = JsonParser.asDouble(pair.get(0));
-            double lat = JsonParser.asDouble(pair.get(1));
-            if (!Double.isFinite(lon) || lon < -180.0 || lon > 180.0 || !Double.isFinite(lat) || lat < -90.0 || lat > 90.0) {
-                return null;
-            }
-            coordinates.add(new Coordinate(lon, lat));
-        }
-        return coordinates;
     }
 
     /** Shortest round-trip form without a trailing ".0", as the .NET "R" format writes the request. */

@@ -1,6 +1,5 @@
 package io.github.skuirrels.traderouter;
 
-import com.sun.net.httpserver.HttpServer;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.movements.OsrmRoadRouteProvider;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
@@ -14,24 +13,17 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -55,7 +47,7 @@ class OsrmRoadRouteProviderTests {
     @Test
     void routeAsyncHttpClientTimeoutIsUnavailable() throws IOException {
         // The .NET test sets HttpClient.Timeout; the JDK client takes the timeout per request via the constructor.
-        try (StubOsrm osrm = StubOsrm.hanging()) {
+        try (StubHttpServer osrm = StubHttpServer.hanging()) {
             var provider = new OsrmRoadRouteProvider(
                     HttpClient.newHttpClient(), osrm.uri(), OsrmRoadRouteProvider.DEFAULT_PROFILE, null,
                     OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, Duration.ofMillis(100));
@@ -68,9 +60,24 @@ class OsrmRoadRouteProviderTests {
     }
 
     @Test
+    void routeAsyncStalledResponseBodyTimesOut() throws IOException {
+        // The JDK request timeout stops at the response headers, so the provider must also time out the body.
+        try (StubHttpServer osrm = StubHttpServer.stallingBody("{\"code\":\"Ok\"")) {
+            var provider = new OsrmRoadRouteProvider(
+                    HttpClient.newHttpClient(), osrm.uri(), OsrmRoadRouteProvider.DEFAULT_PROFILE, null,
+                    OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, Duration.ofMillis(200));
+
+            RoadRouteResult result = provider.routeAsync(createRequest()).orTimeout(10, TimeUnit.SECONDS).join();
+
+            assertThat(result.status()).isEqualTo(RoadRouteStatus.UNAVAILABLE);
+            assertThat(result.message()).isEqualTo("The OSRM request timed out.");
+        }
+    }
+
+    @Test
     void routeAsyncCallerCancellationPropagates() throws IOException {
         // The caller cancels by cancelling the returned future, the Java counterpart of a CancellationToken.
-        try (StubOsrm osrm = StubOsrm.hanging()) {
+        try (StubHttpServer osrm = StubHttpServer.hanging()) {
             var provider = new OsrmRoadRouteProvider(HttpClient.newHttpClient(), osrm.uri());
 
             CompletableFuture<RoadRouteResult> pending = provider.routeAsync(createRequest());
@@ -180,7 +187,7 @@ class OsrmRoadRouteProviderTests {
 
     @Test
     void routeAsyncFailureResultsCarryProfileAndDataVersion() throws IOException {
-        try (StubOsrm osrm = StubOsrm.responding(400, "{\"code\":\"NoSegment\"}")) {
+        try (StubHttpServer osrm = StubHttpServer.responding(400, "{\"code\":\"NoSegment\"}")) {
             var provider = new OsrmRoadRouteProvider(
                     HttpClient.newHttpClient(), osrm.uri(), "truck", "europe-2026-09",
                     OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, null);
@@ -194,7 +201,7 @@ class OsrmRoadRouteProviderTests {
 
     @Test
     void routeAsyncBuildsUriFromBasePathTrimmedProfileAndSnapRadius() throws IOException {
-        try (StubOsrm osrm = StubOsrm.responding(400, "{\"code\":\"NoSegment\"}")) {
+        try (StubHttpServer osrm = StubHttpServer.responding(400, "{\"code\":\"NoSegment\"}")) {
             var provider = new OsrmRoadRouteProvider(
                     HttpClient.newHttpClient(), URI.create(osrm.uri() + "/osrm"), " truck ", null, 250, null);
 
@@ -235,6 +242,8 @@ class OsrmRoadRouteProviderTests {
     static Stream<Arguments> unusableBaseUris() {
         return Stream.of(
                 Arguments.of("osrm/v1", "must be absolute"),
+                Arguments.of("http:osrm.example", "must name a host"),
+                Arguments.of("http:///osrm", "must name a host"),
                 Arguments.of("http://127.0.0.1:5000/?profile=car", "query string or fragment"),
                 Arguments.of("http://127.0.0.1:5000/#section", "query string or fragment"));
     }
@@ -271,6 +280,18 @@ class OsrmRoadRouteProviderTests {
                 .hasMessageContaining("snap distance");
     }
 
+    @ParameterizedTest
+    @ValueSource(longs = {0, -1})
+    void constructorRejectsNonPositiveRequestTimeout(long millis) {
+        HttpClient client = HttpClient.newHttpClient();
+
+        assertThatThrownBy(() -> new OsrmRoadRouteProvider(
+                client, BASE_URI, OsrmRoadRouteProvider.DEFAULT_PROFILE, null,
+                OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS, Duration.ofMillis(millis)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("request timeout must be positive");
+    }
+
     @Test
     void constructorRejectsNullArguments() {
         HttpClient client = HttpClient.newHttpClient();
@@ -288,67 +309,12 @@ class OsrmRoadRouteProviderTests {
 
     /** Routes the default request through a loopback server returning one canned OSRM response. */
     private static RoadRouteResult route(String json, int status) throws IOException {
-        try (StubOsrm osrm = StubOsrm.responding(status, json)) {
+        try (StubHttpServer osrm = StubHttpServer.responding(status, json)) {
             return new OsrmRoadRouteProvider(HttpClient.newHttpClient(), osrm.uri()).routeAsync(createRequest()).join();
         }
     }
 
     private static OsrmRoadRouteProvider createProvider(Function<HttpRequest, CompletableFuture<HttpResponse<?>>> send) {
         return new OsrmRoadRouteProvider(new StubHttpClient(send), BASE_URI);
-    }
-
-    /** A loopback HTTP server that answers every request with one canned OSRM response, or never answers. */
-    private static final class StubOsrm implements AutoCloseable {
-        private final HttpServer server;
-        private final ExecutorService executor = Executors.newCachedThreadPool(runnable -> {
-            Thread thread = new Thread(runnable, "stub-osrm");
-            thread.setDaemon(true);
-            return thread;
-        });
-        private final CountDownLatch released = new CountDownLatch(1);
-        private final AtomicReference<URI> requestUri = new AtomicReference<>();
-
-        private StubOsrm(int status, String body, boolean hang) throws IOException {
-            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-            server.setExecutor(executor);
-            server.createContext("/", exchange -> {
-                requestUri.set(exchange.getRequestURI());
-                if (hang) {
-                    try {
-                        released.await();
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                    exchange.close();
-                    return;
-                }
-                byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-                exchange.getResponseHeaders().add("Content-Type", "application/json");
-                exchange.sendResponseHeaders(status, bytes.length);
-                try (OutputStream out = exchange.getResponseBody()) {
-                    out.write(bytes);
-                }
-            });
-            server.start();
-        }
-
-        static StubOsrm responding(int status, String body) throws IOException {
-            return new StubOsrm(status, body, false);
-        }
-
-        static StubOsrm hanging() throws IOException {
-            return new StubOsrm(0, "", true);
-        }
-
-        URI uri() {
-            return URI.create("http://127.0.0.1:" + server.getAddress().getPort());
-        }
-
-        @Override
-        public void close() {
-            released.countDown();
-            server.stop(0);
-            executor.shutdownNow();
-        }
     }
 }

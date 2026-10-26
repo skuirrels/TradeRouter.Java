@@ -11,6 +11,7 @@ Version 2.2.0, ported from TradeRouter.Net 2.2.0 at `beb64c8`. Not yet published
 - `GoogleRoutesRoadRouteProvider` routes road legs through the Google Maps Platform Routes API, as an alternative to `OsrmRoadRouteProvider`. It sends `DRIVE` requests without live traffic, so calls stay on the Compute Routes Essentials SKU, and reports an endpoint snapped beyond `maximumSnapDistanceMeters` as `OUTSIDE_COVERAGE`. Like the OSRM adapter, it uses the JDK `HttpClient` and takes an optional per-request timeout.
 - `RoadRouteProvider` documents the contract for custom providers: which status to return, how each `RoadRoutingMode` treats it, and the thread-safety requirement.
 - Sample examples 16 and 17 route road legs with Google when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set.
+- The request timeout of `OsrmRoadRouteProvider` and `GoogleRoutesRoadRouteProvider` now covers the whole exchange, including the response body, which the JDK 21 request timeout leaves untimed. This matches the .NET `HttpClient.Timeout`. Both providers also reject a base URI without a host when they are constructed. These two changes are Java-only.
 
 ### Documentation
 

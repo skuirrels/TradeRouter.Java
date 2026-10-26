@@ -9,17 +9,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.regex.Pattern;
 
 /**
@@ -37,6 +33,7 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
     /** Default maximum distance from each endpoint to the start or end of the returned route, in metres. */
     public static final double DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS = 10_000.0;
 
+    private static final String SERVICE_NAME = "Google Routes";
     private static final String SOURCE_NAME = "google-routes";
     private static final String FIELD_MASK = "routes.distanceMeters,routes.duration,routes.polyline.geoJsonLinestring";
     private static final Pattern DURATION_SECONDS = Pattern.compile("(?:[0-9]+\\.?[0-9]*|\\.[0-9]+)");
@@ -68,9 +65,10 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
      *                                  reported as {@link RoadRouteStatus#OUTSIDE_COVERAGE}.
      * @param baseUri                   base URI of the Routes API, or a proxy in front of it, or null for
      *                                  {@link #DEFAULT_BASE_URI}
-     * @param requestTimeout            per-request timeout, or null for none. A timed-out request is reported as
+     * @param requestTimeout            per-request timeout covering the whole exchange including the response
+     *                                  body, or null for none. A timed-out request is reported as
      *                                  {@link RoadRouteStatus#UNAVAILABLE}. The .NET library takes this from
-     *                                  {@code HttpClient.Timeout}; the JDK client sets it per request.
+     *                                  {@code HttpClient.Timeout}.
      */
     public GoogleRoutesRoadRouteProvider(
             HttpClient httpClient,
@@ -86,28 +84,9 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
         if (travelMode == null || travelMode.isBlank()) {
             throw new IllegalArgumentException("The Google Routes travel mode cannot be blank.");
         }
-        if (!Double.isFinite(maximumSnapDistanceMeters) || maximumSnapDistanceMeters <= 0.0) {
-            throw new IllegalArgumentException(
-                    "The maximum Google Routes snap distance must be finite and positive. Received: " + maximumSnapDistanceMeters);
-        }
-        if (baseUri == null) {
-            baseUri = DEFAULT_BASE_URI;
-        }
-        if (!baseUri.isAbsolute()) {
-            throw new IllegalArgumentException("The Google Routes base URI must be absolute.");
-        }
-        if (!"http".equalsIgnoreCase(baseUri.getScheme()) && !"https".equalsIgnoreCase(baseUri.getScheme())) {
-            throw new IllegalArgumentException("The Google Routes base URI must use HTTP or HTTPS.");
-        }
-        if (baseUri.getRawQuery() != null || baseUri.getRawFragment() != null) {
-            throw new IllegalArgumentException("The Google Routes base URI cannot contain a query string or fragment.");
-        }
-        if (requestTimeout != null && (requestTimeout.isNegative() || requestTimeout.isZero())) {
-            throw new IllegalArgumentException("The Google Routes request timeout must be positive. Received: " + requestTimeout);
-        }
-
-        String absolute = baseUri.toString();
-        URI normalizedBase = absolute.endsWith("/") ? baseUri : URI.create(absolute + "/");
+        RoadProviderHttp.validateSnapDistance(maximumSnapDistanceMeters, SERVICE_NAME);
+        URI normalizedBase = RoadProviderHttp.normalizeBaseUri(baseUri != null ? baseUri : DEFAULT_BASE_URI, SERVICE_NAME);
+        RoadProviderHttp.validateTimeout(requestTimeout, SERVICE_NAME);
 
         this.httpClient = httpClient;
         this.apiKey = apiKey.strip();
@@ -126,8 +105,8 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
 
         request.from().coordinate().validate();
         request.to().coordinate().validate();
-        Coordinate from = normalizeLongitude(request.from().coordinate());
-        Coordinate to = normalizeLongitude(request.to().coordinate());
+        Coordinate from = RoadProviderHttp.normalizeLongitude(request.from().coordinate());
+        Coordinate to = RoadProviderHttp.normalizeLongitude(request.to().coordinate());
 
         JsonWriter body = new JsonWriter(false).beginObject();
         writeWaypoint(body.name("origin"), from);
@@ -137,17 +116,17 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
                 .name("polylineEncoding").value("GEO_JSON_LINESTRING")
                 .endObject();
 
-        HttpRequest.Builder builder = HttpRequest.newBuilder(requestUri)
+        HttpRequest httpRequest = HttpRequest.newBuilder(requestUri)
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString(), StandardCharsets.UTF_8))
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("X-Goog-Api-Key", apiKey)
-                .header("X-Goog-FieldMask", FIELD_MASK);
-        if (requestTimeout != null) {
-            builder.timeout(requestTimeout);
-        }
+                .header("X-Goog-FieldMask", FIELD_MASK)
+                .build();
 
-        return httpClient.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
-                .handle((response, error) -> error == null ? read(response, from, to) : fromError(error));
+        return RoadProviderHttp.send(httpClient, httpRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8), requestTimeout)
+                .handle((response, error) -> error == null
+                        ? read(response, from, to)
+                        : unavailable(RoadProviderHttp.failureMessage(error, SERVICE_NAME)));
     }
 
     private RoadRouteResult read(HttpResponse<String> response, Coordinate from, Coordinate to) {
@@ -172,7 +151,7 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
         if (routes != null && !(routes instanceof List<?>)) {
             return unavailable("Google Routes returned invalid JSON: routes is not an array.");
         }
-        Object first = routes == null || ((List<?>) routes).isEmpty() ? null : ((List<?>) routes).get(0);
+        Object first = routes instanceof List<?> list && !list.isEmpty() ? list.get(0) : null;
         if (first == null) {
             return failure(RoadRouteStatus.NO_ROUTE, "Google Routes found no route between the endpoints.");
         }
@@ -194,7 +173,9 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
             return unavailable("Google Routes returned no usable route summary.");
         }
 
-        List<Coordinate> geometry = readGeometry(route.get("polyline"));
+        List<Coordinate> geometry = route.get("polyline") instanceof Map<?, ?> polyline
+                ? RoadProviderHttp.readLineString(JsonParser.asObject(polyline).get("geoJsonLinestring"))
+                : null;
         if (geometry == null) {
             return unavailable("Google Routes returned no usable route geometry.");
         }
@@ -214,17 +195,6 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
                 .geometry(geometry)
                 .profile(travelMode)
                 .build();
-    }
-
-    private RoadRouteResult fromError(Throwable error) {
-        Throwable cause = error instanceof CompletionException && error.getCause() != null ? error.getCause() : error;
-        if (cause instanceof CancellationException cancellation) {
-            throw cancellation;
-        }
-        if (cause instanceof HttpTimeoutException) {
-            return unavailable("The Google Routes request timed out.");
-        }
-        return unavailable("Google Routes was unavailable: " + (cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName()));
     }
 
     private RoadRouteResult failure(RoadRouteStatus status, String message) {
@@ -269,12 +239,6 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
         return DURATION_SECONDS.matcher(number).matches() ? Double.valueOf(number) : null;
     }
 
-    private static Coordinate normalizeLongitude(Coordinate coordinate) {
-        return coordinate.longitude() >= -180.0 && coordinate.longitude() <= 180.0
-                ? coordinate
-                : coordinate.withNormalizedLongitude();
-    }
-
     private static void writeWaypoint(JsonWriter writer, Coordinate coordinate) {
         writer.beginObject()
                 .name("location").beginObject()
@@ -284,29 +248,5 @@ public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
                 .endObject()
                 .endObject()
                 .endObject();
-    }
-
-    private static List<Coordinate> readGeometry(Object polyline) {
-        if (!(polyline instanceof Map<?, ?>)
-                || !(JsonParser.asObject(polyline).get("geoJsonLinestring") instanceof Map<?, ?> lineString)
-                || !(JsonParser.asObject(lineString).get("coordinates") instanceof List<?> positions)
-                || positions.size() < 2) {
-            return null;
-        }
-
-        List<Coordinate> coordinates = new ArrayList<>(positions.size());
-        for (Object position : positions) {
-            if (!(position instanceof List<?> pair) || pair.size() < 2
-                    || !JsonParser.isNumber(pair.get(0)) || !JsonParser.isNumber(pair.get(1))) {
-                return null;
-            }
-            double lon = JsonParser.asDouble(pair.get(0));
-            double lat = JsonParser.asDouble(pair.get(1));
-            if (!Double.isFinite(lon) || lon < -180.0 || lon > 180.0 || !Double.isFinite(lat) || lat < -90.0 || lat > 90.0) {
-                return null;
-            }
-            coordinates.add(new Coordinate(lon, lat));
-        }
-        return coordinates;
     }
 }

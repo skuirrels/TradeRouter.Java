@@ -220,32 +220,34 @@ public final class Program {
             throw new IllegalArgumentException(OSRM_URL_VARIABLE + " must be an absolute HTTP or HTTPS URI. Received: " + osrmUrl);
         }
 
-        HttpClient osrmHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
-        var osrmRoadRouteProvider = new OsrmRoadRouteProvider(
-                osrmHttpClient,
-                osrmBaseUri,
-                OsrmRoadRouteProvider.DEFAULT_PROFILE,
-                System.getenv("TRADEROUTER_OSRM_DATA_VERSION"),
-                OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
-                Duration.ofSeconds(5));
-        MovementRequest osrmRoadRequest = MovementRequest.of(roadPlan)
-                .setCargoTonnes(20.0)
-                .setRoadRouteProvider(osrmRoadRouteProvider)
-                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
-        printMovementResult("14. Gatwick to Heathrow using an OSRM container", TradeRoutes.calculateMovementAsync(osrmRoadRequest).join());
+        // The JDK 21 HttpClient is AutoCloseable; closing it stops its selector thread, as .NET disposes its client.
+        try (HttpClient osrmHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
+            var osrmRoadRouteProvider = new OsrmRoadRouteProvider(
+                    osrmHttpClient,
+                    osrmBaseUri,
+                    OsrmRoadRouteProvider.DEFAULT_PROFILE,
+                    System.getenv("TRADEROUTER_OSRM_DATA_VERSION"),
+                    OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
+                    Duration.ofSeconds(5));
+            MovementRequest osrmRoadRequest = MovementRequest.of(roadPlan)
+                    .setCargoTonnes(20.0)
+                    .setRoadRouteProvider(osrmRoadRouteProvider)
+                    .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+            printMovementResult("14. Gatwick to Heathrow using an OSRM container", TradeRoutes.calculateMovementAsync(osrmRoadRequest).join());
 
-        MovementPlan capeTownToGuildfordPlan = MovementPlan
-                .from(Waypoint.place("ZACPT"))
-                .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
-                .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
-                .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
-        MovementRequest capeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
-                .setCargoTonnes(20.0)
-                .setRoadRouteProvider(osrmRoadRouteProvider)
-                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
-        printMovementResult(
-                "15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container",
-                TradeRoutes.calculateMovementAsync(capeTownToGuildfordRequest).join());
+            MovementPlan capeTownToGuildfordPlan = MovementPlan
+                    .from(Waypoint.place("ZACPT"))
+                    .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
+                    .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
+                    .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
+            MovementRequest capeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
+                    .setCargoTonnes(20.0)
+                    .setRoadRouteProvider(osrmRoadRouteProvider)
+                    .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+            printMovementResult(
+                    "15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container",
+                    TradeRoutes.calculateMovementAsync(capeTownToGuildfordRequest).join());
+        }
     }
 
     private static void printGoogleRoutesExamples(MovementPlan roadPlan) {
@@ -257,32 +259,33 @@ public final class Program {
             return;
         }
 
-        HttpClient googleHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-        var googleRoadRouteProvider = new GoogleRoutesRoadRouteProvider(
-                googleHttpClient,
-                googleApiKey,
-                GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
-                GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
-                null,
-                Duration.ofSeconds(10));
-        MovementRequest googleRoadRequest = MovementRequest.of(roadPlan)
-                .setCargoTonnes(20.0)
-                .setRoadRouteProvider(googleRoadRouteProvider)
-                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
-        printMovementResult("16. Gatwick to Heathrow using the Google Routes API", TradeRoutes.calculateMovementAsync(googleRoadRequest).join());
+        try (HttpClient googleHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()) {
+            var googleRoadRouteProvider = new GoogleRoutesRoadRouteProvider(
+                    googleHttpClient,
+                    googleApiKey,
+                    GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
+                    GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
+                    null,
+                    Duration.ofSeconds(10));
+            MovementRequest googleRoadRequest = MovementRequest.of(roadPlan)
+                    .setCargoTonnes(20.0)
+                    .setRoadRouteProvider(googleRoadRouteProvider)
+                    .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+            printMovementResult("16. Gatwick to Heathrow using the Google Routes API", TradeRoutes.calculateMovementAsync(googleRoadRequest).join());
 
-        MovementPlan capeTownToGuildfordPlan = MovementPlan
-                .from(Waypoint.place("ZACPT"))
-                .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
-                .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
-                .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
-        MovementRequest googleCapeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
-                .setCargoTonnes(20.0)
-                .setRoadRouteProvider(googleRoadRouteProvider)
-                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
-        printMovementResult(
-                "17. Cape Town to Guildford via Johannesburg and Heathrow using the Google Routes API",
-                TradeRoutes.calculateMovementAsync(googleCapeTownToGuildfordRequest).join());
+            MovementPlan capeTownToGuildfordPlan = MovementPlan
+                    .from(Waypoint.place("ZACPT"))
+                    .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
+                    .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
+                    .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
+            MovementRequest googleCapeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
+                    .setCargoTonnes(20.0)
+                    .setRoadRouteProvider(googleRoadRouteProvider)
+                    .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+            printMovementResult(
+                    "17. Cape Town to Guildford via Johannesburg and Heathrow using the Google Routes API",
+                    TradeRoutes.calculateMovementAsync(googleCapeTownToGuildfordRequest).join());
+        }
     }
 
     private static void printMovement(String title, MovementPlan plan, Double tonnes, Double teu) {
