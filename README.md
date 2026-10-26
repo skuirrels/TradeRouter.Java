@@ -5,7 +5,7 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](traderouter/pom.xml)
 
-Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library. A port of [TradeRouter.Net](https://github.com/skuirrels/TradeRouter.Net) 2.1.1 that embeds the same data and produces the same routes, GeoJSON and reports.
+Shortest sea route between ports identified by UN/LOCODE, as a single self-contained Java library. A port of [TradeRouter.Net](https://github.com/skuirrels/TradeRouter.Net) 2.2.0 that embeds the same data and produces the same routes, GeoJSON and reports.
 
 Give it two UN/LOCODE port codes and it returns RFC 7946 GeoJSON with the distance, voyage duration, ports used and canals and straits passed through. Port codes are the native input; raw coordinates remain available as a fallback for custom or unresolved locations. Ordinary routes are `LineString`; antimeridian crossings are split into `MultiLineString`. The maritime network and world ports database are compressed and embedded in the jar, so there is nothing to download, configure or host.
 
@@ -458,6 +458,18 @@ request.setRoadDistanceEstimator(new DistanceDecayRoadDistanceEstimator(
 request.setRoadDistanceEstimator(new CircuityRoadDistanceEstimator(configuration.roadCircuityFactor()));
 ```
 
+#### Choosing a road provider
+
+Each application chooses its own road-network provider with `MovementRequest.setRoadRouteProvider`. The library includes two adapters, and any other service can be plugged in through `RoadRouteProvider`:
+
+| Provider | Road data | Runs where | Cost | Result restrictions |
+| --- | --- | --- | --- | --- |
+| `OsrmRoadRouteProvider` | OpenStreetMap extract you load | Your own OSRM service | Your hosting | ODbL attribution and share-alike for derived databases |
+| `GoogleRoutesRoadRouteProvider` | Google's global road network | Google Maps Platform Routes API | Per request, after a monthly free allowance | Google Maps Platform Terms: limited caching, Google Map or attribution when displayed |
+| Your own `RoadRouteProvider` | Any | Any | Any | The provider's own terms |
+
+#### OSRM
+
 For network distance, run OSRM separately and configure the included HTTP adapter, which uses the JDK's `java.net.http.HttpClient` and adds no dependency. The library does not start, stop or download data for the OSRM service:
 
 ```java
@@ -523,6 +535,88 @@ TRADEROUTER_OSRM_URL=https://your-osrm-service.example mvn -q -pl traderouter-sa
 ```
 
 Example 13 always shows the built-in `ESTIMATE_ONLY` result. Examples 14 and 15 use `OsrmRoadRouteProvider` and `REQUIRE_NETWORK`, so they must return OSRM routes rather than silently fall back. Example 15 covers two continents: Cape Town to Johannesburg by road, Johannesburg to London Heathrow by air, and Heathrow to Guildford by road. When `TRADEROUTER_OSRM_URL` is not set, both OSRM examples are clearly reported as skipped and the rest of the sample still runs.
+
+#### Google Routes API
+
+`GoogleRoutesRoadRouteProvider` calls the Google Maps Platform [Routes API](https://developers.google.com/maps/documentation/routes) `computeRoutes` method through the JDK's `java.net.http.HttpClient`, adding no dependency. It needs an API key for a Google Cloud project with the Routes API enabled; no service or road data runs locally:
+
+```java
+HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+MovementRequest request = MovementRequest.of(plan)
+    .setRoadRouteProvider(new GoogleRoutesRoadRouteProvider(
+        httpClient,
+        configuration.googleMapsApiKey(),
+        GoogleRoutesRoadRouteProvider.DEFAULT_TRAVEL_MODE,
+        GoogleRoutesRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
+        null,                                                    // baseUri: the public Routes API
+        Duration.ofSeconds(10)))                                 // request timeout
+    .setRoadRoutingMode(RoadRoutingMode.PREFER_NETWORK_THEN_ESTIMATE);
+
+MovementResult movement = DefaultTradeRouterEngine.getDefault().calculateMovementAsync(request).join();
+// Road legs report distance_basis "road_network" and distance_source "google-routes".
+```
+
+Read the key from configuration or a secret store; never commit it. The key is sent only in the `X-Goog-Api-Key` header and never appears in result messages. In Google Cloud, restrict the key to the Routes API and to your servers.
+
+The adapter requests `DRIVE` routes without live traffic, asks only for distance, duration and geometry, and receives the geometry as a GeoJSON line. Those choices keep requests on Google's Compute Routes Essentials SKU. Other travel modes are accepted through the `travelMode` argument, but Google bills two-wheeler and large-vehicle routing at a higher SKU, and `TRUCK` needs vehicle attributes this adapter does not send. Google snaps endpoints to roads without a distance limit, so the adapter compares each endpoint with the start and end of the returned route and reports `OUTSIDE_COVERAGE` when either is more than `maximumSnapDistanceMeters` away, 10 km by default. Google does not version its road data, so `routing_data_version` is empty and the same request can return a different route later.
+
+Google's terms apply to every result from this adapter, and they differ from OpenStreetMap's. Google's [Routes API policies](https://developers.google.com/maps/documentation/routes/policies) restrict caching of most Routes API content, require Routes results drawn on a map to be shown on a Google Map, and require Google Maps attribution when a result is displayed without one. A movement's GeoJSON carries Google's route geometry, so do not store it long-term or draw it on another map provider's tiles. Read the [Google Maps Platform Terms](https://cloud.google.com/maps-platform/terms) before using the adapter in production.
+
+For prototyping, Google's [Maps Demo Key](https://developers.google.com/maps/demo-key) covers Compute Routes without a billing account. It is available only to personal Google accounts, has an unpublished daily limit and is not for production use. Production use needs a project with billing enabled.
+
+Examples 16 and 17 in the sample repeat examples 14 and 15 with `GoogleRoutesRoadRouteProvider`. They run when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set and otherwise report that they were skipped:
+
+```bash
+TRADEROUTER_GOOGLE_MAPS_API_KEY="$(cat ~/.config/traderouter/google-maps-api-key)" mvn -q -pl traderouter-sample exec:java
+```
+
+#### Your own provider
+
+Implement `RoadRouteProvider` to use any other routing service, such as a commercial truck-routing API or an internal service. Complete the future with a status rather than exceptionally for service outcomes, because `RoadRoutingMode` decides what each status means for the movement:
+
+```java
+public final class MyRoadRouteProvider implements RoadRouteProvider {
+    private final HttpClient httpClient;
+
+    public MyRoadRouteProvider(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    @Override
+    public CompletableFuture<RoadRouteResult> routeAsync(RoadRouteRequest request) {
+        return callMyServiceAsync(httpClient, request.from().coordinate(), request.to().coordinate())
+            .handle((route, error) -> {
+                if (error != null) {
+                    Throwable cause = error instanceof CompletionException && error.getCause() != null ? error.getCause() : error;
+                    if (cause instanceof CancellationException cancellation) {
+                        throw cancellation;
+                    }
+                    return RoadRouteResult.builder(RoadRouteStatus.UNAVAILABLE, "my-router").message(cause.getMessage()).build();
+                }
+                if (route == null) {
+                    return RoadRouteResult.builder(RoadRouteStatus.NO_ROUTE, "my-router").message("No road connects the endpoints.").build();
+                }
+                return RoadRouteResult.builder(RoadRouteStatus.SUCCESS, "my-router")
+                    .distanceKm(route.metres() / 1000.0)
+                    .durationHours(route.seconds() / 3600.0)
+                    .geometry(route.points())
+                    .profile("hgv")
+                    .build();
+            });
+    }
+}
+```
+
+| Status | Return it when | `PREFER_NETWORK_THEN_ESTIMATE` | `REQUIRE_NETWORK` |
+| --- | --- | --- | --- |
+| `SUCCESS` | A route was found. `distanceKm` is required; duration and geometry are optional. | Uses the route | Uses the route |
+| `OUTSIDE_COVERAGE` | An endpoint cannot be matched to the provider's road network | Falls back to the estimate with a `distance_warning` | Throws |
+| `NO_ROUTE` | Both endpoints are covered but not connected by road | Throws | Throws |
+| `UNAVAILABLE` | Timeouts, transport failures or unusable responses | Falls back to the estimate with a `distance_warning` | Throws |
+
+The source is required and becomes `distance_source` in the output. The geometry is in traversal order with longitude first. Let cancellation of the returned future propagate. One provider instance may be shared by concurrent movement calculations, so keep it thread-safe.
+
+#### Fallback and errors
 
 `PREFER_NETWORK_THEN_ESTIMATE` falls back only when the provider is unavailable or an endpoint is outside its loaded coverage, and records the reason in `distance_warning`. A provider-confirmed `NO_ROUTE` is an error rather than silently inventing a distance. `REQUIRE_NETWORK` also treats unavailable or out-of-coverage results as errors. `ESTIMATE_ONLY` never calls the provider. Because provider calls are I/O, use `calculateMovementAsync`, which returns a `CompletableFuture`; cancelling it stops further legs and cancels an in-flight provider call. Synchronous `calculateMovement` is available for estimates and imported routes, and throws `IllegalStateException` when a request would need to call a provider.
 
@@ -723,7 +817,7 @@ traderouter/                the library, published as io.github.skuirrels:trader
     graph/                  MaritimeGraph, BidirectionalDijkstra, AStar, per-thread search buffers
     json/                   dependency-free JSON reader and writer
     locations/              UN/LOCODE entry, functions and lookup
-    movements/              multi-leg movements: plan, legs, parser, request, result, location resolution, road estimators, OSRM provider, emission factors, sea service allowance
+    movements/              multi-leg movements: plan, legs, parser, request, result, location resolution, road estimators, OSRM and Google Routes providers, emission factors, sea service allowance
     passages/               passage identifiers
     ports/                  Port, PortDatabase, PortParameters, AreaFeature, PortProps
     seaareas/               sea-area identifiers, catalogue and the index that finds them along a route
@@ -772,9 +866,9 @@ To prepare or reuse the default local OSRM container and run the same sample:
 ./traderouter-sample/run-with-osrm.sh
 ```
 
-The sample contains fifteen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Add `-Dexec.args=--geojson` to print a full feature.
+The sample contains seventeen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Examples 16 and 17 repeat them with the Google Routes API when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set. Add `-Dexec.args=--geojson` to print a full feature.
 
-`mvn install` places `traderouter-2.1.1.jar`, with its sources and Javadoc jars, in your local Maven repository.
+`mvn install` places `traderouter-2.2.0.jar`, with its sources and Javadoc jars, in your local Maven repository.
 
 ## Differences from TradeRouter.Net
 
@@ -795,6 +889,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 | `IRoadRouteProvider.RouteAsync` returning `ValueTask`, with a `CancellationToken` | `RoadRouteProvider.routeAsync` returning `CompletableFuture`; cancel the future instead of passing a token |
 | `CalculateMovementAsync(request, cancellationToken)` | `calculateMovementAsync(request)` returning a cancellable `CompletableFuture` |
 | `OsrmRoadRouteProvider(HttpClient, Uri, ...)` with `HttpClient.Timeout` | `OsrmRoadRouteProvider(java.net.http.HttpClient, URI, ...)` with an explicit per-request `Duration` timeout |
+| `GoogleRoutesRoadRouteProvider(HttpClient, apiKey, travelMode:, maximumSnapDistanceMeters:, baseUri:)` with `HttpClient.Timeout` | `GoogleRoutesRoadRouteProvider(java.net.http.HttpClient, apiKey)`, or the full constructor ending in `URI baseUri` and an explicit per-request `Duration` timeout |
 | `IRoadDistanceEstimator`, init-only `RoadRouteResult` | `RoadDistanceEstimator`; `RoadRouteResult.builder(status, source)` |
 | `System.Text.Json` | Built-in reader and writer; integral doubles are written without a decimal point, other doubles with Java's shortest round-trip form |
 

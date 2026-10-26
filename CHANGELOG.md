@@ -2,6 +2,21 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Version 2.2.0, ported from TradeRouter.Net 2.2.0 at `beb64c8`. Not yet published to Maven Central.
+
+### Road routing
+
+- `GoogleRoutesRoadRouteProvider` routes road legs through the Google Maps Platform Routes API, as an alternative to `OsrmRoadRouteProvider`. It sends `DRIVE` requests without live traffic, so calls stay on the Compute Routes Essentials SKU, and reports an endpoint snapped beyond `maximumSnapDistanceMeters` as `OUTSIDE_COVERAGE`. Like the OSRM adapter, it uses the JDK `HttpClient` and takes an optional per-request timeout.
+- `RoadRouteProvider` documents the contract for custom providers: which status to return, how each `RoadRoutingMode` treats it, and the thread-safety requirement.
+- Sample examples 16 and 17 route road legs with Google when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set.
+- The request timeout of `OsrmRoadRouteProvider` and `GoogleRoutesRoadRouteProvider` now covers the whole exchange, including the response body, which the JDK 21 request timeout leaves untimed. This matches the .NET `HttpClient.Timeout`. Both providers also reject a base URI without a host when they are constructed. These two changes are Java-only.
+
+### Documentation
+
+- The README compares the OSRM, Google and custom road providers, covers Google's caching and display terms, and shows a custom provider.
+
 ## [2.1.1] - 2026-10-24
 
 Ported from TradeRouter.Net 2.1.1 at `e80f054`.
@@ -62,5 +77,6 @@ First release on Maven Central, ported from TradeRouter.Net 2.0.0 at `de93a0e`.
 - Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
+[Unreleased]: https://github.com/skuirrels/TradeRouter.Java/compare/v2.1.1...HEAD
 [2.1.1]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.1.1
 [2.0.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.0.0
