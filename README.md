@@ -1,7 +1,7 @@
 # TradeRouter.Java
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.skuirrels/traderouter?logo=apachemaven)](https://central.sonatype.com/artifact/io.github.skuirrels/traderouter)
-[![Java 21+](https://img.shields.io/badge/Java-21%2B-007396?logo=openjdk)](https://openjdk.org)
+[![Java 17+](https://img.shields.io/badge/Java-17%2B-007396?logo=openjdk)](https://openjdk.org)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](traderouter/pom.xml)
 
@@ -219,7 +219,7 @@ The current version is 2.2.0, published on Maven Central as `io.github.skuirrels
 </dependency>
 ```
 
-Requires Java 21 or later. The library has no runtime dependencies: JSON is read and written by a small built-in reader and writer.
+Releases after 2.2.0 require Java 17 or later; 2.2.0 and earlier require Java 21. The library has no runtime dependencies: JSON is read and written by a small built-in reader and writer.
 
 Changes in each release are listed in the [changelog](CHANGELOG.md).
 
@@ -800,7 +800,7 @@ mvn -q package -DskipTests && java -jar traderouter-benchmarks/target/benchmarks
 ## Repository layout
 
 ```
-pom.xml                     parent build: Java 21, dependency and plugin versions
+pom.xml                     parent build: JDK 21 (the library targets Java 17), dependency and plugin versions
 LICENSE                     Apache-2.0
 CHANGELOG.md                notable changes per release
 CLAUDE.md                   contributor rules for AI-assisted changes
@@ -846,7 +846,7 @@ tools/                      Python scripts that built the embedded data and revi
 
 ## Building, testing and trying it out
 
-Requires JDK 21 or later and Maven 3.9 or later.
+Requires JDK 21 or later and Maven 3.9 or later. The library is compiled for Java 17; the sample and benchmarks for Java 21.
 
 ```bash
 mvn verify
