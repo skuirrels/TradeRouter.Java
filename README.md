@@ -209,17 +209,17 @@ Example output for Jebel Ali (AEJEA) to St John's, Antigua (AGSJO) with Suez clo
 
 ## Installation
 
-The current version is 2.2.0, published on Maven Central as `io.github.skuirrels:traderouter`:
+The current version is 2.2.1, published on Maven Central as `io.github.skuirrels:traderouter`:
 
 ```xml
 <dependency>
   <groupId>io.github.skuirrels</groupId>
   <artifactId>traderouter</artifactId>
-  <version>2.2.0</version>
+  <version>2.2.1</version>
 </dependency>
 ```
 
-Releases after 2.2.0 require Java 17 or later; 2.2.0 and earlier require Java 21. The library has no runtime dependencies: JSON is read and written by a small built-in reader and writer.
+Version 2.2.1 and later require Java 17 or later; 2.2.0 and earlier require Java 21. The library has no runtime dependencies: JSON is read and written by a small built-in reader and writer.
 
 Changes in each release are listed in the [changelog](CHANGELOG.md).
 
@@ -868,7 +868,7 @@ To prepare or reuse the default local OSRM container and run the same sample:
 
 The sample contains seventeen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Examples 16 and 17 repeat them with the Google Routes API when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set. Add `-Dexec.args=--geojson` to print a full feature.
 
-`mvn install` places `traderouter-2.2.0.jar`, with its sources and Javadoc jars, in your local Maven repository.
+`mvn install` places `traderouter-2.2.1.jar`, with its sources and Javadoc jars, in your local Maven repository.
 
 ## Differences from TradeRouter.Net
 
