@@ -104,12 +104,17 @@ public final class AreaFeature {
             double dx = bx - ax;
             double dy = by - ay;
             double segmentLengthSquared = (dx * dx) + (dy * dy);
-            double t = segmentLengthSquared == 0 ? 0 : Math.clamp(((-ax * dx) + (-ay * dy)) / segmentLengthSquared, 0.0, 1.0);
+            double t = segmentLengthSquared == 0 ? 0 : clamp(((-ax * dx) + (-ay * dy)) / segmentLengthSquared, 0.0, 1.0);
             double closestX = ax + (t * dx);
             double closestY = ay + (t * dy);
             minDistanceSquared = Math.min(minDistanceSquared, (closestX * closestX) + (closestY * closestY));
         }
 
         return Math.sqrt(minDistanceSquared) * earthRadiusKm;
+    }
+
+    // Math.clamp needs Java 21; the library targets Java 17.
+    private static double clamp(double value, double min, double max) {
+        return Math.min(Math.max(value, min), max);
     }
 }

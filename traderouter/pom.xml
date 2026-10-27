@@ -21,6 +21,11 @@
   </description>
   <url>https://github.com/skuirrels/TradeRouter.Java</url>
 
+  <properties>
+    <!-- The library runs on Java 17; the sample, benchmarks and the build itself stay on Java 21. -->
+    <maven.compiler.release>17</maven.compiler.release>
+  </properties>
+
   <dependencies>
     <!-- The library has no runtime dependencies beyond the JDK. -->
     <dependency>

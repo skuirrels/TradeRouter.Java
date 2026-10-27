@@ -271,7 +271,7 @@ public final class MaritimeGraph {
         incomingEdgeWeights = incomingWeights;
         incomingEdgePassageIds = incomingPassages;
         kdTree = new KdTree<>(items);
-        haversineHeuristicScale = Math.clamp(heuristicScale, 0.0, 1.0);
+        haversineHeuristicScale = clamp(heuristicScale, 0.0, 1.0);
         readOnly = true;
 
         adjacencyTargets.clear();
@@ -425,6 +425,11 @@ public final class MaritimeGraph {
             throw new IllegalArgumentException(
                     parameterName + " must be between 0 and " + (nodeCoordinates.size() - 1) + ". Received: " + nodeId);
         }
+    }
+
+    // Math.clamp needs Java 21; the library targets Java 17.
+    private static double clamp(double value, double min, double max) {
+        return Math.min(Math.max(value, min), max);
     }
 
     private final class EdgeView extends AbstractList<GraphEdge> {

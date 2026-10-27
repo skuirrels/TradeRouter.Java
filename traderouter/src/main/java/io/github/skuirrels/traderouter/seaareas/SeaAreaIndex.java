@@ -347,7 +347,7 @@ final class SeaAreaIndex {
             toX = Math.cos(toLat) * Math.cos(toLon);
             toY = Math.cos(toLat) * Math.sin(toLon);
             toZ = Math.sin(toLat);
-            double dot = Math.clamp((fromX * toX) + (fromY * toY) + (fromZ * toZ), -1.0, 1.0);
+            double dot = clamp((fromX * toX) + (fromY * toY) + (fromZ * toZ), -1.0, 1.0);
             angle = Math.acos(dot);
         }
 
@@ -515,11 +515,11 @@ final class SeaAreaIndex {
         }
 
         private int column(double x) {
-            return Math.clamp((long) Math.floor((x - originX) / CELL_DEGREES), 0, columns - 1);
+            return clamp((long) Math.floor((x - originX) / CELL_DEGREES), 0, columns - 1);
         }
 
         private int row(double y) {
-            return Math.clamp((long) Math.floor((y - originY) / CELL_DEGREES), 0, rows - 1);
+            return clamp((long) Math.floor((y - originY) / CELL_DEGREES), 0, rows - 1);
         }
 
         private void forEachSegmentCell(CellVisitor visit) {
@@ -540,5 +540,14 @@ final class SeaAreaIndex {
     @FunctionalInterface
     private interface CellVisitor {
         void visit(int cell, int segment);
+    }
+
+    // Math.clamp needs Java 21; the library targets Java 17.
+    private static double clamp(double value, double min, double max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    private static int clamp(long value, int min, int max) {
+        return (int) Math.min(Math.max(value, min), max);
     }
 }

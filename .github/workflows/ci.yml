@@ -31,3 +31,29 @@ jobs:
           name: traderouter-jar
           path: traderouter/target/traderouter-*.jar
           if-no-files-found: error
+
+  library-tests-java-17:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The last version listed becomes JAVA_HOME, so Maven runs on 21 and JAVA_HOME_17_X64 points at 17.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+          cache: maven
+
+      - name: Test the library on Java 17
+        run: mvn -B --no-transfer-progress -pl traderouter test -Djvm="$JAVA_HOME_17_X64/bin/java"
+
+      - name: Check the tests ran on Java 17
+        run: |
+          reports=(traderouter/target/surefire-reports/TEST-*.xml)
+          other=$(grep -L 'name="java.specification.version" value="17"' "${reports[@]}")
+          if [ -n "$other" ]; then
+            echo "Not run on Java 17:" $other
+            exit 1
+          fi

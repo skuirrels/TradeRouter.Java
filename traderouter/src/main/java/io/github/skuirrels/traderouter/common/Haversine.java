@@ -41,7 +41,7 @@ public final class Haversine {
         double sinHalfDLon = Math.sin(dLon / 2.0);
 
         double a = (sinHalfDLat * sinHalfDLat) + (sinHalfDLon * sinHalfDLon * Math.cos(lat1) * Math.cos(lat2));
-        a = Math.clamp(a, 0.0, 1.0);
+        a = clamp(a, 0.0, 1.0);
         double b = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
 
         return b * AVG_EARTH_RADIUS_METERS * unit.conversionFactorFromMeters();
@@ -68,7 +68,7 @@ public final class Haversine {
         double sinHalfDLon = Math.sin(dLon / 2.0);
 
         double a = (sinHalfDLat * sinHalfDLat) + (Math.cos(lat1) * Math.cos(lat2) * sinHalfDLon * sinHalfDLon);
-        a = Math.clamp(a, 0.0, 1.0);
+        a = clamp(a, 0.0, 1.0);
         return EARTH_RADIUS_KM * 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
     }
 
@@ -136,5 +136,10 @@ public final class Haversine {
 
     private static double toRadians(double degrees) {
         return degrees * (Math.PI / 180.0);
+    }
+
+    // Math.clamp needs Java 21; the library targets Java 17.
+    private static double clamp(double value, double min, double max) {
+        return Math.min(Math.max(value, min), max);
     }
 }
