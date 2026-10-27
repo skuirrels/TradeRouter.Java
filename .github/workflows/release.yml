@@ -2,9 +2,12 @@ name: Release
 
 # Pushing a tag such as v2.0.0 signs the parent POM and the library and uploads them to the Central Portal, where the
 # deployment waits, validated, until it is published by hand. docs/releasing.md lists the secrets this needs.
+# Running it by hand is a dry run: it builds, tests and signs with the same secrets, checks the signatures, and uploads
+# nothing.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,6 +29,7 @@ jobs:
           server-password: CENTRAL_TOKEN_PASSWORD
 
       - name: Check the tag matches the project version
+        if: github.event_name == 'push'
         run: |
           version=$(mvn -B -q org.apache.maven.plugins:maven-help-plugin:3.5.1:evaluate -Dexpression=project.version -DforceStdout)
           if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
@@ -36,10 +40,39 @@ jobs:
       - name: Reject hard-coded sample road routes
         run: ./scripts/check-no-hardcoded-sample-routes.sh
 
-      - name: Build, test, sign and upload
-        run: mvn -B --no-transfer-progress -P release -Dgpg.signer=bc deploy
+      - name: Build, test and sign, and upload unless this is a dry run
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            set -- -DskipPublishing=true
+          fi
+          mvn -B --no-transfer-progress -P release -Dgpg.signer=bc deploy "$@"
         env:
           CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      # keys.openpgp.org serves the key without a user ID, which gpg will not import, so the signatures are checked
+      # against the key in the secret and its fingerprint is then looked up on the key server Central reads.
+      - name: Check the signatures and the published key
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          printf '%s\n' "$MAVEN_GPG_KEY" | gpg --batch --quiet --import
+          fingerprint=$(gpg --batch --with-colons --list-keys | awk -F: '/^fpr:/ { print $10; exit }')
+          echo "Signing key ${fingerprint}"
+          failed=0
+          for file in target/traderouter-parent-*.pom traderouter/target/traderouter-*.jar traderouter/target/traderouter-*.pom; do
+            if gpg --batch --status-fd 1 --verify "${file}.asc" "${file}" 2>/dev/null | grep -q "VALIDSIG .*${fingerprint}"; then
+              echo "Signed: ${file}"
+            else
+              echo "Missing or bad signature: ${file}"
+              failed=1
+            fi
+          done
+          if ! curl -fsS -o /dev/null "https://keys.openpgp.org/vks/v1/by-fingerprint/${fingerprint}"; then
+            echo "Key ${fingerprint} is not on keys.openpgp.org."
+            failed=1
+          fi
+          exit "$failed"
+        env:
+          MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}

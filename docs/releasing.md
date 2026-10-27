@@ -39,6 +39,14 @@ Publishing goes through the [Central Portal](https://central.sonatype.com) with 
    | `MAVEN_GPG_KEY` | ASCII-armoured private key, from `gpg --armor --export-secret-keys <key id>` |
    | `MAVEN_GPG_PASSPHRASE` | Passphrase of that key |
 
+## Testing the signing setup
+
+Running the Release workflow by hand is a dry run. It builds, tests and signs with the `maven-central` secrets, checks each signature against the key in `MAVEN_GPG_KEY` and that the key is on `keys.openpgp.org`, and uploads nothing:
+
+```bash
+gh workflow run release.yml --ref main
+```
+
 ## Each release
 
 1. Set the version in all four POMs, without `-SNAPSHOT`, and move `project.build.outputTimestamp` in `pom.xml` forward to the release date.
