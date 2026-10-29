@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.github.skuirrels</groupId>
     <artifactId>traderouter-parent</artifactId>
-    <version>2.2.1</version>
+    <version>2.4.0</version>
   </parent>
 
   <artifactId>traderouter-benchmarks</artifactId>
