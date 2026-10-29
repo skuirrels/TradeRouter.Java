@@ -22,6 +22,7 @@
   {"id": "mediterranean_sea", "name": "Mediterranean Sea", "class": "sea", "wikidata": "Q4918", "ne_id": 1159115321},
   {"id": "aegean_sea", "name": "Aegean Sea", "class": "sea", "wikidata": "Q34575", "ne_id": 1159117123},
   {"id": "black_sea", "name": "Black Sea", "class": "sea", "wikidata": "Q166", "ne_id": 1159115171},
+  {"id": "caspian_sea", "name": "Caspian Sea", "class": "sea", "wikidata": "Q5484", "ne_id": 1159115461},
   {"id": "strait_of_gibraltar", "name": "Strait of Gibraltar", "class": "strait", "wikidata": "Q36124", "ne_id": 1159117067},
   {"id": "north_sea", "name": "North Sea", "class": "sea", "wikidata": "Q1693", "ne_id": 1159115879},
   {"id": "english_channel", "name": "English Channel", "class": "channel", "wikidata": "Q34640", "ne_id": 1159116535},

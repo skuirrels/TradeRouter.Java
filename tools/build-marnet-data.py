@@ -16,6 +16,14 @@ EXPECTED_HASHES = {
     "segments": "56052b2ddd35de483ec00a29a7f0ffc37e162b0ee0249a9a435c8a8b2d8ffe0f",
 }
 
+# Stretches of untagged source lines tagged here, from one vertex to another along the line. The Marnet line from
+# the Caspian Sea to Taganrog Bay carries no passage, so its canal stretch, from the Volga at Volgograd to the Don
+# near Kalach-na-Donu, is tagged volga_don. The lower Volga and lower Don stay untagged, so Astrakhan and Rostov
+# remain reachable from their own seas when the canal is closed.
+PASSAGE_STRETCHES = [
+    {"passage": "volga_don", "start": [44.503624, 48.424983], "end": [43.694824, 48.654066], "edges": 7},
+]
+
 
 def load(path: Path, kind: str) -> dict:
     content = path.read_bytes()
@@ -32,6 +40,22 @@ def lines(feature: dict) -> list[list[list[float]]]:
     if geometry["type"] == "MultiLineString":
         return geometry["coordinates"]
     raise ValueError(f"unsupported geometry {geometry['type']}")
+
+
+def stretch_passages(line: list[list[float]], passage: str | None, matched: list[int]) -> list[str | None]:
+    """Returns the passage of each segment in the line, applying any stretch that lies on it."""
+    passages = [passage] * (len(line) - 1)
+    for index, stretch in enumerate(PASSAGE_STRETCHES):
+        if stretch["start"] not in line or stretch["end"] not in line:
+            continue
+        if passage is not None:
+            raise ValueError(f"{stretch['passage']}: the source line is already tagged {passage}")
+        start, end = sorted((line.index(stretch["start"]), line.index(stretch["end"])))
+        if end - start != stretch["edges"]:
+            raise ValueError(f"{stretch['passage']}: expected {stretch['edges']} segments, found {end - start}")
+        passages[start:end] = [stretch["passage"]] * (end - start)
+        matched[index] += 1
+    return passages
 
 
 def distance_km(a: tuple[float, float], b: tuple[float, float]) -> float:
@@ -61,16 +85,21 @@ def main() -> None:
             nodes.append([*key])
         return node_ids[key]
 
+    matched = [0] * len(PASSAGE_STRETCHES)
     for source in (load(args.segments, "segments"), load(args.marnet, "marnet")):
         for feature in source["features"]:
             passage = feature.get("properties", {}).get("passage")
             for line in lines(feature):
-                for start, end in zip(line, line[1:]):
+                for start, end, segment_passage in zip(line, line[1:], stretch_passages(line, passage, matched)):
                     u = node_id(start)
                     v = node_id(end)
                     weight = round(distance_km(tuple(start), tuple(end)), 1)
-                    edges.append([u, v, weight, passage])
-                    edges.append([v, u, weight, passage])
+                    edges.append([u, v, weight, segment_passage])
+                    edges.append([v, u, weight, segment_passage])
+
+    for stretch, count in zip(PASSAGE_STRETCHES, matched):
+        if count != 1:
+            raise ValueError(f"{stretch['passage']}: expected the stretch on one source line, found {count}")
 
     encoded = json.dumps({"nodes": nodes, "edges": edges}, separators=(",", ":")).encode()
     with args.output.open("wb") as raw:

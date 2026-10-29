@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PassageRestrictionTests {
 
@@ -18,7 +19,8 @@ class PassageRestrictionTests {
             "babalmandab, Bab-el-Mandeb",
             "ormuz, Hormuz",
             "south_africa, Cape of Good Hope",
-            "chili, Magellan Strait"
+            "chili, Magellan Strait",
+            "volga_don, Volga-Don Canal"
     })
     void displayNameUsesRecognizableGeographicNames(String passage, String expected) {
         assertThat(Passage.getDisplayName(passage)).isEqualTo(expected);
@@ -152,6 +154,45 @@ class PassageRestrictionTests {
         TradeRouterOptions copy = options.copy();
         assertThat(copy.isAllowNorthwest()).isTrue();
         assertThat(copy.getClosedPassages()).containsExactly(Passage.SUEZ);
+    }
+
+    @Test
+    void volgaDonIsOpenByDefaultAndReportedOutOfTheCaspian() {
+        GeoJsonFeature route = TradeRoutes.calculate("AZBAK", "RUNVS", new TradeRouterOptions().setReturnPassages(true)); // Baku to Novorossiysk
+
+        assertThat(new TradeRouterOptions().getClosedPassages()).doesNotContain(Passage.VOLGA_DON);
+        assertThat(route.geometry()).isNotNull();
+        assertThat(route.properties().getTraversedPassages()).containsExactlyInAnyOrder(Passage.VOLGA_DON);
+    }
+
+    @Test
+    void volgaDonClosedLeavesNoRouteOutOfTheCaspian() {
+        TradeRouterOptions options = new TradeRouterOptions().setRestrictions(Passage.VOLGA_DON);
+
+        GeoJsonFeature route = TradeRoutes.calculate("AZBAK", "RUNVS", options);
+
+        assertThat(route.geometry()).isNull();
+        assertThat(route.properties().getLength()).isEqualTo(0.0);
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Port AZBAK to Port RUNVS Sea", options))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("no sea route between AZBAK and RUNVS");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "AZBAK, RUASF", // Baku to Astrakhan, up the lower Volga
+            "RURND, RUNVS", // Rostov-on-Don to Novorossiysk, down the lower Don
+            "AZBAK, KZAAU"  // Baku to Aktau
+    })
+    void volgaDonClosedKeepsTheLowerVolgaAndDonOnTheirOwnSeas(String origin, String destination) {
+        GeoJsonFeature open = TradeRoutes.calculate(origin, destination, new TradeRouterOptions().setReturnPassages(true));
+        GeoJsonFeature closed = TradeRoutes.calculate(origin, destination, new TradeRouterOptions()
+                .setRestrictions(Passage.VOLGA_DON)
+                .setReturnPassages(true));
+
+        assertThat(open.properties().getTraversedPassages()).isEmpty();
+        assertThat(closed.geometry()).isNotNull();
+        assertThat(closed.properties().getLength()).isEqualTo(open.properties().getLength());
     }
 
     private static Coordinate at(String code) {

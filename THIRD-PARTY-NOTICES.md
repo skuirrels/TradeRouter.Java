@@ -18,7 +18,7 @@ The embedded rail graph is transformed from the [North American Rail Network Lin
 
 ## Natural Earth
 
-The embedded sea-area polygons are taken unchanged from the [Natural Earth](https://www.naturalearthdata.com/) 1:50m `ne_50m_geography_marine_polys` layer, as published in [nvkelso/natural-earth-vector](https://github.com/nvkelso/natural-earth-vector) at commit `117488dc88`. Natural Earth is in the public domain; see its [terms of use](https://www.naturalearthdata.com/about/terms-of-use/). Only 42 features are kept; see `DATA_PROVENANCE.md` and `tools/build-sea-area-data.py`.
+The embedded sea-area polygons are taken unchanged from the [Natural Earth](https://www.naturalearthdata.com/) 1:50m `ne_50m_geography_marine_polys` layer, as published in [nvkelso/natural-earth-vector](https://github.com/nvkelso/natural-earth-vector) at commit `117488dc88`. Natural Earth is in the public domain; see its [terms of use](https://www.naturalearthdata.com/about/terms-of-use/). Only 43 features are kept; see `DATA_PROVENANCE.md` and `tools/build-sea-area-data.py`.
 
 ## UN/LOCODE
 

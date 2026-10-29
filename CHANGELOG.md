@@ -2,6 +2,16 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.3.0 and 2.4.0 at `aa137e1`.
+
+### Sea routing
+
+- The Caspian Sea is a sea area: `SeaArea.CASPIAN_SEA`, `caspian_sea`, Wikidata Q5484, from the same pinned Natural Earth 1:50m marine polygons. Routes between Caspian ports, and routes leaving it over the Volga–Don link, now report it in `traversed_sea_areas`.
+- The Volga–Don Canal is a passage: `Passage.VOLGA_DON`, `volga_don`. It is the only lane out of the Caspian Sea, so routes leaving the Caspian now report it in `traversed_passages`, and listing it in `setRestrictions` closes it. It is open by default, so routes are unchanged.
+- `tools/build-marnet-data.py` tags the canal stretch of the untagged searoute-py line between the Caspian Sea and Taganrog Bay. The lower Volga and lower Don stay untagged, so Astrakhan and Rostov-on-Don keep their routes to their own seas when the canal is closed.
+
 ## [2.2.1] - 2026-10-27
 
 A Java-only release. Routes, data and output are unchanged from 2.2.0 and still match TradeRouter.Net 2.2.0 at `beb64c8`.

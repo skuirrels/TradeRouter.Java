@@ -88,6 +88,9 @@ public final class SeaArea {
     /** Black Sea. */
     public static final String BLACK_SEA = "black_sea";
 
+    /** Caspian Sea. */
+    public static final String CASPIAN_SEA = "caspian_sea";
+
     /** Strait of Gibraltar. */
     public static final String STRAIT_OF_GIBRALTAR = "strait_of_gibraltar";
 

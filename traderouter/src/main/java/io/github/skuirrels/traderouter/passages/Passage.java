@@ -53,10 +53,13 @@ public final class Passage {
     /** Dardanelles strait connecting the Aegean Sea to the Sea of Marmara. */
     public static final String DARDANELLES = "dardanelles";
 
+    /** Volga-Don Canal in Russia, the only lane between the Caspian Sea and the Sea of Azov. */
+    public static final String VOLGA_DON = "volga_don";
+
     /** All recognized passage identifiers, in lower case. */
     public static final Set<String> VALID_PASSAGES = Collections.unmodifiableSet(new LinkedHashSet<>(List.of(
             BABALMANDAB, BOSPORUS, GIBRALTAR, SUEZ, PANAMA, ORMUZ, NORTHWEST, MALACCA, SUNDA, CHILI, SOUTH_AFRICA,
-            BERING, DARDANELLES)));
+            BERING, DARDANELLES, VOLGA_DON)));
 
     /** Whether the identifier names a recognized passage, matched case-insensitively after trimming. */
     public static boolean isValid(String passage) {
@@ -82,6 +85,7 @@ public final class Passage {
             case SOUTH_AFRICA -> "Cape of Good Hope";
             case BERING -> "Bering Strait";
             case DARDANELLES -> "Dardanelles";
+            case VOLGA_DON -> "Volga-Don Canal";
             default -> throw new IllegalArgumentException("Unknown passage identifier '" + passage + "'.");
         };
     }
