@@ -2,12 +2,17 @@ package io.github.skuirrels.traderouter;
 
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
+import io.github.skuirrels.traderouter.graph.GraphEdge;
+import io.github.skuirrels.traderouter.graph.MaritimeGraph;
 import io.github.skuirrels.traderouter.passages.Passage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -165,9 +170,10 @@ class PassageRestrictionTests {
         assertThat(route.properties().getTraversedPassages()).containsExactlyInAnyOrder(Passage.VOLGA_DON);
     }
 
-    @Test
-    void volgaDonClosedLeavesNoRouteOutOfTheCaspian() {
-        TradeRouterOptions options = new TradeRouterOptions().setRestrictions(Passage.VOLGA_DON);
+    @ParameterizedTest
+    @ValueSource(strings = {TradeRouterOptions.DIJKSTRA, TradeRouterOptions.ASTAR})
+    void volgaDonClosedLeavesNoRouteOutOfTheCaspian(String algorithm) {
+        TradeRouterOptions options = new TradeRouterOptions().setRestrictions(Passage.VOLGA_DON).setAlgorithm(algorithm);
 
         GeoJsonFeature route = TradeRoutes.calculate("AZBAK", "RUNVS", options);
 
@@ -193,6 +199,23 @@ class PassageRestrictionTests {
         assertThat(open.properties().getTraversedPassages()).isEmpty();
         assertThat(closed.geometry()).isNotNull();
         assertThat(closed.properties().getLength()).isEqualTo(open.properties().getLength());
+    }
+
+    @Test
+    void everyPassageTagInTheEmbeddedNetworkIsARecognisedPassage() {
+        MaritimeGraph graph = DefaultTradeRouterEngine.getDefault().graph();
+        Set<String> tags = new HashSet<>();
+        for (int node = 0; node < graph.nodeCount(); node++) {
+            for (GraphEdge edge : graph.getEdges(node)) {
+                if (edge.passage() != null) {
+                    tags.add(edge.passage());
+                }
+            }
+        }
+
+        // Internal antimeridian seam tags are never public restrictions.
+        tags.removeAll(Set.of("segment", "segment2", "pacific_ocean"));
+        assertThat(tags).containsExactlyInAnyOrderElementsOf(Passage.VALID_PASSAGES);
     }
 
     private static Coordinate at(String code) {
