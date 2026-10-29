@@ -150,8 +150,8 @@ These apply to single routes and to multi-leg movements, which are described [be
 - **Lane point**: a fixed dot on the sea map, one of 9,708, all on water. The router inserts them between the two waypoints of a sea leg; you never name one.
 - **Lane**: a straight link between two neighbouring lane points. Sea legs travel only along lanes.
 - **Snapping**: moving a waypoint's position to its nearest lane point so a sea leg can start or end on the map, then joining the two with a straight line so the leg still begins and ends at the waypoint.
-- **Choke point**: a lane that runs through a canal or strait, tagged with its name. Thirteen exist. Closing one makes the router route round it.
-- **Sea area**: a named sea, gulf, strait or ocean drawn as a polygon, one of 42 from Natural Earth. A route can report which ones it crosses and where it enters and leaves each. Sea areas never change the route; unlike choke points they cannot be closed.
+- **Choke point**: a lane that runs through a canal or strait, tagged with its name. Fourteen exist. Closing one makes the router route round it.
+- **Sea area**: a named sea, gulf, strait or ocean drawn as a polygon, one of 43 from Natural Earth. A route can report which ones it crosses and where it enters and leaves each. Sea areas never change the route; unlike choke points they cannot be closed.
 - **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail legs in the United States, Canada and Mexico are routed on the embedded North American rail network; other rail legs and air legs use great-circle distance. None uses maritime lane points, choke points or sea areas.
 
 Implementation notes:
@@ -292,7 +292,7 @@ GeoJsonFeature arctic = TradeRoutes.calculate("NLRTM", "JPYOK", new TradeRouterO
 // arctic.properties().getTraversedPassages() contains "northwest"
 ```
 
-Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `MALACCA`, `NORTHWEST` (closed unless `setAllowNorthwest(true)`), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`. Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md).
+Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `MALACCA`, `NORTHWEST` (closed unless `setAllowNorthwest(true)`), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`, `VOLGA_DON` (Volga–Don Canal, the only way out of the Caspian Sea). Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md).
 
 ### Sea areas along a route
 
@@ -324,11 +324,12 @@ The rules:
 
 - An area is listed once for each time the route enters it. A return with no other listed area in between is merged into one entry, so a route crossing the North Atlantic's unlisted Sargasso Sea hole shows the North Atlantic once.
 - Where listed areas overlap, each of them is listed.
-- Water outside every listed area is not reported. On the five routes in the tests this is 0.3% to 26% of the route, most on Istanbul to Port Said; the 1:50m data has no Gulf of Suez or Sea of Marmara, which the `suez`, `bosporus` and `dardanelles` passages cover.
+- Water outside every listed area is not reported. On the five acceptance routes in the tests this is 0.3% to 26% of the route, most on Istanbul to Port Said; the 1:50m data has no Gulf of Suez or Sea of Marmara, which the `suez`, `bosporus` and `dardanelles` passages cover.
+- The Caspian Sea is reached only through the Volga–Don Canal, passage `volga_don`. The lanes up the Volga from Astrakhan and down the Don to the Sea of Azov cross no listed area, so Baku to Novorossiysk lists the Caspian Sea and then the Black Sea with about 1,300 km between them.
 - Connector segments, such as port to lane, count. Areas are found on the continuous path before it is split at the antimeridian.
 - Each sea leg of a movement carries the same property, counted from the start of that leg.
 
-Recognised sea areas: `AEGEAN_SEA`, `ANDAMAN_SEA`, `ARABIAN_SEA`, `ARCTIC_OCEAN`, `BALTIC_SEA`, `BAY_OF_BENGAL`, `BAY_OF_BISCAY`, `BLACK_SEA`, `BO_HAI`, `CARIBBEAN_SEA`, `CORAL_SEA`, `EAST_CHINA_SEA`, `ENGLISH_CHANNEL`, `GULF_OF_ADEN`, `GULF_OF_GUINEA`, `GULF_OF_MEXICO`, `GULF_OF_OMAN`, `GULF_OF_THAILAND`, `INDIAN_OCEAN`, `JAVA_SEA`, `KOREA_STRAIT`, `LACCADIVE_SEA`, `MEDITERRANEAN_SEA`, `MOZAMBIQUE_CHANNEL`, `NORTH_ATLANTIC_OCEAN`, `NORTH_PACIFIC_OCEAN`, `NORTH_SEA`, `PERSIAN_GULF`, `PHILIPPINE_SEA`, `RED_SEA`, `SEA_OF_JAPAN`, `SOUTH_ATLANTIC_OCEAN`, `SOUTH_CHINA_SEA`, `SOUTH_PACIFIC_OCEAN`, `SOUTHERN_OCEAN`, `STRAIT_OF_GIBRALTAR`, `STRAIT_OF_MALACCA`, `STRAIT_OF_SINGAPORE`, `STRAITS_OF_FLORIDA`, `TAIWAN_STRAIT`, `TASMAN_SEA`, `YELLOW_SEA`. Each is a `SeaArea` constant holding the lower snake_case identifier, such as `SeaArea.RED_SEA` for `red_sea`. `SeaArea.getCatalogue()` gives each one's `id`, `name`, `wikidata` and Natural Earth `neId`, and `SeaArea.get(id)` looks one up case-insensitively. `SeaArea.traverse(path)` finds the areas along any continuous list of coordinates, measured the same way. The Wikidata item is a cross-reference only: the North and South halves of an ocean share one.
+Recognised sea areas: `AEGEAN_SEA`, `ANDAMAN_SEA`, `ARABIAN_SEA`, `ARCTIC_OCEAN`, `BALTIC_SEA`, `BAY_OF_BENGAL`, `BAY_OF_BISCAY`, `BLACK_SEA`, `BO_HAI`, `CARIBBEAN_SEA`, `CASPIAN_SEA`, `CORAL_SEA`, `EAST_CHINA_SEA`, `ENGLISH_CHANNEL`, `GULF_OF_ADEN`, `GULF_OF_GUINEA`, `GULF_OF_MEXICO`, `GULF_OF_OMAN`, `GULF_OF_THAILAND`, `INDIAN_OCEAN`, `JAVA_SEA`, `KOREA_STRAIT`, `LACCADIVE_SEA`, `MEDITERRANEAN_SEA`, `MOZAMBIQUE_CHANNEL`, `NORTH_ATLANTIC_OCEAN`, `NORTH_PACIFIC_OCEAN`, `NORTH_SEA`, `PERSIAN_GULF`, `PHILIPPINE_SEA`, `RED_SEA`, `SEA_OF_JAPAN`, `SOUTH_ATLANTIC_OCEAN`, `SOUTH_CHINA_SEA`, `SOUTH_PACIFIC_OCEAN`, `SOUTHERN_OCEAN`, `STRAIT_OF_GIBRALTAR`, `STRAIT_OF_MALACCA`, `STRAIT_OF_SINGAPORE`, `STRAITS_OF_FLORIDA`, `TAIWAN_STRAIT`, `TASMAN_SEA`, `YELLOW_SEA`. Each is a `SeaArea` constant holding the lower snake_case identifier, such as `SeaArea.RED_SEA` for `red_sea`. `SeaArea.getCatalogue()` gives each one's `id`, `name`, `wikidata` and Natural Earth `neId`, and `SeaArea.get(id)` looks one up case-insensitively. `SeaArea.traverse(path)` finds the areas along any continuous list of coordinates, measured the same way. The Wikidata item is a cross-reference only: the North and South halves of an ocean share one.
 
 ### Routing with coordinates
 
@@ -837,7 +838,7 @@ traderouter-sample/         console app exercising every entry point, plus run-w
 scripts/                    CI guard against hard-coded sample road routes
 traderouter-benchmarks/     JMH routing benchmarks, shaded into benchmarks.jar
 docs/
-  waypoints-and-choke-points.md   every waypoint type and all 13 passages with measured detours
+  waypoints-and-choke-points.md   every waypoint type and all 14 passages with measured detours
   diagrams/                 editable HTML diagrams with SVG and selected PNG exports
   unlocode-unresolved.csv   the 4,301 UN/LOCODEs no source could place, with the reason for each
   releasing.md              Maven Central signing, secrets and release steps
@@ -899,7 +900,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 - **World ports**, transformed from searoute-py 1.6.0: 3,962 records with code, name, country, terminal flag and permitted destination countries.
 - **UN/LOCODE**, the UNECE code list for trade and transport locations: 106,588 codes with name and function flags, of which 84,516 carry coordinates to one minute of arc. Used to resolve movement legs that name airports, terminals and inland places. Loaded only when a movement needs it.
 - **UN/LOCODE coordinate supplement**: one JSON file of 17,918 rows, each recording its source. 17,771 fill codes UNECE publishes without a coordinate: five hand-reviewed entries (Gatwick, Shanghai Railway Station, Shanghai Hongqiao, Melrose and Guildford) and 17,766 positions from the 16 September 2026 GeoNames snapshot, each with an explicit `unlc` code, matching country and name or recorded alternate name, and one unambiguous coordinate. Lightwater (`GBLGE`) is included. The other 147 replace UNECE coordinates that fall far outside their country: 145 from GeoNames, the Akpo offshore field (`NGAKP`) from Wikipedia, and Amurang (`IDTZD`) with its longitude sign corrected. [DATA_PROVENANCE.md](DATA_PROVENANCE.md) documents the selection.
-- **Sea areas**, from Natural Earth 1:50m marine polygons, public domain: a JSON selection of 42 seas, gulfs, straits and oceans and their polygons, 21,055 vertices. Used to report `traversed_sea_areas`. Loaded only when a route asks for sea areas.
+- **Sea areas**, from Natural Earth 1:50m marine polygons, public domain: a JSON selection of 43 seas, gulfs, straits and oceans and their polygons, 21,399 vertices. Used to report `traversed_sea_areas`. Loaded only when a route asks for sea areas.
 - **North American rail network**, the main line of the BTS NTAD North American Rail Network Lines: 87,789 nodes and 91,000 track edges covering 272,068 km in the United States, Canada and Mexico, each edge with its published track length and owning railroad. Used to route rail legs. Loaded only when a movement has a rail leg.
 - **Port-code aliases**: a reviewed JSON file mapping 61 official UN/LOCODE sea-port codes to the port-list record held under another code. Used only when the port list lacks the requested code.
 - **UN/LOCODE sea-port supplement**: a hand-maintained JSON file of codes that UNECE publishes without the sea-port function but that cited sources document as sea ports. Currently two entries: Alumar and Duncan Bay. It only adds the sea-port function and never removes one.

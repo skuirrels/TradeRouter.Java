@@ -69,7 +69,7 @@ class SeaAreaTests {
             }
         }
 
-        assertThat(SeaArea.getCatalogue()).hasSize(42);
+        assertThat(SeaArea.getCatalogue()).hasSize(43);
         assertThat(SeaArea.getCatalogue()).extracting(SeaAreaInfo::id).containsExactlyInAnyOrderElementsOf(constants);
         assertThat(SeaArea.getCatalogue()).extracting(SeaAreaInfo::neId).doesNotHaveDuplicates();
         assertThat(SeaArea.getValidSeaAreas()).containsExactlyInAnyOrderElementsOf(constants);
@@ -112,6 +112,37 @@ class SeaAreaTests {
         }
 
         assertThat(areas.get(areas.size() - 1).exitKm()).isLessThanOrEqualTo(route.properties().getLength() + 1e-6);
+    }
+
+    @Test
+    void caspianRouteStaysInsideTheCaspianSea() {
+        GeoJsonFeature route = DefaultTradeRouterEngine.getDefault().calculateRoute("AZBAK", "KZAAU", new TradeRouterOptions() // Baku to Aktau
+                .setAppendOriginDestination(true)
+                .setReturnSeaAreas(true));
+
+        List<SeaAreaTraversal> areas = route.properties().getTraversedSeaAreas();
+        assertThat(areas).hasSize(1);
+        SeaAreaTraversal area = areas.get(0);
+        assertThat(area.id()).isEqualTo(SeaArea.CASPIAN_SEA);
+        assertThat(area.name()).isEqualTo("Caspian Sea");
+        assertThat(area.wikidata()).isEqualTo("Q5484");
+        assertThat(area.enterKm()).isLessThan(15.0);
+        assertThat(area.exitKm()).isBetween(route.properties().getLength() - 15.0, route.properties().getLength());
+    }
+
+    @Test
+    void caspianRouteLeavesForTheBlackSeaOverTheVolgaDonLink() {
+        GeoJsonFeature route = DefaultTradeRouterEngine.getDefault().calculateRoute("AZBAK", "RUNVS", new TradeRouterOptions() // Baku to Novorossiysk
+                .setAppendOriginDestination(true)
+                .setReturnPassages(true)
+                .setReturnSeaAreas(true));
+
+        // The lanes from Astrakhan to the Sea of Azov cross no listed area, and the Sea of Azov is not listed either.
+        assertThat(route.properties().getTraversedPassages()).containsExactlyInAnyOrder(Passage.VOLGA_DON);
+        List<SeaAreaTraversal> areas = route.properties().getTraversedSeaAreas();
+        assertThat(areas).extracting(SeaAreaTraversal::id).containsExactly(SeaArea.CASPIAN_SEA, SeaArea.BLACK_SEA);
+        assertThat(areas.get(0).exitKm()).isCloseTo(764, within(5.0));
+        assertThat(areas.get(1).enterKm()).isCloseTo(2071, within(5.0));
     }
 
     @Test

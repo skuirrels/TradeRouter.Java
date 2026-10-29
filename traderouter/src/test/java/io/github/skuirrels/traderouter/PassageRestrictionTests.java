@@ -2,14 +2,20 @@ package io.github.skuirrels.traderouter;
 
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
+import io.github.skuirrels.traderouter.graph.GraphEdge;
+import io.github.skuirrels.traderouter.graph.MaritimeGraph;
 import io.github.skuirrels.traderouter.passages.Passage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PassageRestrictionTests {
 
@@ -18,7 +24,8 @@ class PassageRestrictionTests {
             "babalmandab, Bab-el-Mandeb",
             "ormuz, Hormuz",
             "south_africa, Cape of Good Hope",
-            "chili, Magellan Strait"
+            "chili, Magellan Strait",
+            "volga_don, Volga-Don Canal"
     })
     void displayNameUsesRecognizableGeographicNames(String passage, String expected) {
         assertThat(Passage.getDisplayName(passage)).isEqualTo(expected);
@@ -152,6 +159,63 @@ class PassageRestrictionTests {
         TradeRouterOptions copy = options.copy();
         assertThat(copy.isAllowNorthwest()).isTrue();
         assertThat(copy.getClosedPassages()).containsExactly(Passage.SUEZ);
+    }
+
+    @Test
+    void volgaDonIsOpenByDefaultAndReportedOutOfTheCaspian() {
+        GeoJsonFeature route = TradeRoutes.calculate("AZBAK", "RUNVS", new TradeRouterOptions().setReturnPassages(true)); // Baku to Novorossiysk
+
+        assertThat(new TradeRouterOptions().getClosedPassages()).doesNotContain(Passage.VOLGA_DON);
+        assertThat(route.geometry()).isNotNull();
+        assertThat(route.properties().getTraversedPassages()).containsExactlyInAnyOrder(Passage.VOLGA_DON);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {TradeRouterOptions.DIJKSTRA, TradeRouterOptions.ASTAR})
+    void volgaDonClosedLeavesNoRouteOutOfTheCaspian(String algorithm) {
+        TradeRouterOptions options = new TradeRouterOptions().setRestrictions(Passage.VOLGA_DON).setAlgorithm(algorithm);
+
+        GeoJsonFeature route = TradeRoutes.calculate("AZBAK", "RUNVS", options);
+
+        assertThat(route.geometry()).isNull();
+        assertThat(route.properties().getLength()).isEqualTo(0.0);
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Port AZBAK to Port RUNVS Sea", options))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("no sea route between AZBAK and RUNVS");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "AZBAK, RUASF", // Baku to Astrakhan, up the lower Volga
+            "RURND, RUNVS", // Rostov-on-Don to Novorossiysk, down the lower Don
+            "AZBAK, KZAAU"  // Baku to Aktau
+    })
+    void volgaDonClosedKeepsTheLowerVolgaAndDonOnTheirOwnSeas(String origin, String destination) {
+        GeoJsonFeature open = TradeRoutes.calculate(origin, destination, new TradeRouterOptions().setReturnPassages(true));
+        GeoJsonFeature closed = TradeRoutes.calculate(origin, destination, new TradeRouterOptions()
+                .setRestrictions(Passage.VOLGA_DON)
+                .setReturnPassages(true));
+
+        assertThat(open.properties().getTraversedPassages()).isEmpty();
+        assertThat(closed.geometry()).isNotNull();
+        assertThat(closed.properties().getLength()).isEqualTo(open.properties().getLength());
+    }
+
+    @Test
+    void everyPassageTagInTheEmbeddedNetworkIsARecognisedPassage() {
+        MaritimeGraph graph = DefaultTradeRouterEngine.getDefault().graph();
+        Set<String> tags = new HashSet<>();
+        for (int node = 0; node < graph.nodeCount(); node++) {
+            for (GraphEdge edge : graph.getEdges(node)) {
+                if (edge.passage() != null) {
+                    tags.add(edge.passage());
+                }
+            }
+        }
+
+        // Internal antimeridian seam tags are never public restrictions.
+        tags.removeAll(Set.of("segment", "segment2", "pacific_ocean"));
+        assertThat(tags).containsExactlyInAnyOrderElementsOf(Passage.VALID_PASSAGES);
     }
 
     private static Coordinate at(String code) {

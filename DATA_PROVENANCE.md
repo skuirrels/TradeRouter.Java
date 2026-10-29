@@ -9,10 +9,12 @@ SHA-256 values are hashes of the files as stored, not of their decompressed JSON
 - Source `marnet_searoute.geojson`: SHA-256 `111a82d949bb949c396a69a08828781314d3afe779c07e9754c3b2834dfca415`.
 - Source `segment.geojson`: SHA-256 `56052b2ddd35de483ec00a29a7f0ffc37e162b0ee0249a9a435c8a8b2d8ffe0f`.
 - Source `ports.geojson`: SHA-256 `8398cb9554a19cf37f53f932f3842f58fbd94fce4c8e2704c3f5a4205ea5977e`.
-- Embedded `marnet.json.gz`: SHA-256 `8d9be0fb7881b77f46d21bd066779cd4c561f8f70c80f02a5e381706ff7aa880`; 9,708 nodes and 31,950 directed edges.
+- Embedded `marnet.json.gz`: SHA-256 `7cb0ea865b4e080abf6caa8e28baef2146b4a644a37dad71fa80d001f4c9a074`; 9,708 nodes and 31,950 directed edges.
 - Embedded `ports.json.gz`: SHA-256 `ccf97018a8d8c9cccafc08d69388dc0b483e39520f24bde94b36d6a8f8d2dca2`; 3,962 records.
 
-`tools/build-marnet-data.py` combines the tagged Marnet network with its tagged antimeridian segments, converts every line to directed edges in both directions, and calculates weights with the same mean-earth-radius Haversine formula used by the library. `tools/build-ports-data.py` retains every source port record, including duplicate codes. Both scripts verify their input hashes and write deterministic gzip files.
+`tools/build-marnet-data.py` combines the tagged Marnet network with its tagged antimeridian segments, converts every line to directed edges in both directions, tags the Volga–Don Canal, and calculates weights with the same mean-earth-radius Haversine formula used by the library. `tools/build-ports-data.py` retains every source port record, including duplicate codes. Both scripts verify their input hashes and write deterministic gzip files.
+
+The Volga–Don Canal tag, `volga_don`, is the one passage not taken from searoute-py, added on 29 October 2026. The source line from the Caspian Sea at 47.8023° E, 45.1174° N to Taganrog Bay at 39.0431° E, 47.104° N carries no passage. The build script tags its seven segments from the vertex at 44.503624° E, 48.424983° N, where the lane leaves the Volga at Volgograd, to the vertex at 43.694824° E, 48.654066° N, where it reaches the Don near Kalach-na-Donu: 14 directed edges, 71.4 km. It fails unless both vertices lie on exactly one untagged source line and seven segments apart. Without the tag the script reproduces the earlier embedded file, SHA-256 `8d9be0fb7881b77f46d21bd066779cd4c561f8f70c80f02a5e381706ff7aa880`, byte for byte.
 
 The searoute-py project credits [Eurostat SeaRoute](https://github.com/eurostat/searoute) as the origin of the maritime network. Eurostat describes that network as based on the Oak Ridge National Labs CTA global shipping lane network, enriched around European coasts with AIS-derived lines.
 
@@ -20,8 +22,8 @@ The searoute-py project credits [Eurostat SeaRoute](https://github.com/eurostat/
 
 - Publisher: [Natural Earth](https://www.naturalearthdata.com/), 1:50m physical vectors, `ne_50m_geography_marine_polys`. Natural Earth is in the public domain ([terms of use](https://www.naturalearthdata.com/about/terms-of-use/)).
 - Source: [nvkelso/natural-earth-vector](https://github.com/nvkelso/natural-earth-vector) commit `117488dc88`, the last change to the file, 5 May 2022. `geojson/ne_50m_geography_marine_polys.geojson` SHA-256 `6fe58083e0cc5c7fad9e396970e28a8580bbd8770cfa4d1d7b5a34423e912f97`; 118 features.
-- Embedded `sea-areas.json`: SHA-256 `5517a2b4801d52639553539ba744310d6975df1e16a9dab9559c3eda13197887`; the selection of 42 areas requested by Supply Chain Intelligence on 24 October 2026. Each entry gives the identifier, the English name in lower snake_case as passages are named, the Natural Earth class, the Wikidata item and the `ne_id`.
-- Embedded `sea-area-polygons.json.gz`: SHA-256 `8a3a1ee19767b9d347b5be424169a86ef6c66189cdbfc2b29a3daf0d2fd464b9`; the 42 selected polygons, 21,055 vertices, keyed by `ne_id`.
+- Embedded `sea-areas.json`: SHA-256 `758197d16cee52b6020e8edcc7b193cf6549a538b9aa840f469779b10e24927c`; the selection of 42 areas requested by Supply Chain Intelligence on 24 October 2026, and the Caspian Sea, added on 29 October 2026. The Caspian is a `sea` feature in this layer, not a lake, and is absent from `ne_50m_lakes`. Each entry gives the identifier, the English name in lower snake_case as passages are named, the Natural Earth class, the Wikidata item and the `ne_id`.
+- Embedded `sea-area-polygons.json.gz`: SHA-256 `8a0c7d64d39327dd89fc367917850a70beb29c4a97c8f08b4a32aaea1c5c0f5e`; the 43 selected polygons, 21,399 vertices, keyed by `ne_id`.
 
 `tools/build-sea-area-data.py` verifies the source hash, finds exactly one feature for each selected `ne_id`, and checks the selection's name, class and Wikidata item against the feature's `name`, `featurecla` and `wikidataid`. Names and classes are compared without case because the source spells `INDIAN OCEAN` and `SOUTHERN OCEAN` in capitals; the selection uses the title-case names. Polygons are copied unchanged, holes and antimeridian-split parts included, and written as deterministic gzip.
 
