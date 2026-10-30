@@ -56,11 +56,12 @@ final class MovementTextFormatter {
                 "",
                 formatCargo(movement)));
         appendLine(output, String.format(Locale.ROOT,
-                "Modelled minimum = %s h travel + %s h sea operations + %s h port handling + %s h connections = %s h (%s days)",
+                "Modelled minimum = %s h travel + %s h sea operations + %s h port handling + %s h connections%s = %s h (%s days)",
                 n1(movement.totalDurationHours()),
                 n1(movement.totalOperationalAllowanceHours()),
                 n0(movement.totalPortHours()),
                 n0(movement.totalConnectionHours()),
+                formatRailAllowances(movement),
                 n1(movement.totalTransitHours()),
                 n1(movement.totalTransitHours() / 24.0)));
 
@@ -73,6 +74,17 @@ final class MovementTextFormatter {
         }
 
         return output.toString().stripTrailing();
+    }
+
+    // Rail allowances default to zero; the summary names them only when a request sets them.
+    private static String formatRailAllowances(MovementResult movement) {
+        if (movement.totalRailTerminalHours() + movement.totalRailInterchangeHours() + movement.totalBorderHours() <= 0.0) {
+            return "";
+        }
+        return String.format(Locale.ROOT, " + %s h rail terminals + %s h rail interchanges + %s h border crossings",
+                n0(movement.totalRailTerminalHours()),
+                n0(movement.totalRailInterchangeHours()),
+                n0(movement.totalBorderHours()));
     }
 
     /** Formats a number with thousands separators and no decimals, as the .NET "N0" format does. */

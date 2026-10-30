@@ -109,6 +109,11 @@ final class GeoJsonSerializer {
         optional(writer, "operational_allowance_fraction", p.getOperationalAllowanceFraction());
         optional(writer, "operational_allowance_corridor", p.getOperationalAllowanceCorridor());
         optional(writer, "connection_hours", p.getConnectionHours());
+        optional(writer, "rail_terminal_hours", p.getRailTerminalHours());
+        optional(writer, "rail_interchanges", p.getRailInterchanges());
+        optional(writer, "rail_interchange_hours", p.getRailInterchangeHours());
+        optional(writer, "border_crossings", p.getBorderCrossings());
+        optional(writer, "border_hours", p.getBorderHours());
         optional(writer, "transit_hours", p.getTransitHours());
         optional(writer, "co2e_g_per_tonne_km", p.getCo2eGramsPerTonneKm());
         optional(writer, "co2e_kg_per_tonne", p.getCo2eKgPerTonne());
@@ -127,6 +132,9 @@ final class GeoJsonSerializer {
         writer.name("total_port_hours").value(p.getTotalPortHours());
         writer.name("total_operational_allowance_hours").value(p.getTotalOperationalAllowanceHours());
         writer.name("total_connection_hours").value(p.getTotalConnectionHours());
+        writer.name("total_rail_terminal_hours").value(p.getTotalRailTerminalHours());
+        writer.name("total_rail_interchange_hours").value(p.getTotalRailInterchangeHours());
+        writer.name("total_border_hours").value(p.getTotalBorderHours());
         writer.name("total_transit_hours").value(p.getTotalTransitHours());
         writer.name("legs").value((long) p.getLegCount());
         writer.name("total_co2e_kg_per_tonne").value(p.getTotalCo2eKgPerTonne());
@@ -156,6 +164,12 @@ final class GeoJsonSerializer {
     private static void optional(JsonWriter writer, String name, String value) {
         if (value != null) {
             writer.name(name).value(value);
+        }
+    }
+
+    private static void optional(JsonWriter writer, String name, Integer value) {
+        if (value != null) {
+            writer.name(name).value((long) value);
         }
     }
 

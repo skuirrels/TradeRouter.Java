@@ -11,6 +11,7 @@ import io.github.skuirrels.traderouter.graph.BidirectionalDijkstra;
 import io.github.skuirrels.traderouter.graph.MaritimeGraph;
 import io.github.skuirrels.traderouter.graph.PathResult;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
+import io.github.skuirrels.traderouter.movements.RailServiceAllowance;
 import io.github.skuirrels.traderouter.movements.RailRoutingMode;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
 import io.github.skuirrels.traderouter.movements.SuppliedRoute;
@@ -92,6 +93,22 @@ final class RailLegs {
     }
 
     /**
+     * The country of a location taken from its UN/LOCODE, the first two letters of a five-character code, or null
+     * when the code is missing or not UN/LOCODE-shaped.
+     */
+    static String countryOf(ResolvedLocation location) {
+        String code = location.code();
+        if (code == null || code.length() != 5 || !isAsciiLetter(code.charAt(0)) || !isAsciiLetter(code.charAt(1))) {
+            return null;
+        }
+        return code.substring(0, 2).toUpperCase(Locale.ROOT);
+    }
+
+    private static boolean isAsciiLetter(char c) {
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+    }
+
+    /**
      * A rail leg is North American when both ends lie within the request's snap distance of the embedded North
      * American rail network: the coverage test the rail router uses, applied whether the leg was routed on the
      * network, supplied or left at great-circle distance.
@@ -114,8 +131,10 @@ final class RailLegs {
         double speedKmh = railSpeedKmh(speedsKmh);
 
         List<String> railroads = new ArrayList<>();
+        List<RailServiceAllowance.TrackSegment> segments = new ArrayList<>(path.size());
         for (int i = 1; i < path.size(); i++) {
             String owner = graph.getPassage(path.get(i - 1), path.get(i));
+            segments.add(new RailServiceAllowance.TrackSegment(owner, Haversine.distanceKm(path.get(i - 1), path.get(i))));
             if (owner != null && !railroads.contains(owner)) {
                 railroads.add(owner);
             }
@@ -142,6 +161,7 @@ final class RailLegs {
                 .setDurationBasis("assumed_speed")
                 .setGeometryBasis("rail_network")
                 .setRailroads(railroads)
+                .setRailInterchanges(RailServiceAllowance.countClassIInterchanges(segments))
                 .setPortOrigin(from.port())
                 .setPortDest(to.port());
         return new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(RouteNormalizer.normalizeRoute(coordinates)), properties);

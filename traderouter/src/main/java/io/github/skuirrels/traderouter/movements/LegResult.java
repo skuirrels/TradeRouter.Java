@@ -78,6 +78,21 @@ public final class LegResult {
         return orZero(properties().getConnectionHours());
     }
 
+    /** Rail terminal time in hours: origin and destination dwell on a rail leg, zero for other modes. */
+    public double railTerminalHours() {
+        return orZero(properties().getRailTerminalHours());
+    }
+
+    /** Time for changes between Class I railroads on a rail leg in hours, zero for other modes. */
+    public double railInterchangeHours() {
+        return orZero(properties().getRailInterchangeHours());
+    }
+
+    /** Border-crossing time on a rail leg in hours, zero for other modes. */
+    public double borderHours() {
+        return orZero(properties().getBorderHours());
+    }
+
     /** Modelled minimum time in hours, including all configured allowances. */
     public double transitHours() {
         Double transit = properties().getTransitHours();

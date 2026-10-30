@@ -7,6 +7,9 @@ import io.github.skuirrels.traderouter.movements.MovementPlan;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.movements.Waypoint;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -21,6 +24,8 @@ import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RailSupplementTests {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -66,7 +71,10 @@ class RailSupplementTests {
             UnLocode record = DefaultTradeRouterEngine.getDefault().unLocodes().getByCode(entry.code());
             assertThat(record).as("%s must be a UN/LOCODE", entry.code()).isNotNull();
             assertThat(record.name()).as("%s must name its UN/LOCODE record", entry.code()).isEqualTo(entry.name());
-            assertThat(record.coordinate()).as("%s must resolve to a position for rail legs", entry.code()).isNotNull();
+            // Beaumont (USBPT) has no UN/LOCODE coordinate and resolves from the port list.
+            assertThatCode(() -> TradeRoutes.locate(entry.code()))
+                    .as("%s must resolve to a position for rail legs", entry.code())
+                    .doesNotThrowAnyException();
             assertThat(entry.source()).as("%s must cite a source", entry.code()).contains("https://");
         }
     }
@@ -101,5 +109,96 @@ class RailSupplementTests {
         LegResult leg = legs.get(0);
         assertThat(leg.feature().properties().getDistanceBasis()).isEqualTo("rail_network");
         assertThat(leg.length()).isBetween(3_300.0, 3_800.0);
+    }
+
+    @Test
+    void movementTangerMedThroughMontrealToDetroitByCodeRoutesOnTheRailNetwork() {
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.port("MAPTM"))
+                .thenTo(Waypoint.port("CAMTR"), TransportMode.SEA)
+                .thenTo(Waypoint.station("USDET"), TransportMode.RAIL);
+
+        LegResult rail = TradeRoutes.calculateMovement(plan).legs().get(1);
+
+        assertThat(rail.feature().properties().getDistanceBasis()).isEqualTo("rail_network");
+        assertThat(rail.feature().properties().getRailroads()).contains("CN");
+        assertThat(rail.length()).isBetween(850.0, 1_000.0);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "USJOT, USLAX", // Chicago-area ramp to the Los Angeles ports.
+            "USCHS, USATL", // Port of Charleston inland.
+            "USSLC, USOAK",
+            "USEZA, USCHI", // Port Elizabeth on-dock rail to Chicago.
+            "USMIA, USJAX", // FEC from PortMiami.
+            "USSAT, USLRD",
+            "USPIT, USCMH",
+            "USEWI, USLAX", // BNSF Logistics Park Chicago.
+            "USNTI, USOAK", // UP Global 2.
+            "USEEU, USCHI", // BNSF Logistics Park Kansas City.
+            "USV7X, USCHI", // NS Croxton.
+            "USMQM, USLAX", // UP Marion, across the river from Memphis.
+            "USSXT, USLAX", // UP Santa Teresa.
+            "CABRP, CAMTR", // CN Brampton.
+            "CAEDM, CAPRR",
+            "CAREG, CAWNP",
+            "CADEL, CATOR", // Deltaport on-dock rail.
+            "CAMNT, CAHAL",
+            "MXZLO, MXGDL", // Manzanillo on-dock rail inland to Guadalajara.
+            "MXVER, MXMEX",
+            "MXATM, MXMTY",
+            "MXQRO, MXMEX",
+            "MXTLC, MXMEX", // CPKC Puerta Mexico.
+            "MXSIL, MXAGU", // Guanajuato Inland Port.
+            "MXSLW, MXMTY",
+            "MXCUU, MXHMO"
+    })
+    void movementSupplementedRampsRouteOnTheRailNetworkByCode(String origin, String destination) {
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.station(origin))
+                .thenTo(Waypoint.station(destination), TransportMode.RAIL);
+
+        List<LegResult> legs = TradeRoutes.calculateMovement(plan).legs();
+
+        assertThat(legs).hasSize(1);
+        LegResult leg = legs.get(0);
+        assertThat(leg.feature().properties().getDistanceBasis()).isEqualTo("rail_network");
+        assertThat(leg.feature().properties().getDistanceWarning()).isNull();
+        assertThat(leg.length()).isGreaterThan(leg.feature().properties().getStraightLineLength());
+    }
+
+    @Test
+    void movementAnchorageHasNoRailLinkToTheLower48() {
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.station("USANC"))
+                .thenTo(Waypoint.station("USCHI"), TransportMode.RAIL);
+
+        List<LegResult> legs = TradeRoutes.calculateMovement(plan).legs();
+
+        assertThat(legs).hasSize(1);
+        LegResult leg = legs.get(0);
+        assertThat(leg.feature().properties().getDistanceBasis()).isNotEqualTo("rail_network");
+        assertThat(leg.feature().properties().getDistanceWarning()).contains("No connected main line");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "USBNA", // Nashville: no source names a container terminal.
+            "USBHM", // Birmingham: the NS terminal at McCalla is 31 km out.
+            "USTUL", // Tulsa: only the bulk Port of Catoosa, 24 km out.
+            "USRCX", // Rochelle: UP idled Global III in 2019.
+            "MXCJS", // Ciudad Juarez: sources describe only the border crossing.
+            "MXTAM", // Tampico: no source names port rail; Altamira is about 26 km out.
+            "MXPBC"  // Puebla: the only named terminal dates from 2005.
+    })
+    void movementUnsourcedMarketsStillNeedADeclaredRailFunction(String code) {
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.station("USCHI"))
+                .thenTo(Waypoint.station(code), TransportMode.RAIL);
+
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement(plan))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("AdditionalLocationFunctions");
     }
 }

@@ -233,6 +233,26 @@ class MovementTests {
     }
 
     @Test
+    void movementSupplementedPortCoordinatesPlaceTangerMedAndMontrealAtTheirPorts() {
+        // Tanger Med is in neither UNECE's coordinates nor the port list, so movements could not place it by code.
+        UnLocode tangerMed = engine().unLocodes().getByCode("MAPTM");
+        assertThat(tangerMed.coordinate()).isEqualTo(new Coordinate(-5.52071, 35.87498));
+        assertThat(tangerMed.coordinateSource()).startsWith("Wikipedia, Tanger Med");
+        assertThat(TradeRoutes.locate("MAPTM").source()).isEqualTo("unlocode");
+
+        // Montreal gains a UN/LOCODE position, but the port list agrees on the name and still places the code.
+        assertThat(engine().unLocodes().getByCode("CAMTR").coordinate()).isEqualTo(new Coordinate(-73.530, 45.547));
+        assertThat(TradeRoutes.locate("CAMTR").source()).isEqualTo("ports");
+
+        MovementPlan plan = MovementPlan
+                .from(Waypoint.port("MAPTM"))
+                .thenTo(Waypoint.port("CAMTR"), TransportMode.SEA);
+        List<LegResult> legs = TradeRoutes.calculateMovement(plan).legs();
+        assertThat(legs).hasSize(1);
+        assertThat(legs.get(0).length()).isBetween(5_800.0, 6_400.0);
+    }
+
+    @Test
     void movementGeoNamesSupplementResolvesLightwaterByUnLocode() {
         var database = engine().unLocodes();
         UnLocode lightwater = database.getByCode("GBLGE");
@@ -243,7 +263,7 @@ class MovementTests {
         ResolvedLocation resolved = TradeRoutes.locate("GBLGE");
         assertThat(resolved.source()).isEqualTo("unlocode");
         assertThat(resolved.coordinate()).isEqualTo(lightwater.coordinate());
-        assertThat(database.countWithCoordinates()).isEqualTo(102_287);
+        assertThat(database.countWithCoordinates()).isEqualTo(102_703);
     }
 
     @Test
@@ -257,7 +277,7 @@ class MovementTests {
         // A flipped sign (Luque, Paraguay, published in the northern hemisphere) and swapped latitude and longitude.
         assertThat(database.getByCode("PYLUQ").coordinate().latitude()).isCloseTo(-25.27, within(0.01));
         assertThat(database.getByCode("DEGKO").coordinate().latitude()).isCloseTo(52.17, within(0.01));
-        assertThat(database.countWithCoordinates()).isEqualTo(102_287);
+        assertThat(database.countWithCoordinates()).isEqualTo(102_703);
     }
 
     @Test

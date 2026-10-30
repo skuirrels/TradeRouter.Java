@@ -36,6 +36,11 @@ public final class TradeRouterProperties {
     private Double operationalAllowanceFraction;
     private String operationalAllowanceCorridor;
     private Double connectionHours;
+    private Double railTerminalHours;
+    private Integer railInterchanges;
+    private Double railInterchangeHours;
+    private Integer borderCrossings;
+    private Double borderHours;
     private Double transitHours;
     private Double co2eGramsPerTonneKm;
     private Double co2eKgPerTonne;
@@ -370,8 +375,79 @@ public final class TradeRouterProperties {
     }
 
     /**
-     * Modelled minimum time for the leg in hours: travel, operational allowance, port handling and connection
-     * time. This is not a carrier-scheduled or guaranteed transit time. Movement legs only. JSON: {@code transit_hours}.
+     * Rail terminal time for the leg in hours: the request's origin and destination terminal dwell. Rail movement
+     * legs only. JSON: {@code rail_terminal_hours}.
+     */
+    public Double getRailTerminalHours() {
+        return railTerminalHours;
+    }
+
+    /** Sets the rail terminal hours. */
+    public TradeRouterProperties setRailTerminalHours(Double railTerminalHours) {
+        this.railTerminalHours = railTerminalHours;
+        return this;
+    }
+
+    /**
+     * Changes from one Class I railroad to another along a rail leg routed on the rail network. Other track owners
+     * are skipped; see {@code RailServiceAllowance.CLASS_I_RAILROADS}. JSON: {@code rail_interchanges}.
+     */
+    public Integer getRailInterchanges() {
+        return railInterchanges;
+    }
+
+    /** Sets the rail interchange count. */
+    public TradeRouterProperties setRailInterchanges(Integer railInterchanges) {
+        this.railInterchanges = railInterchanges;
+        return this;
+    }
+
+    /**
+     * Interchange time for the leg in hours: the interchange count times the request's hours per interchange. Rail
+     * movement legs only. JSON: {@code rail_interchange_hours}.
+     */
+    public Double getRailInterchangeHours() {
+        return railInterchangeHours;
+    }
+
+    /** Sets the rail interchange hours. */
+    public TradeRouterProperties setRailInterchangeHours(Double railInterchangeHours) {
+        this.railInterchangeHours = railInterchangeHours;
+        return this;
+    }
+
+    /**
+     * Crossings of the US–Canada or US–Mexico border, counted from the countries of the leg's ends. Rail movement
+     * legs only. JSON: {@code border_crossings}.
+     */
+    public Integer getBorderCrossings() {
+        return borderCrossings;
+    }
+
+    /** Sets the border crossing count. */
+    public TradeRouterProperties setBorderCrossings(Integer borderCrossings) {
+        this.borderCrossings = borderCrossings;
+        return this;
+    }
+
+    /**
+     * Border time for the leg in hours: the crossing count times the request's hours per crossing. Rail movement
+     * legs only. JSON: {@code border_hours}.
+     */
+    public Double getBorderHours() {
+        return borderHours;
+    }
+
+    /** Sets the border hours. */
+    public TradeRouterProperties setBorderHours(Double borderHours) {
+        this.borderHours = borderHours;
+        return this;
+    }
+
+    /**
+     * Modelled minimum time for the leg in hours: travel, operational allowance, port handling, connection time
+     * and, on rail legs, terminal, interchange and border time. This is not a carrier-scheduled or guaranteed
+     * transit time. Movement legs only. JSON: {@code transit_hours}.
      */
     public Double getTransitHours() {
         return transitHours;
