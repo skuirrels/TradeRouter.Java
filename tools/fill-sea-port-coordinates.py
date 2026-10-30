@@ -50,7 +50,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "src/TradeRouter/Data"
+DATA = ROOT / "traderouter/src/main/resources/io/github/skuirrels/traderouter/data"
 MANIFEST = Path(__file__).with_name("sea-port-coordinate-sources.json")
 MARKER = "Port fill, "
 PORTISH = {"PRT", "HBR", "PIER", "LDNG", "MAR", "DCKY", "ANCH", "RDST", "WHRF", "DCK", "OILT", "TRMO"}

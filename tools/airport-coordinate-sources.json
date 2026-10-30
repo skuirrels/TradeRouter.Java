@@ -1,0 +1,9 @@
+{
+  "retrieved": "2026-10-30",
+  "sources": {
+    "airports.csv": "OurAirports airports, public domain, https://davidmegginson.github.io/ourairports-data/airports.csv"
+  },
+  "files": {
+    "airports.csv": "423a70f3a3a6b849db1063a5558e47bbd4e715decb6071f1f80f413ab92a88ac"
+  }
+}

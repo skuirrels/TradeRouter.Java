@@ -2,6 +2,15 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.8.0 at `6a4d4c6`.
+
+### Location data
+
+- 1,143 airports have coordinates, so movements and `locate` can name them by code. UNECE publishes none for them, and air legs to or from them previously threw. They include Narita (`JPNRT`), Haneda (`JPHND`), Kansai (`JPKIX`), Dallas-Fort Worth (`USDFW`), Dulles (`USIAD`), Detroit (`USDTW`), Beijing Capital (`CNPEK`), Malpensa (`ITMXP`), Linate (`ITLIN`), Arlanda (`SEARN`), Stansted (`GBSTN`), Montreal (`CAYUL`), Vancouver (`CAYVR`), Jakarta (`IDCGK`) and Addis Ababa (`ETADD`). `tools/fill-airport-coordinates.py` places each at the OurAirports airport that is the only open one in its country carrying its IATA code, when the names share a distinctive word. 271 airport codes remain without a position.
+- 20 of the 27 codes that 2.6.1 rejected as port-list namesakes now resolve to their own UN/LOCODE place, because they are airports: Latrobe (`USLBE`) is at Arnold Palmer Regional Airport in Pennsylvania, Madison (`USMDN`) in Indiana, and Shantou (`CNSWA`) and Wuxi (`CNWUX`) at their airports. Seven still throw.
+
 ## [2.7.0] - 2026-10-30
 
 Ported from TradeRouter.Net 2.7.0 at `a8b1f8b`.

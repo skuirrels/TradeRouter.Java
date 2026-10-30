@@ -92,8 +92,8 @@ class PortListNamesakeTests {
 
     @ParameterizedTest
     @CsvSource({
-            "USLBE, Latrobe, Laguna Beach",
-            "USMDN, Madison, Mandan",
+            "USAAB, Anamosa, Bell Bay",
+            "USLIL, Lakeville, Lilesville",
             "CASKE, Saint-Anne-de-Kent, Sherbrooke"
     })
     void locateRejectsAPortListNamesakeWhenUnLocodeHasNoPosition(String code, String unLocodeName, String portListName) {
@@ -107,7 +107,7 @@ class PortListNamesakeTests {
     @ParameterizedTest
     @ValueSource(strings = {
             "FIHEL", // Helsinki, filed by UN/LOCODE as Helsingfors (Helsinki).
-            "CNHRB", // Haerbin and Harbin Taiping International Apt.
+            "RUPRN", // Poronaysk and Poronaisk.
             "RUNIA", // Nikolaevsk on Amur and Nikolayevsk-na-Amure.
             "JPSGM", // Shiogama and Sendaishiogama.
             "SNMBA"  // M'Bao Oil Terminal and M'bao Terminal.
