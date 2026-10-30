@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 
 class PassageRestrictionTests {
 
@@ -25,7 +26,8 @@ class PassageRestrictionTests {
             "ormuz, Hormuz",
             "south_africa, Cape of Good Hope",
             "chili, Magellan Strait",
-            "volga_don, Volga-Don Canal"
+            "volga_don, Volga-Don Canal",
+            "kiel, Kiel Canal"
     })
     void displayNameUsesRecognizableGeographicNames(String passage, String expected) {
         assertThat(Passage.getDisplayName(passage)).isEqualTo(expected);
@@ -216,6 +218,85 @@ class PassageRestrictionTests {
         // Internal antimeridian seam tags are never public restrictions.
         tags.removeAll(Set.of("segment", "segment2", "pacific_ocean"));
         assertThat(tags).containsExactlyInAnyOrderElementsOf(Passage.VALID_PASSAGES);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "DEHAM, DKFRC, 350, 450, 956.3",  // Hamburg to Fredericia
+            "DEHAM, PLSZZ, 450, 650, 1177.8"  // Hamburg to Szczecin
+    })
+    void kielIsOpenByDefaultAndShortensElbeToBalticRoutes(
+            String origin, String destination, double minKm, double maxKm, double skagenKm) {
+        GeoJsonFeature open = TradeRoutes.calculate(origin, destination, new TradeRouterOptions().setReturnPassages(true));
+        GeoJsonFeature closed = TradeRoutes.calculate(origin, destination, new TradeRouterOptions()
+                .setRestrictions(Passage.KIEL)
+                .setReturnPassages(true));
+
+        assertThat(new TradeRouterOptions().getClosedPassages()).doesNotContain(Passage.KIEL);
+        assertThat(open.properties().getTraversedPassages()).containsExactlyInAnyOrder(Passage.KIEL);
+        assertThat(open.properties().getLength()).isBetween(minKm, maxKm);
+        assertThat(maxLatitude(open)).isLessThan(56.0);
+
+        // Closed, the route goes back round Skagen, at 57.7 N, with its 2.6.1 length.
+        assertThat(closed.properties().getTraversedPassages()).isEmpty();
+        assertThat(closed.properties().getLength()).isCloseTo(skagenKm, within(0.1));
+        assertThat(maxLatitude(closed)).isGreaterThan(57.5);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "NLRTM, SGSIN, 15521.4", // Rotterdam to Singapore
+            "DEHAM, USNYC, 6479.9",  // Hamburg to New York
+            "DEHAM, GBFXT, 688.0",   // Hamburg to Felixstowe
+            "DEHAM, NLRTM, 574.9",   // Hamburg to Rotterdam
+            "DEHAM, NOBGO, 1010.3",  // Hamburg to Bergen
+            "PLGDN, FIHEL, 791.7",   // Gdansk to Helsinki
+            "DKAAR, SESTO, 1007.3",  // Aarhus to Stockholm
+            "SEGOT, NOOSL, 278.7"    // Gothenburg to Oslo
+    })
+    void kielLeavesRoutesThatDoNotUseItUnchanged(String origin, String destination, double expectedKm) {
+        GeoJsonFeature open = TradeRoutes.calculate(origin, destination, new TradeRouterOptions().setReturnPassages(true));
+        GeoJsonFeature closed = TradeRoutes.calculate(origin, destination, new TradeRouterOptions()
+                .setRestrictions(Passage.KIEL)
+                .setReturnPassages(true));
+
+        assertThat(open.properties().getTraversedPassages()).doesNotContain(Passage.KIEL);
+        assertThat(open.properties().getLength()).isCloseTo(expectedKm, within(0.1));
+        assertThat(closed.properties().getLength()).isEqualTo(open.properties().getLength());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "DEBRB", // Brunsbuettel, at the Elbe end
+            "DEKEL", // Kiel, at the Baltic end
+            "DEHUS", // Husum, on the North Sea
+            "DETOE", // Toenning, on the North Sea
+            "DEECK", // Eckernfoerde, on the Baltic
+            "DESLS"  // Schleswig, on the Baltic
+    })
+    void kielClosedKeepsPortsBesideTheCanalOnTheirOwnSeas(String port) {
+        TradeRouterOptions options = new TradeRouterOptions().setRestrictions(Passage.KIEL).setReturnPassages(true);
+
+        GeoJsonFeature toRotterdam = TradeRoutes.calculate(port, "NLRTM", options);
+        GeoJsonFeature toGdansk = TradeRoutes.calculate(port, "PLGDN", options);
+
+        assertThat(toRotterdam.geometry()).isNotNull();
+        assertThat(toGdansk.geometry()).isNotNull();
+        assertThat(toRotterdam.properties().getTraversedPassages()).isEmpty();
+        assertThat(toGdansk.properties().getTraversedPassages()).isEmpty();
+    }
+
+    @Test
+    void kielClosedLeavesRendsburgOnTheCanalWithoutARoute() {
+        GeoJsonFeature open = TradeRoutes.calculate("DEREN", "NLRTM", new TradeRouterOptions().setReturnPassages(true));
+        GeoJsonFeature closed = TradeRoutes.calculate("DEREN", "NLRTM", new TradeRouterOptions().setRestrictions(Passage.KIEL));
+
+        assertThat(open.properties().getTraversedPassages()).containsExactlyInAnyOrder(Passage.KIEL);
+        assertThat(closed.geometry()).isNull();
+    }
+
+    private static double maxLatitude(GeoJsonFeature route) {
+        return route.geometry().positions().stream().mapToDouble(position -> position[1]).max().orElseThrow();
     }
 
     private static Coordinate at(String code) {

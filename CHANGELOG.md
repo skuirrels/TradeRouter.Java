@@ -2,6 +2,16 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.7.0 at `a8b1f8b`.
+
+### Sea routing
+
+- The Kiel Canal is a passage: `Passage.KIEL`, `kiel`, as Eurostat SeaRoute names it. searoute-py has no lane through the canal, so routes between the Elbe or the North Sea and the Baltic went round Skagen. `tools/build-marnet-data.py` now adds Eurostat SeaRoute's canal line from Brunsbüttel to Kiel-Holtenau, 96 km, with Eurostat's approach lanes up and down the Elbe and out to Kiel Bay. It is open by default, so those routes now use it and report it in `traversed_passages`: Hamburg to Fredericia is 398 km instead of 956 km, Hamburg to Szczecin 522 km instead of 1,178 km, Rotterdam to Gdansk 1,250 km instead of 1,640 km and Bremerhaven to Stockholm 1,155 km instead of 1,656 km. Listing it in `setRestrictions` restores the route round Skagen with its earlier length. Routes that do not use it are unchanged.
+- Eurostat's lanes to Husum, Tönning and Eckernförde are added too. These ports had no lane, and without one they would snap to the canal. Twelve ports beside the canal now snap to an added lane point nearer them: Brunsbüttel, Holtenau, Kiel, Laboe, Rendsburg, Eckernförde, Schleswig, Kappeln, Husum, Tönning, Büsum and Cuxhaven. Their routes now include the lane to the port, so a route that does not use the canal can be longer: Husum to Rotterdam is 572 km instead of 479 km, and Kiel to Gothenburg 421 km instead of 406 km. With it closed, places on the canal have no sea route: Rendsburg, and in movements UN/LOCODE sea ports such as Audorf (`DEAUO`), Budelsdorf (`DEUSF`) and Obereiderhafen (`DEOEX`).
+- The lane network has 9,748 nodes and 32,034 directed edges, up from 9,708 and 31,950. The earlier nodes and edges are unchanged.
+
 ## [2.6.1] - 2026-10-30
 
 Ported from TradeRouter.Net 2.5.0, 2.6.0 and 2.6.1 at `8211bc4`.

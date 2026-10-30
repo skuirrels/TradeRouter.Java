@@ -147,10 +147,10 @@ These apply to single routes and to multi-leg movements, which are described [be
 
 - **Waypoint**: a place you name in a leg by its UN/LOCODE. Pickup places, ports and delivery places are all waypoints. The first and last waypoints of a movement are the pickup and delivery places.
 - **Leg**: the journey between two consecutive waypoints, by one transport mode.
-- **Lane point**: a fixed dot on the sea map, one of 9,708, all on water. The router inserts them between the two waypoints of a sea leg; you never name one.
+- **Lane point**: a fixed dot on the sea map, one of 9,748, all on water. The router inserts them between the two waypoints of a sea leg; you never name one.
 - **Lane**: a straight link between two neighbouring lane points. Sea legs travel only along lanes.
 - **Snapping**: moving a waypoint's position to its nearest lane point so a sea leg can start or end on the map, then joining the two with a straight line so the leg still begins and ends at the waypoint.
-- **Choke point**: a lane that runs through a canal or strait, tagged with its name. Fourteen exist. Closing one makes the router route round it.
+- **Choke point**: a lane that runs through a canal or strait, tagged with its name. Fifteen exist. Closing one makes the router route round it.
 - **Sea area**: a named sea, gulf, strait or ocean drawn as a polygon, one of 43 from Natural Earth. A route can report which ones it crosses and where it enters and leaves each. Sea areas never change the route; unlike choke points they cannot be closed.
 - **Non-sea leg**: road legs use a configured road-network provider when available and otherwise a labelled circuity estimate. Rail legs in the United States, Canada and Mexico are routed on the embedded North American rail network; other rail legs and air legs use great-circle distance. None uses maritime lane points, choke points or sea areas.
 
@@ -292,7 +292,7 @@ GeoJsonFeature arctic = TradeRoutes.calculate("NLRTM", "JPYOK", new TradeRouterO
 // arctic.properties().getTraversedPassages() contains "northwest"
 ```
 
-Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `MALACCA`, `NORTHWEST` (closed unless `setAllowNorthwest(true)`), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`, `VOLGA_DON` (Volga–Don Canal, the only way out of the Caspian Sea). Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md).
+Recognised passages: `BABALMANDAB`, `BERING`, `BOSPORUS`, `CHILI` (Magellan Strait), `DARDANELLES`, `GIBRALTAR`, `KIEL` (Kiel Canal, between the Elbe and the Baltic), `MALACCA`, `NORTHWEST` (closed unless `setAllowNorthwest(true)`), `ORMUZ`, `PANAMA`, `SOUTH_AFRICA` (Cape of Good Hope), `SUEZ`, `SUNDA`, `VOLGA_DON` (Volga–Don Canal, the only way out of the Caspian Sea). Each one, and every kind of waypoint a route can contain, is described with measured detour distances in [docs/waypoints-and-choke-points.md](docs/waypoints-and-choke-points.md).
 
 ### Sea areas along a route
 
@@ -868,7 +868,7 @@ traderouter-sample/         console app exercising every entry point, plus run-w
 scripts/                    CI guard against hard-coded sample road routes
 traderouter-benchmarks/     JMH routing benchmarks, shaded into benchmarks.jar
 docs/
-  waypoints-and-choke-points.md   every waypoint type and all 14 passages with measured detours
+  waypoints-and-choke-points.md   every waypoint type and all 15 passages with measured detours
   diagrams/                 editable HTML diagrams with SVG and selected PNG exports
   unlocode-unresolved.csv   the 3,885 UN/LOCODEs no source could place, with the reason for each
   releasing.md              Maven Central signing, secrets and release steps
@@ -927,7 +927,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 
 ## Data
 
-- **Marnet and antimeridian segments**, transformed from searoute-py 1.6.0: 9,708 nodes and 31,950 directed edges with distance and passage tags.
+- **Marnet and antimeridian segments**, transformed from searoute-py 1.6.0, with the Kiel Canal and its approaches added from Eurostat SeaRoute: 9,748 nodes and 32,034 directed edges with distance and passage tags.
 - **World ports**, transformed from searoute-py 1.6.0: 3,962 records with code, name, country, terminal flag and permitted destination countries.
 - **UN/LOCODE**, the UNECE code list for trade and transport locations: 106,588 codes with name and function flags, of which 84,516 carry coordinates to one minute of arc. Used to resolve movement legs that name airports, terminals and inland places. Loaded only when a movement needs it.
 - **UN/LOCODE coordinate supplement**: one JSON file of 18,353 rows, each recording its source. 18,187 fill codes UNECE publishes without a coordinate: seven hand-reviewed entries (Gatwick, Shanghai Railway Station, Shanghai Hongqiao, Melrose, Guildford, and the ports of Tanger Med and Montreal) and 17,754 positions from the 16 September 2026 GeoNames snapshot, each with an explicit `unlc` code, matching country and name or recorded alternate name, and one unambiguous coordinate. Lightwater (`GBLGE`) is included. 414 more place sea ports from the NGA World Port Index (public domain), Wikidata (CC0) and GeoNames, each confirmed by a code link, a second source, its subdivision or its distance from the coast. 147 replace UNECE coordinates that fall far outside their country: 145 from GeoNames, the Akpo offshore field (`NGAKP`) from Wikipedia, and Amurang (`IDTZD`) with its longitude sign corrected. 31 more correct codes whose UNECE or GeoNames position lies over 50 km from a port-list entry that independent evidence supports: 21 from the World Port Index and ten from GeoNames. [DATA_PROVENANCE.md](DATA_PROVENANCE.md) documents the selection.

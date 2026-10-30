@@ -38,7 +38,7 @@
   <rect x="560" y="72" width="176" height="56" rx="6" fill="#f6f7f8"/>
   <rect x="560" y="72" width="176" height="56" rx="6" fill="rgba(24,24,24,0.05)" stroke="#5b6472" stroke-width="1"/>
   <text x="648" y="96" fill="#181818" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Marnet lane network</text>
-  <text x="648" y="112" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">9,708 lane points · 31,950 links</text>
+  <text x="648" y="112" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">9,748 lane points · 32,034 links</text>
 
   <!-- Editorial callout: what Marnet is -->
   <text x="1232" y="84" fill="#181818" font-size="14" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="end">Marnet is Eurostat's global map of shipping lanes.</text>
@@ -136,7 +136,7 @@
   <text x="40" y="440" fill="#181818" font-size="8" font-weight="600" font-family="'Geist Mono', monospace">LEG</text>
   <text x="144" y="440" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace">the journey between two consecutive waypoints, by one transport mode</text>
   <text x="40" y="456" fill="#181818" font-size="8" font-weight="600" font-family="'Geist Mono', monospace">LANE POINT</text>
-  <text x="144" y="456" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace">a fixed dot on the sea map, one of 9,708, all on water; the router inserts</text>
+  <text x="144" y="456" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace">a fixed dot on the sea map, one of 9,748, all on water; the router inserts</text>
   <text x="144" y="472" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace">them between the two waypoints of a sea leg, you never name one</text>
   <text x="40" y="488" fill="#181818" font-size="8" font-weight="600" font-family="'Geist Mono', monospace">LANE</text>
   <text x="144" y="488" fill="#5b6472" font-size="8" font-family="'Geist Mono', monospace">a straight link between two neighbouring lane points; sea legs travel only along lanes</text>
