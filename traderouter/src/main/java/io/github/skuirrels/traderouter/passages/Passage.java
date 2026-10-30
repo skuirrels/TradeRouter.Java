@@ -56,10 +56,13 @@ public final class Passage {
     /** Volga-Don Canal in Russia, the only lane between the Caspian Sea and the Sea of Azov. */
     public static final String VOLGA_DON = "volga_don";
 
+    /** Kiel Canal in Germany, between the Elbe at Brunsbüttel and the Baltic Sea at Kiel-Holtenau. */
+    public static final String KIEL = "kiel";
+
     /** All recognized passage identifiers, in lower case. */
     public static final Set<String> VALID_PASSAGES = Collections.unmodifiableSet(new LinkedHashSet<>(List.of(
             BABALMANDAB, BOSPORUS, GIBRALTAR, SUEZ, PANAMA, ORMUZ, NORTHWEST, MALACCA, SUNDA, CHILI, SOUTH_AFRICA,
-            BERING, DARDANELLES, VOLGA_DON)));
+            BERING, DARDANELLES, VOLGA_DON, KIEL)));
 
     /** Whether the identifier names a recognized passage, matched case-insensitively after trimming. */
     public static boolean isValid(String passage) {
@@ -86,6 +89,7 @@ public final class Passage {
             case BERING -> "Bering Strait";
             case DARDANELLES -> "Dardanelles";
             case VOLGA_DON -> "Volga-Don Canal";
+            case KIEL -> "Kiel Canal";
             default -> throw new IllegalArgumentException("Unknown passage identifier '" + passage + "'.");
         };
     }

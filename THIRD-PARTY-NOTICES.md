@@ -12,6 +12,8 @@ searoute-py credits [Eurostat SeaRoute](https://github.com/eurostat/searoute) fo
 
 The embedded Marnet network is therefore derived from material that Eurostat publishes under EUPL-1.2. searoute-py distributes its copy under Apache-2.0, and TradeRouter.Java takes the network from that distribution. The Apache-2.0 licence on TradeRouter.Java's code does not override any EUPL-1.2 terms that apply to the network. Users who redistribute the embedded maritime data should review EUPL-1.2 alongside this notice.
 
+The Kiel Canal and its approach lanes are taken directly from the Eurostat SeaRoute network, `marnet_plus_5km.gpkg` at [commit `88a2e568`](https://github.com/eurostat/searoute/tree/88a2e568a8e0144d1f5a81c3931a7bc2bcce6901), under the [European Union Public Licence 1.2](https://github.com/eurostat/searoute/blob/88a2e568a8e0144d1f5a81c3931a7bc2bcce6901/LICENSE). Their coordinates are copied unchanged and converted to the compact graph; see `DATA_PROVENANCE.md` and `tools/build-marnet-data.py`.
+
 ## North American Rail Network
 
 The embedded rail graph is transformed from the [North American Rail Network Lines](https://doi.org/10.21949/1528950) in the U.S. Department of Transportation Bureau of Transportation Statistics National Transportation Atlas Database, compiled from Federal Railroad Administration data. It is a work of the United States government under 17 U.S.C. § 101, not protected by U.S. copyright and available for unrestricted public use. The graph keeps the main line only and simplifies its geometry; see `DATA_PROVENANCE.md` and the scripts in `tools/`.
