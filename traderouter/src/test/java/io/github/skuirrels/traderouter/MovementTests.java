@@ -263,7 +263,7 @@ class MovementTests {
         ResolvedLocation resolved = TradeRoutes.locate("GBLGE");
         assertThat(resolved.source()).isEqualTo("unlocode");
         assertThat(resolved.coordinate()).isEqualTo(lightwater.coordinate());
-        assertThat(database.countWithCoordinates()).isEqualTo(102_703);
+        assertThat(database.countWithCoordinates()).isEqualTo(103_846);
     }
 
     @Test
@@ -277,7 +277,7 @@ class MovementTests {
         // A flipped sign (Luque, Paraguay, published in the northern hemisphere) and swapped latitude and longitude.
         assertThat(database.getByCode("PYLUQ").coordinate().latitude()).isCloseTo(-25.27, within(0.01));
         assertThat(database.getByCode("DEGKO").coordinate().latitude()).isCloseTo(52.17, within(0.01));
-        assertThat(database.countWithCoordinates()).isEqualTo(102_703);
+        assertThat(database.countWithCoordinates()).isEqualTo(103_846);
     }
 
     @Test

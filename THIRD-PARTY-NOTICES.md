@@ -44,6 +44,10 @@ Sea-port rows and reviewed corrections in the UN/LOCODE coordinate supplement wh
 
 Sea-port rows whose `source` names a Wikidata item take their position from [Wikidata](https://www.wikidata.org/), whose structured data is published under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
 
+## OurAirports
+
+Airport rows in the UN/LOCODE coordinate supplement whose `source` begins `Airport fill, OurAirports` take their position from the [OurAirports data](https://ourairports.com/data/) `airports.csv`, which OurAirports releases into the public domain. The file used, retrieved on 30 October 2026, is pinned in [the fill script's manifest](tools/airport-coordinate-sources.json).
+
 ## GeoNames
 
 The GeoNames entries in the same UN/LOCODE coordinate supplement are derived from the [GeoNames gazetteer downloads](https://download.geonames.org/export/dump/), specifically `alternateNamesV2.zip` and `allCountries.zip` dated 16 September 2026. GeoNames is licensed under [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). Each included row retains its GeoNames identifier; the [generation script](tools/build-unlocode-coordinate-supplement.py) and [data provenance](DATA_PROVENANCE.md) document the filters and exact source hashes. Sea-port rows whose `source` begins `Port fill, GeoNames` come from the GeoNames per-country dumps and alternate names retrieved on 29 October 2026 by [another script](tools/fill-sea-port-coordinates.py), with hashes pinned in [its manifest](tools/sea-port-coordinate-sources.json). Data is provided as is without a warranty of accuracy.

@@ -701,7 +701,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         }
 
         // With no UN/LOCODE position to measure against, the name is the only evidence that the port list's record is
-        // the place UN/LOCODE files under the code: the port list's USLBE is Laguna Beach, UN/LOCODE's is Latrobe.
+        // the place UN/LOCODE files under the code: the port list's USAAB is Bell Bay, UN/LOCODE's is Anamosa.
         boolean portIsNamesake = port != null && unLocode != null && !namesProbablyAgree(port.name(), unLocode.name());
         if (port != null && !portIsNamesake) {
             return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
