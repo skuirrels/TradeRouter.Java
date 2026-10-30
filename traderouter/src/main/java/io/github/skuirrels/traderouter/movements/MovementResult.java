@@ -22,6 +22,9 @@ public final class MovementResult {
     private final double totalPortHours;
     private final double totalOperationalAllowanceHours;
     private final double totalConnectionHours;
+    private final double totalRailTerminalHours;
+    private final double totalRailInterchangeHours;
+    private final double totalBorderHours;
     private final double totalTransitHours;
     private final Map<TransportMode, Double> lengthByMode;
     private final double totalCo2eKgPerTonne;
@@ -41,6 +44,9 @@ public final class MovementResult {
         double totalPort = 0.0;
         double totalOperationalAllowance = 0.0;
         double totalConnection = 0.0;
+        double totalRailTerminal = 0.0;
+        double totalRailInterchange = 0.0;
+        double totalBorder = 0.0;
         double totalTransit = 0.0;
         double totalCo2ePerTonne = 0.0;
         double totalCo2e = 0.0;
@@ -52,6 +58,9 @@ public final class MovementResult {
             totalPort += leg.portHours();
             totalOperationalAllowance += leg.operationalAllowanceHours();
             totalConnection += leg.connectionHours();
+            totalRailTerminal += leg.railTerminalHours();
+            totalRailInterchange += leg.railInterchangeHours();
+            totalBorder += leg.borderHours();
             totalTransit += leg.transitHours();
             totalCo2ePerTonne += leg.co2eKgPerTonne();
             if (leg.co2eKg() != null) {
@@ -66,6 +75,9 @@ public final class MovementResult {
         this.totalPortHours = totalPort;
         this.totalOperationalAllowanceHours = totalOperationalAllowance;
         this.totalConnectionHours = totalConnection;
+        this.totalRailTerminalHours = totalRailTerminal;
+        this.totalRailInterchangeHours = totalRailInterchange;
+        this.totalBorderHours = totalBorder;
         this.totalTransitHours = totalTransit;
         this.lengthByMode = Collections.unmodifiableMap(byMode);
         this.totalCo2eKgPerTonne = totalCo2ePerTonne;
@@ -105,6 +117,21 @@ public final class MovementResult {
     /** Sum of transshipment connection hours. */
     public double totalConnectionHours() {
         return totalConnectionHours;
+    }
+
+    /** Sum of rail terminal hours. */
+    public double totalRailTerminalHours() {
+        return totalRailTerminalHours;
+    }
+
+    /** Sum of rail interchange hours. */
+    public double totalRailInterchangeHours() {
+        return totalRailInterchangeHours;
+    }
+
+    /** Sum of rail border-crossing hours. */
+    public double totalBorderHours() {
+        return totalBorderHours;
     }
 
     /** Modelled minimum hours across all legs. */
@@ -151,6 +178,9 @@ public final class MovementResult {
                 .setTotalPortHours(totalPortHours)
                 .setTotalOperationalAllowanceHours(totalOperationalAllowanceHours)
                 .setTotalConnectionHours(totalConnectionHours)
+                .setTotalRailTerminalHours(totalRailTerminalHours)
+                .setTotalRailInterchangeHours(totalRailInterchangeHours)
+                .setTotalBorderHours(totalBorderHours)
                 .setTotalTransitHours(totalTransitHours)
                 .setLegCount(legs.size())
                 .setTotalCo2eKgPerTonne(totalCo2eKgPerTonne)

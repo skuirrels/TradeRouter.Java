@@ -10,6 +10,9 @@ public final class MovementProperties {
     private double totalPortHours;
     private double totalOperationalAllowanceHours;
     private double totalConnectionHours;
+    private double totalRailTerminalHours;
+    private double totalRailInterchangeHours;
+    private double totalBorderHours;
     private double totalTransitHours;
     private int legCount;
     private double totalCo2eKgPerTonne;
@@ -80,6 +83,39 @@ public final class MovementProperties {
     /** Sets the total connection hours. */
     public MovementProperties setTotalConnectionHours(double totalConnectionHours) {
         this.totalConnectionHours = totalConnectionHours;
+        return this;
+    }
+
+    /** Sum of rail terminal hours. */
+    public double getTotalRailTerminalHours() {
+        return totalRailTerminalHours;
+    }
+
+    /** Sets the total rail terminal hours. */
+    public MovementProperties setTotalRailTerminalHours(double totalRailTerminalHours) {
+        this.totalRailTerminalHours = totalRailTerminalHours;
+        return this;
+    }
+
+    /** Sum of rail interchange hours. */
+    public double getTotalRailInterchangeHours() {
+        return totalRailInterchangeHours;
+    }
+
+    /** Sets the total rail interchange hours. */
+    public MovementProperties setTotalRailInterchangeHours(double totalRailInterchangeHours) {
+        this.totalRailInterchangeHours = totalRailInterchangeHours;
+        return this;
+    }
+
+    /** Sum of rail border-crossing hours. */
+    public double getTotalBorderHours() {
+        return totalBorderHours;
+    }
+
+    /** Sets the total border hours. */
+    public MovementProperties setTotalBorderHours(double totalBorderHours) {
+        this.totalBorderHours = totalBorderHours;
         return this;
     }
 

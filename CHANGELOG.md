@@ -2,6 +2,33 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.5.0, 2.6.0 and 2.6.1 at `8211bc4`.
+
+### Location resolution
+
+- A code whose port-list records are duplicated no longer throws in movements, `locate` or port-to-port `calculate`. Resolution takes the record nearest the code's UN/LOCODE position, or, without one, the terminal record when the records lie within 50 km of each other. Twelve codes had no UN/LOCODE position and threw `IllegalStateException` for every mode, including Nhava Sheva (`INNSA`), Davao (`PHDVO`) and Palembang (`IDPLM`). Port-to-port `calculate` also threw for the 26 duplicated codes that do have a position, such as Vancouver (`CAVAN`). A code whose records lie further apart, with no UN/LOCODE position, now throws `IllegalArgumentException` rather than `IllegalStateException`.
+- A code that UN/LOCODE lists without a position no longer falls back to a port-list record for a different place. With no position to compare, the names must agree, allowing for spelling variants such as Haerbin and Harbin. Latrobe (`USLBE`) had resolved to Laguna Beach, California, and Madison (`USMDN`) to Mandan, North Dakota. 27 codes now throw an `IllegalArgumentException` naming both places, 21 of them in the United States. Shantou (`CNSWA`) and Wuxi (`CNWUX`) are among them, because UN/LOCODE files those codes as airports; the ports are `CNSTG` and `CNWXS`.
+- A code no longer resolves to a same-named port-list entry more than 50 km from its UN/LOCODE position; the UN/LOCODE position wins. The port list had filed namesakes under 277 codes over 100 km away, 194 of them in the United States, so Pittsburgh (`USPIT`) resolved to Pilottown, Louisiana, Phoenix (`USPHX`) to Louisiana, Nashville (`USBNA`) and Birmingham (`USBHM`) to Michigan, and Monterrey (`MXMTY`) to Chiapas. Rail legs to those codes now route to the right city. The resolved `port()` is null for these codes. Port-to-port `calculate` still uses the port list and is unchanged.
+- 31 codes whose UN/LOCODE or GeoNames position was wrong where the port list was right are corrected from the World Port Index or GeoNames, so they keep resolving to the port list: for example Pago Pago (`ASPPG`), High Point (`USHPZ`) and Rafina (`GRRAF`).
+
+### Location data
+
+- Tanger Med (`MAPTM`) has a coordinate, so movements can name it by code. Port-to-port `calculate("MAPTM", ...)` still needs coordinates, because the port list lacks it.
+- Montreal (`CAMTR`) is a rail terminal in the rail supplement and gains a UN/LOCODE coordinate at the port; the port list still places it for movements, so routes are unchanged.
+- 414 more sea ports have coordinates, from the NGA World Port Index, Wikidata and GeoNames, built by `tools/fill-sea-port-coordinates.py` from pinned sources. 3,885 codes still have no position.
+
+### Rail timing
+
+- Rail legs can carry time allowances on top of distance divided by speed, reported in `transit_hours`: `MovementRequest.setRailOriginTerminalHours` and `setRailDestinationTerminalHours` for terminal dwell, `setRailInterchangeHours` for each interchange between Class I railroads, and `setRailBorderCrossingHours` for each crossing of the US–Canada or US–Mexico border. All default to zero, so rail times are unchanged unless a request sets them. Negative or non-finite values are rejected.
+- Rail legs report `rail_terminal_hours`, `rail_interchanges`, `rail_interchange_hours`, `border_crossings` and `border_hours`, and movements report `total_rail_terminal_hours`, `total_rail_interchange_hours` and `total_border_hours`. The same figures are on `LegResult` and `MovementResult`, and the text summary names them when a request sets them.
+- Interchanges are estimated by `RailServiceAllowance.countClassIInterchanges` as the number of Class I railroads owning at least 1,000 km of a routed leg, less one. `MovementRequest.getRailInterchangeCounts()` sets the count for a leg when it is known, including great-circle and supplied rail legs. Border crossings are counted from the UN/LOCODE country of each end.
+
+### Rail terminals
+
+- 77 more codes are rail terminals in the rail supplement, 97 in all: 44 more US terminals, 21 Canadian hubs and US suburban ramps, 11 Mexican terminals and Montreal. Each cites a page naming the terminal. They can now be named as stations and joined by rail legs without `addLocationFunctions`.
+
 ## [2.4.0] - 2026-10-29
 
 Ported from TradeRouter.Net 2.3.0 and 2.4.0 at `aa137e1`.

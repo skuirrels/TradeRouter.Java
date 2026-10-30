@@ -29,6 +29,11 @@ public final class MovementRequest {
     private double portDwellHours = 24.0;
     private Double seaOperationalAllowance;
     private double transshipmentConnectionHours = 48.0;
+    private double railOriginTerminalHours;
+    private double railDestinationTerminalHours;
+    private double railInterchangeHours;
+    private final Map<Integer, Integer> railInterchangeCounts = new TreeMap<>();
+    private double railBorderCrossingHours;
     private final Map<TransportMode, Double> speedsKmh = new EnumMap<>(TransportMode.class);
     private RoadRouteProvider roadRouteProvider;
     private RailRoutingMode railRoutingMode = RailRoutingMode.PREFER_NETWORK_THEN_GREAT_CIRCLE;
@@ -224,6 +229,83 @@ public final class MovementRequest {
     /** Sets the transshipment connection hours. */
     public MovementRequest setTransshipmentConnectionHours(double transshipmentConnectionHours) {
         this.transshipmentConnectionHours = transshipmentConnectionHours;
+        return this;
+    }
+
+    /**
+     * Hours added to every rail leg for the wait at its origin terminal: loading or ramp dwell before the train
+     * departs. The default is zero, which keeps rail time as distance divided by speed. Reported in the leg's
+     * rail terminal hours together with {@link #getRailDestinationTerminalHours()}.
+     */
+    public double getRailOriginTerminalHours() {
+        return railOriginTerminalHours;
+    }
+
+    /** Sets the rail origin terminal hours. */
+    public MovementRequest setRailOriginTerminalHours(double railOriginTerminalHours) {
+        this.railOriginTerminalHours = railOriginTerminalHours;
+        return this;
+    }
+
+    /**
+     * Hours added to every rail leg for the wait at its destination terminal: arrival, unloading or ramp dwell
+     * before the cargo is available. The default is zero.
+     */
+    public double getRailDestinationTerminalHours() {
+        return railDestinationTerminalHours;
+    }
+
+    /** Sets the rail destination terminal hours. */
+    public MovementRequest setRailDestinationTerminalHours(double railDestinationTerminalHours) {
+        this.railDestinationTerminalHours = railDestinationTerminalHours;
+        return this;
+    }
+
+    /**
+     * Hours added for each interchange between Class I railroads on a rail leg. The count comes from
+     * {@link #getRailInterchangeCounts()} when set for the leg, otherwise it is estimated from the track owners
+     * along a leg routed on the embedded network by {@link RailServiceAllowance#countClassIInterchanges}. The
+     * estimate is approximate, because the network names track owners rather than train operators. Great-circle
+     * and supplied rail legs have no routed path and receive no interchange time unless a count is set. The
+     * default is zero.
+     */
+    public double getRailInterchangeHours() {
+        return railInterchangeHours;
+    }
+
+    /** Sets the hours per rail interchange. */
+    public MovementRequest setRailInterchangeHours(double railInterchangeHours) {
+        this.railInterchangeHours = railInterchangeHours;
+        return this;
+    }
+
+    /**
+     * Interchange counts keyed by one-based rail leg sequence, used instead of the estimate from the routed path.
+     * Use it when the railroads that carry the leg are known, for example 0 for a single-line Class I move. The
+     * map is live and may be modified.
+     */
+    public Map<Integer, Integer> getRailInterchangeCounts() {
+        return railInterchangeCounts;
+    }
+
+    /** Sets the interchange count for a one-based rail leg sequence. */
+    public MovementRequest putRailInterchangeCount(int sequence, int count) {
+        railInterchangeCounts.put(sequence, count);
+        return this;
+    }
+
+    /**
+     * Hours added for each crossing of the US–Canada or US–Mexico border by a rail leg, counted from the
+     * UN/LOCODE country of each end by {@link RailServiceAllowance#countBorderCrossings}. A leg whose end has no
+     * UN/LOCODE-shaped code receives none. The default is zero.
+     */
+    public double getRailBorderCrossingHours() {
+        return railBorderCrossingHours;
+    }
+
+    /** Sets the hours per rail border crossing. */
+    public MovementRequest setRailBorderCrossingHours(double railBorderCrossingHours) {
+        this.railBorderCrossingHours = railBorderCrossingHours;
         return this;
     }
 

@@ -21,6 +21,7 @@ import io.github.skuirrels.traderouter.movements.LocationResolver;
 import io.github.skuirrels.traderouter.movements.MovementLeg;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
+import io.github.skuirrels.traderouter.movements.RailServiceAllowance;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
 import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
 import io.github.skuirrels.traderouter.movements.SeaServiceAllowance;
@@ -181,12 +182,53 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (portCode == null || portCode.isBlank()) {
             throw new IllegalArgumentException("Port code cannot be null or whitespace.");
         }
-        Port port = ports().getByCode(portCode);
+        String code = portCode.trim().toUpperCase(Locale.ROOT);
+        // UN/LOCODE is looked up only for duplicated codes, so a port-to-port route does not load the list.
+        Port port = selectPortRecord(code, () -> unLocodes().getByCode(code));
         if (port != null) {
             return port;
         }
-        String alias = lazyPortCodeAliases.get().get(portCode.trim().toUpperCase(Locale.ROOT));
-        return alias != null ? ports().getByCode(alias) : null;
+        String alias = lazyPortCodeAliases.get().get(code);
+        return alias != null ? selectPortRecord(alias, () -> unLocodes().getByCode(alias)) : null;
+    }
+
+    /**
+     * Picks the port-list record for a code. Some codes have more than one record: the one nearest the code's
+     * UN/LOCODE position is taken, or, when UN/LOCODE has no position, the first terminal record of a group lying
+     * within {@link #PORT_LIST_NAMESAKE_KM}, since that is one port listed twice, as Nhava Sheva and Jawaharlal
+     * Nehru Port are under INNSA.
+     *
+     * @param code     the upper-case code
+     * @param unLocode supplies the code's UN/LOCODE record, or null when it has none; called only for duplicated codes
+     */
+    private Port selectPortRecord(String code, Supplier<UnLocode> unLocode) {
+        List<Port> candidates = ports().getByCodeCandidates(code);
+        if (candidates.size() <= 1) {
+            return candidates.isEmpty() ? null : candidates.get(0);
+        }
+        UnLocode listed = unLocode.get();
+        if (listed != null && listed.coordinate() != null) {
+            return ports().getByCode(code, listed.coordinate());
+        }
+
+        double spread = 0.0;
+        for (Port a : candidates) {
+            for (Port b : candidates) {
+                spread = Math.max(spread, Haversine.distanceKm(a.coordinate(), b.coordinate()));
+            }
+        }
+        if (spread > PORT_LIST_NAMESAKE_KM) {
+            throw new IllegalArgumentException(String.format(Locale.ROOT,
+                    "Port code '%s' has %d port-list records up to %,.0f km apart, and UN/LOCODE publishes no position "
+                            + "to choose between them. Supply the location as a coordinate.",
+                    code, candidates.size(), spread));
+        }
+        for (Port candidate : candidates) {
+            if (candidate.isTerminal()) {
+                return candidate;
+            }
+        }
+        return candidates.get(0);
     }
 
     @Override
@@ -437,10 +479,27 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                 properties.setOperationalAllowanceHours(0.0);
             }
             properties.setConnectionHours(followsSeaLeg ? request.getTransshipmentConnectionHours() : 0.0);
+            double railAllowanceHours = 0.0;
+            if (leg.mode() == TransportMode.RAIL) {
+                int crossings = RailServiceAllowance.countBorderCrossings(RailLegs.countryOf(from), RailLegs.countryOf(to));
+                Integer interchanges = request.getRailInterchangeCounts().get(sequence);
+                if (interchanges != null) {
+                    properties.setRailInterchanges(interchanges);
+                }
+                int interchangeCount = properties.getRailInterchanges() != null ? properties.getRailInterchanges() : 0;
+                properties.setRailTerminalHours(request.getRailOriginTerminalHours() + request.getRailDestinationTerminalHours());
+                properties.setRailInterchangeHours(interchangeCount * request.getRailInterchangeHours());
+                properties.setBorderCrossings(crossings);
+                properties.setBorderHours(crossings * request.getRailBorderCrossingHours());
+                railAllowanceHours = properties.getRailTerminalHours()
+                        + properties.getRailInterchangeHours()
+                        + properties.getBorderHours();
+            }
             properties.setTransitHours(properties.getDurationHours()
                     + properties.getPortHours()
                     + properties.getOperationalAllowanceHours()
-                    + properties.getConnectionHours());
+                    + properties.getConnectionHours()
+                    + railAllowanceHours);
             boolean northAmericanRail = leg.mode() == TransportMode.RAIL
                     && RailLegs.isNorthAmerican(from, to, request, railGraph());
             applyEmissions(feature, leg, units, request, northAmericanRail);
@@ -577,7 +636,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
     /**
      * Resolution order: an explicit coordinate on the location; {@link MovementRequest#getCoordinates()}; the
      * embedded port list when UN/LOCODE agrees it is the same place; the UN/LOCODE list when it carries
-     * coordinates; the port list otherwise; then {@link MovementRequest#getResolver()}.
+     * coordinates; the port list otherwise, unless UN/LOCODE names a different place; then
+     * {@link MovementRequest#getResolver()}.
      */
     private ResolvedLocation resolveUncached(Location location, MovementRequest request) {
         if (location.coordinate() != null) {
@@ -623,13 +683,15 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
     private ResolvedLocation resolveCode(String code, LocationResolver resolver) {
         UnLocode unLocode = unLocodes().getByCode(code);
-        Port port = unLocode != null && unLocode.coordinate() != null
-                ? ports().getByCode(code, unLocode.coordinate())
-                : ports().getByCode(code);
+        Port port = selectPortRecord(code, () -> unLocode);
 
         // The port list has positions tuned to the lane network, so it wins when UN/LOCODE agrees on the name.
         // When the names disagree (the port list's CNSHG is Sanshan, UN/LOCODE's is Shanghai Pt) UN/LOCODE wins.
-        if (port != null && (unLocode == null || namesAgree(port.name(), unLocode.name()))) {
+        // It also wins when the port list puts a same-named place far from the UN/LOCODE position: that is a
+        // namesake filed under the code, such as the port list's USPIT, Pilottown in Louisiana, not Pittsburgh.
+        if (port != null && (unLocode == null || namesAgree(port.name(), unLocode.name()))
+                && (unLocode == null || unLocode.coordinate() == null
+                        || Haversine.distanceKm(port.coordinate(), unLocode.coordinate()) <= PORT_LIST_NAMESAKE_KM)) {
             return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
                     unLocode != null ? unLocode.functions() : SEA_PORT_ONLY);
         }
@@ -638,7 +700,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             return new ResolvedLocation(code, unLocode.name(), unLocode.coordinate(), null, "unlocode", unLocode.functions());
         }
 
-        if (port != null) {
+        // With no UN/LOCODE position to measure against, the name is the only evidence that the port list's record is
+        // the place UN/LOCODE files under the code: the port list's USLBE is Laguna Beach, UN/LOCODE's is Latrobe.
+        boolean portIsNamesake = port != null && unLocode != null && !namesProbablyAgree(port.name(), unLocode.name());
+        if (port != null && !portIsNamesake) {
             return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
                     unLocode != null ? unLocode.functions() : SEA_PORT_ONLY);
         }
@@ -655,8 +720,18 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                 ? "UN/LOCODE knows '" + code + "' as " + unLocode.name() + " (" + describeFunctions(unLocode.functions())
                         + ") but publishes no coordinates for it."
                 : "Location '" + code + "' is in neither the embedded port list nor the UN/LOCODE list.";
+        if (portIsNamesake) {
+            known += " The port list's " + code + ", " + port.name() + ", is a different place.";
+        }
         throw new IllegalArgumentException(known + " Add its coordinate to MovementRequest.getCoordinates() or supply a LocationResolver.");
     }
+
+    /**
+     * How far a same-named port-list position may lie from the code's UN/LOCODE position and still be taken as the
+     * same place. A harbour can sit some way from the town UN/LOCODE places, as Cabo Negro (CLCNX) does at 49 km,
+     * but a port-list entry further away than this is a namesake filed under the code.
+     */
+    private static final double PORT_LIST_NAMESAKE_KM = 50.0;
 
     private static boolean namesAgree(String portName, String unLocodeName) {
         String a = normaliseName(portName);
@@ -677,6 +752,86 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * A looser test than {@link #namesAgree}, for when no position can confirm the match. Ignoring words such as
+     * Port, Terminal and Saint, the names agree when one contains the other or they differ by a spelling variant, as
+     * Haerbin and Harbin or Nikolaevsk and Nikolayevsk do. Laguna Beach and Latrobe do not.
+     */
+    private static boolean namesProbablyAgree(String portName, String unLocodeName) {
+        if (namesAgree(portName, unLocodeName)) {
+            return true;
+        }
+        List<String> a = nameWords(portName);
+        List<String> b = nameWords(unLocodeName);
+        String joinedA = String.join("", a);
+        String joinedB = String.join("", b);
+        if (Math.min(joinedA.length(), joinedB.length()) >= 4
+                && (joinedA.contains(joinedB) || joinedB.contains(joinedA) || spellingVariants(joinedA, joinedB))) {
+            return true;
+        }
+        for (String x : a) {
+            for (String y : b) {
+                if (spellingVariants(x, y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static final Set<String> GENERIC_NAME_WORDS = Set.of(
+            "terminal", "marine", "port", "pt", "puerto", "harbour", "harbor", "havn", "oil", "apt", "airport",
+            "international", "intl", "island", "pulau", "refinery", "east", "west", "north", "south", "new",
+            "saint", "st", "de", "la", "the", "on", "na");
+
+    private static List<String> nameWords(String name) {
+        List<String> words = new ArrayList<>();
+        StringBuilder word = new StringBuilder();
+        String decomposed = Normalizer.normalize(name, Normalizer.Form.NFD);
+        for (int i = 0; i < decomposed.length(); i++) {
+            char c = decomposed.charAt(i);
+            if (Character.isLetter(c)) {
+                word.append(Character.toLowerCase(c));
+            } else if (c == '\'' || c == '\u2019' || Character.getType(c) == Character.NON_SPACING_MARK) {
+                continue;
+            } else if (word.length() > 0) {
+                words.add(word.toString());
+                word.setLength(0);
+            }
+        }
+        if (word.length() > 0) {
+            words.add(word.toString());
+        }
+        words.removeIf(GENERIC_NAME_WORDS::contains);
+        return words;
+    }
+
+    /** Words of at least four letters within one edit per four letters of the shorter. */
+    private static boolean spellingVariants(String a, String b) {
+        int shorter = Math.min(a.length(), b.length());
+        int allowed = Math.max(1, shorter / 4);
+        return shorter >= 4 && editDistance(a, b) <= allowed;
+    }
+
+    private static int editDistance(String a, String b) {
+        int[] previous = new int[b.length() + 1];
+        int[] current = new int[b.length() + 1];
+        for (int j = 0; j <= b.length(); j++) {
+            previous[j] = j;
+        }
+        for (int i = 1; i <= a.length(); i++) {
+            current[0] = i;
+            for (int j = 1; j <= b.length(); j++) {
+                current[j] = Math.min(Math.min(previous[j] + 1, current[j - 1] + 1),
+                        previous[j - 1] + (a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1));
+            }
+            int[] swap = previous;
+            previous = current;
+            current = swap;
+        }
+        return previous[b.length()];
     }
 
     private static String describeFunctions(Set<LocationFunction> functions) {
@@ -759,6 +914,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     "Transshipment connection time must be finite and non-negative. Received: "
                             + request.getTransshipmentConnectionHours());
         }
+        validateHours(request.getRailOriginTerminalHours(), "Rail origin terminal time");
+        validateHours(request.getRailDestinationTerminalHours(), "Rail destination terminal time");
+        validateHours(request.getRailInterchangeHours(), "Rail interchange time");
+        validateHours(request.getRailBorderCrossingHours(), "Rail border-crossing time");
         if (request.getSpeedsKmh().containsKey(TransportMode.SEA)) {
             throw new IllegalArgumentException(
                     "Sea speed is taken from SeaOptions.getSpeedKnots(); remove the SEA entry from getSpeedsKmh().");
@@ -812,6 +971,22 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
         RoadLegs.validateOverrides(request, request.getRoadRouteOverrides(), TransportMode.ROAD);
         RoadLegs.validateOverrides(request, request.getRailRouteOverrides(), TransportMode.RAIL);
+        for (Map.Entry<Integer, Integer> entry : request.getRailInterchangeCounts().entrySet()) {
+            Integer sequence = entry.getKey();
+            if (sequence == null || sequence < 1 || sequence > legs.size() || legs.get(sequence - 1).mode() != TransportMode.RAIL) {
+                throw new IllegalArgumentException("Rail interchange count sequence " + sequence + " does not refer to a rail leg.");
+            }
+            if (entry.getValue() == null || entry.getValue() < 0) {
+                throw new IllegalArgumentException(
+                        "Rail interchange count for leg " + sequence + " must be non-negative. Received: " + entry.getValue());
+            }
+        }
+    }
+
+    private static void validateHours(double value, String description) {
+        if (!Double.isFinite(value) || value < 0) {
+            throw new IllegalArgumentException(description + " must be finite and non-negative. Received: " + value);
+        }
     }
 
     private static void validatePositiveOptional(Double value, String name) {

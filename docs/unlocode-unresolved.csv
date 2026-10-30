@@ -23,16 +23,11 @@ AOSOQ,Soyo-Quinfuquena Terminal,conflicting or missing match,12196068
 AOTAK,Takula Terminal,no explicit link,
 ARATU,Atucha,conflicting or missing match,3433312
 ARCLX,Clorinda,conflicting or missing match,3435365
-ARCRD,Comodoro Rivadavia,conflicting or missing match,3860443;11525598
 ARCOC,Concordia,conflicting or missing match,3435261;11525586
-ARCUA,Cuatreros/Bahia Blanca,conflicting or missing match,3855120
 ARAEP,Jorge Newbury Apt/Buenos Aires,conflicting or missing match,6301847
 ARMDX,Mercedes,conflicting or missing match,7730769
 ARMJR,Miramar,conflicting or missing match,3430669
 ARXOS,Mosconi,conflicting or missing match,3855116;6300559
-ARPBG,Puerto Belgrano/Bahia Blanca,conflicting or missing match,3840114;11525567
-ARPGV,Puerto Galvan/Bahia Blanca,conflicting or missing match,3840099
-ARPNL,Puerto Nacional/Bahia Blanca,no explicit link,
 ARRAM,Ramallo,conflicting or missing match,3839444;11525583
 ARRDS,Rincon de los Sauces,conflicting or missing match,7730147
 ARSLO,San Lorenzo,conflicting or missing match,3837097;11525591
@@ -116,7 +111,6 @@ AUGLM,Glenormiston,conflicting or missing match,7731061
 AUGOI,Goods Is,conflicting or missing match,2165034
 AUGDD,Gordon Downs,conflicting or missing match,7731045
 AUGTS,Granites,conflicting or missing match,2060380
-AUGRH,Greenhead,no explicit link,
 AUGVP,Greenvale,conflicting or missing match,7731079
 AUGGD,Gregory Downs,conflicting or missing match,7731053
 AUGDF,Guildford,conflicting or missing match,9972700
@@ -192,7 +186,6 @@ AUORS,Orpheus Island Resort,conflicting or missing match,8299176
 AUOSB,Osborne Island,no explicit link,
 AUPDE,Pandie Pandie,conflicting or missing match,7731391
 AUPRD,Pardoo,conflicting or missing match,7731411
-AUPAE,Port Adelaide,conflicting or missing match,2063059;11886621
 AUPBY,Port Bonython,conflicting or missing match,2078464;8615497
 AUPHJ,Port Hunter,conflicting or missing match,8850986
 AUPJK,Port Jackson,no explicit link,
@@ -201,7 +194,6 @@ AUPLO,Port Lincoln,conflicting or missing match,2063036;11876723
 AUPSY,Port Stanley,no explicit link,
 AUPST,Port Stanvac,no explicit link,
 AUPWL,Port Walcott,no explicit link,
-AUPWR,Port Warrender,no explicit link,
 AUPRB,Proper Bay,no explicit link,
 AURCM,Richmond,conflicting or missing match,7668764
 AUROH,Robinhood,conflicting or missing match,7731466
@@ -243,7 +235,6 @@ AUWNT,Wandoo Terminal,no explicit link,
 AUWRW,Warrawagine,conflicting or missing match,7731627
 AUWLO,Waterloo,conflicting or missing match,7731622
 AUWAN,Waverney,conflicting or missing match,8298988
-AUWEP,Westernport,conflicting or missing match,2144001;8194011
 AUWIN,Winton,conflicting or missing match,7730281
 AUVIT,Wishart,no explicit link,
 AUWON,Wondoola,conflicting or missing match,8298892
@@ -274,13 +265,8 @@ BGZLA,Zlatarevo,conflicting or missing match,725299
 BJCOO,Cotonou,conflicting or missing match,2394819;11876775
 BJSEM,Seme Terminal,no explicit link,
 BNLUM,Lumut,conflicting or missing match,1820422
-BSASD,"Andros Town, Andros Island",conflicting or missing match,3572907
-BSCCZ,"Chub Cay, Berry Islands",conflicting or missing match,3572652
 BSCRI,Crooked Island,conflicting or missing match,8030545
-BSELE,Eleuthera Island,conflicting or missing match,3571777
 BSFPO,"Freeport, Grand Bahama",conflicting or missing match,3572375
-BSGGT,"George Town, Great Exuma Island",conflicting or missing match,6299937
-BSGHB,"Governors Harbour, Eleuthera",conflicting or missing match,7730118
 BSGBI,Grand Bahama,conflicting or missing match,8030546
 BSNMC,Norman's Cay,conflicting or missing match,3571801
 BSWZY,Seaplane Base,no explicit link,
@@ -302,7 +288,6 @@ CAYDV,Bloodvein,conflicting or missing match,8520831
 CAYBO,Bobquinn Lake,conflicting or missing match,8555876
 CABCL,Bon Conseil,conflicting or missing match,6091439
 CAYBM,Bronson Creek,conflicting or missing match,8554808
-CABKN,Brooklyn,conflicting or missing match,6178460
 CABRT,Broughton Is,conflicting or missing match,6296303
 CAYBH,Bull Harbour,conflicting or missing match,8298728
 CABDT,Burdett,no explicit link,
@@ -312,8 +297,6 @@ CAYYC,Calgary Apt,conflicting or missing match,6296327
 CACPB,Campobello,conflicting or missing match,5914495
 CAYCJ,Cape-Saint-James,conflicting or missing match,5916297
 CACLT,Carleton,conflicting or missing match,6693777
-CASKI,Charlotte (Skidegate),conflicting or missing match,6148858
-CACHN,Chatham,conflicting or missing match,5920454
 CAYHR,Chevery,conflicting or missing match,7668125
 CACJH,Chilko Lake,conflicting or missing match,8260795
 CAYCN,Cochrane,conflicting or missing match,7668117
@@ -321,7 +304,6 @@ CACHS,Cohasset,no explicit link,
 CACLB,Colborne,conflicting or missing match,6111704
 CACFL,Cooper Cliff,no explicit link,
 CACWI,Cornwallis Is,no explicit link,
-CACSC,Cote-Sainte-Catherine,no explicit link,
 CACOH,Country Harbour,conflicting or missing match,5933199
 CAYXC,Cranbrook,conflicting or missing match,6296313
 CAYDN,Dauphin,conflicting or missing match,6301451
@@ -349,7 +331,6 @@ CAGDW,Goodwood,no explicit link,
 CAYGE,Gorge Harbor,no explicit link,
 CADAS,Great Bear Lake,conflicting or missing match,8533822
 CAYGN,Greenway Sound,conflicting or missing match,7910285
-CAGRS,Grindstone,no explicit link,
 CAGCA,Gros Cacouna,no explicit link,
 CAYHC,Hakai Pass,conflicting or missing match,8260824
 CAYHZ,Halifax Apt,conflicting or missing match,6296207
@@ -380,7 +361,6 @@ CAKWI,King William Is,no explicit link,
 CAYKE,Knee Lake,conflicting or missing match,8298690
 CAKOL,Kola,no explicit link,
 CAYLB,Lac Biche,conflicting or missing match,6028050
-CALAC,Lachine/Montreal,conflicting or missing match,6545041
 CAYLF,Laforges,conflicting or missing match,8260845
 CAYGL,La Grande,conflicting or missing match,6949250
 CAYAH,Lagrande 4,conflicting or missing match,6296152
@@ -398,7 +378,6 @@ CAYMC,Maricourt Airstrip,no explicit link,
 CAYTO,Metropolitan Area Apt/Toronto,conflicting or missing match,11549704
 CAYAV,Miners Bay,conflicting or missing match,8533174
 CAYMF,Montagne Harbor,no explicit link,
-CAMTR,Montreal,conflicting or missing match,6077243;11876668
 CAYUL,Montreal-Dorval Apt,conflicting or missing match,6296296
 CAYML,Murray Bay,conflicting or missing match,6296232
 CAMSA,Muskrat Dam,conflicting or missing match,7668162
@@ -417,8 +396,6 @@ CAYUF,Pelly Bay,conflicting or missing match,6301441
 CAZPO,Pine House,conflicting or missing match,8260884
 CAPPC,Pointe au Pic,no explicit link,
 CAESX,Point-Escuminac,no explicit link,
-CAPOA,Port Arthur,no explicit link,
-CAPMO,Port Moody/Vancouver,no explicit link,
 CAQUE,Quebec,conflicting or missing match,6325494;11886671
 CAYQB,Quebec Apt,conflicting or missing match,6301472
 CAQUL,Quliqura,no explicit link,
@@ -486,7 +463,6 @@ CHLUG,Lugano,conflicting or missing match,2659836;8436732
 CHOHI,Oberhasli,conflicting or missing match,6458842
 CHXXX,RIS Inland waterways,no explicit link,
 CIAFI,Amalfi,no explicit link,
-CKMOI,Mitiaro Island,conflicting or missing match,4035642
 CLPPD,Punta Padrones,no explicit link,
 CMKOL,Kole Terminal,no explicit link,
 CMKBI,Kribi,conflicting or missing match,9256332
@@ -542,7 +518,6 @@ CNFUO,Foshan Apt,conflicting or missing match,8299063
 CNFRT,Foshan New Pt,conflicting or missing match,11524246
 CNFYX,Fuyang Xiguan Apt,conflicting or missing match,7910485
 CNFOC,Fuzhou Changle International Apt,conflicting or missing match,6301381;11494342;12196022
-CNFZG,Fuzhou Pt,conflicting or missing match,2037423
 CNFZX,Fuzhouxingang,no explicit link,
 CNGQD,Ganqmod,no explicit link,
 CNKOW,Ganzhou Huangjin Apt,conflicting or missing match,6301382
@@ -555,7 +530,6 @@ CNGUZ,Guangzhoudong Railway Station,no explicit link,
 CNGCL,Guchengli,no explicit link,
 CNKWL,Guilin Liangjiang International Apt,conflicting or missing match,6301362
 CNKWE,Guiyang Longdongbao International Apt,conflicting or missing match,6301391
-CNXMH,"Haicang, Xiamen",conflicting or missing match,6607668
 CNHDN,Haidian,no explicit link,
 CNHGN,Haigeng,no explicit link,
 CNHAK,Haikou Meilan International Apt,conflicting or missing match,6453422
@@ -577,7 +551,6 @@ CNHNS,Huanshi,no explicit link,
 CNHQG,Huiqiang,no explicit link,
 CNHLD,Hulunbuir Hailar Apt,conflicting or missing match,7668789
 CNHUP,Huo Pt,no explicit link,
-CNJMS,Jiamusi Pt,conflicting or missing match,2036581
 CNJAN,Jiangan Railway Station,no explicit link,
 CNJGJ,Jiangjin,conflicting or missing match,1805798
 CNJSU,Jiangsiu,conflicting or missing match,1806260
@@ -593,7 +566,6 @@ CNJNH,Jinhaian,no explicit link,
 CNJII,Jining,no explicit link,
 CNJJI,Jinjiang,no explicit link,
 CNJPI,Jinpai,no explicit link,
-CNJLP,Jiulongpo Pt,conflicting or missing match,1805144
 CNJZU,Jiuzhou Pt,conflicting or missing match,11494321
 CNKZG,Kangzhou Pt,no explicit link,
 CNKHG,Kashi Apt,conflicting or missing match,6301394
@@ -638,7 +610,6 @@ CNMDG,Mudanjiang,conflicting or missing match,7668814
 CNMZT,Muzhaerte,no explicit link,
 CNKHN,Nanchang Changbei International Apt,conflicting or missing match,6301380
 CNNKG,Nanjing Lukou International Apt,conflicting or missing match,6301384
-CNNJG,Nanjing Pt,conflicting or missing match,1796341
 CNNIG,Nanning Pt,no explicit link,
 CNNNG,Nanning Wuxu International Apt,conflicting or missing match,6301363
 CNNSY,Nianshanyapojiao,no explicit link,
@@ -647,10 +618,8 @@ CNNGB,Ningbo Lishe International Apt,conflicting or missing match,7668805
 CNLZY,Nyingchi,conflicting or missing match,7730303
 CNPZI,Panzhihua,conflicting or missing match,7910215
 CNPHN,Pinghu'Nan,no explicit link,
-CNPDX,Pudongxinqu Pt,conflicting or missing match,1814826
 CNIQM,Qiemo Apt,conflicting or missing match,7668810
 CNTAO,Qingdao Jiaodong International Apt,conflicting or missing match,6301387
-CNQDG,Qingdao Pt,conflicting or missing match,1547845
 CNQSE,Qingshuihe/Shenzhen,no explicit link,
 CNIQN,Qingyang Xifengzhen Apt,conflicting or missing match,7730289
 CNQZH,Qinzhou,conflicting or missing match,1797551;11494319
@@ -662,7 +631,6 @@ CNRCH,Rongcheng,no explicit link,
 CNRUG,Rugao,conflicting or missing match,1797069
 CNRJN,Runjiang,conflicting or missing match,1798008
 CNSBM,Sanbaimen,no explicit link,
-CNSBU,Sanbu Pt,conflicting or missing match,1789211
 CNNHS,Sanshan pt,no explicit link,
 CNSYX,Sanya,conflicting or missing match,6301369
 CNSAL,Shalingzhuang,no explicit link,
@@ -680,9 +648,7 @@ CNSIP,Shiqu Pt,no explicit link,
 CNSFE,Suifenhe Railway Station,no explicit link,
 CNSGG,Suijiang,conflicting or missing match,6648024
 CNWUX,Sunan Shuofang International Apt,conflicting or missing match,7668806
-CNSZG,Suzhou Pt,no explicit link,
 CNTYN,Taiyuan Wusu International Apt,conflicting or missing match,6301357
-CNTAZ,Taizhou Pt,conflicting or missing match,11903590
 CNTKK,Taykexkin,no explicit link,
 CNTBS,Tianjinbaoshuiqu,no explicit link,
 CNTSN,Tianjin Binhai International Apt,conflicting or missing match,6301356
@@ -691,8 +657,6 @@ CNTJD,Tuojidao,no explicit link,
 CNCIF,Ulanhad Tuchengcity Apt,conflicting or missing match,2048157
 CNHLH,Ulan Hot Apt,conflicting or missing match,7731089
 CNURC,Urumqi Diwobao International Apt,conflicting or missing match,6301396
-CNWGQ,Waigaoqiao Pt,conflicting or missing match,7845618;12196205
-CNWAX,Wanxian,conflicting or missing match,1791748;11494353
 CNWZH,Wanzhou,conflicting or missing match,8403617
 CNWEH,Weihai Dashuipo Apt,conflicting or missing match,7730298
 CNWJD,Wenjindu,no explicit link,
@@ -718,7 +682,6 @@ CNXUI,Xuhuiqu,no explicit link,
 CNXUZ,Xuzhou Guanyin Apt,conflicting or missing match,8505071;10630003
 CNYNZ,Yancheng,conflicting or missing match,7731646
 CNYPE,Yangpeng,no explicit link,
-CNYSA,Yangshan,no explicit link,
 CNYGG,Yanguan,conflicting or missing match,1787531
 CNYXT,Yangxifengtou,no explicit link,
 CNYNJ,Yanji Chaoyangchuan Apt,conflicting or missing match,7668815
@@ -742,7 +705,6 @@ CNZQN,Zhaoqing Railway Station,no explicit link,
 CNZAT,Zhaotong,conflicting or missing match,7731648
 CNZPK,Zhapoyouku,no explicit link,
 CNCGO,Zhengzhou Xinzheng International Apt,conflicting or missing match,6301367
-CNZHI,Zhenhai Pt,conflicting or missing match,1784525
 CNZOU,Zhenzhou,no explicit link,
 CNZXN,Zhongxian,no explicit link,
 CNZQJ,Zhouqujia,no explicit link,
@@ -789,14 +751,12 @@ DETXL,Berlin-Tegel Apt,conflicting or missing match,3208806
 DEBRF,Brebach-Fechingen,no explicit link,
 DETLD,Bresteland,no explicit link,
 DEBUH,Burbach/Siegen,conflicting or missing match,2941595
-DEBSK,Burgstaaken/Fehmarn,conflicting or missing match,2941154
 DECLE,Cable,no explicit link,
 DECHI,Chiemsee,conflicting or missing match,2913942
 DEECH,Eching/Freising,conflicting or missing match,2933799
 DEEHR,Ehringshausen/Lahn-Dill,conflicting or missing match,2932788
 DEEEU,Elfershausen,no explicit link,
 DEERB,Erbach/Odenwald,conflicting or missing match,2929802
-DEESF,Estorf/Weser,conflicting or missing match,2928712
 DEGEM,Gemunden,conflicting or missing match,2921379
 DEGNE,Gernrode/Harz,conflicting or missing match,2920999
 DEGLD,Goeland,no explicit link,
@@ -817,7 +777,6 @@ DECCC,Leimbach,no explicit link,
 DELLD,Leinefelde,conflicting or missing match,2879193
 DELKE,Linken,no explicit link,
 DELKH,Linkenheim,conflicting or missing match,3272461
-DELIS,List/Sylt,conflicting or missing match,2876837
 DELUG,Ludwigsburg,no explicit link,
 DEMAX,Maxdorf/Pfalz,conflicting or missing match,2872686
 DENCH,Nachrodt,conflicting or missing match,2867252
@@ -829,9 +788,7 @@ DENFN,Niefern,conflicting or missing match,3206254
 DEOEA,Oelsa/Freital,no explicit link,
 DEORT,Orth/Fehmarn,conflicting or missing match,2857004
 DEOTL,Otzberg Lengfeld,no explicit link,
-DEPSW,Petershagen/Weser,conflicting or missing match,11524880
 DEREK,Reken,conflicting or missing match,2888344
-DERZB,Rettenbach / Gunzburg,conflicting or missing match,2848001
 DERHI,"Rheinau, Ortenaukreis",conflicting or missing match,3209262
 DERHT,Rhodt,conflicting or missing match,2847558
 DERDB,Rieden (Amberg-Sulzbach),conflicting or missing match,2847242
@@ -844,7 +801,6 @@ DESLH,Schopfloch/Freudenstadt,conflicting or missing match,2836409
 DESEH,Sehestedt/Eider,no explicit link,
 DESEP,Sostrop,no explicit link,
 DESPR,Sprendlingen/Rheinhessen,no explicit link,
-DESDD,"Steenodde, Amrum",conflicting or missing match,2829175
 DESTO,Stolberg/Harz,conflicting or missing match,2826594
 DESWA,Swisttal,conflicting or missing match,2928767
 DETHM,Thalheim/Erzgebirge,conflicting or missing match,2823081
@@ -903,15 +859,12 @@ DKSVV,Stalvalsevarket,no explicit link,
 DKSTT,Statoil-Havnen,no explicit link,
 DKSTG,Stignasvarkets Havn,no explicit link,
 DKSTN,Stigsnas,conflicting or missing match,3221881
-DKSTB,Strib Havn,no explicit link,
 DKSSV,Studstrupvarkets Havn,no explicit link,
 DKTBA,Taarbak,conflicting or missing match,2611867
 DKTRS,Tars,conflicting or missing match,9828957
-DKTUB,Tuborg,no explicit link,
 DKTNO,Tuno,conflicting or missing match,2611120
 DKVNG,Vang Havn,no explicit link,
 DKVEN,Veno Havn,no explicit link,
-DKVES,"Vestero Havn, Laso",conflicting or missing match,2610394
 DKVAS,Vigsnas,conflicting or missing match,2610275
 DOOCO,Ocoa Bay,no explicit link,
 DOPUO,Puerto Libertador,no explicit link,
@@ -933,10 +886,8 @@ EGGEI,Geisum Terminal,no explicit link,
 EGQGX,Gerga,no explicit link,
 EGHAM,Hamrawein,conflicting or missing match,356156
 EGMAH,Mersa El Hamra,conflicting or missing match,357888
-EGPIB,Port Ibrahim,conflicting or missing match,414030
 EGSKT,Sidi Kerir Terminal,conflicting or missing match,348359
 EGSIN,South Sinai (Ganoub Sinai),no explicit link,
-EGWAF,Wadi Feiran,no explicit link,
 ESADA,Aldea,conflicting or missing match,3130521
 ESADL,Aldea de los rios,no explicit link,
 ESALG,Algeciras,conflicting or missing match,2522013;8436022;9796219
@@ -959,7 +910,6 @@ ESGJI,Granja de San Idelfonso,no explicit link,
 ESGTA,Guantarajal,no explicit link,
 ESHDA,Horta de Avinyo,conflicting or missing match,3109796
 ESHDI,Hospitalet del Infant,conflicting or missing match,3120620
-ESHUV,Huelva,conflicting or missing match,2516548;9845502;11886625
 ESLJM,La Ametlla del Vall,no explicit link,
 ESLES,La Estaca,conflicting or missing match,2512195
 ESLMC,La Maruca,no explicit link,
@@ -967,7 +917,6 @@ ESMAT,La Matanza,no explicit link,
 ESLAN,Lanciego,no explicit link,
 ESRON,Lantaron,no explicit link,
 ESLPL,La Palma,conflicting or missing match,2511180
-ESTJI,La Tejita,no explicit link,
 ESVAD,La Vall d'Uxo,no explicit link,
 ESLSF,Les Franquesese,no explicit link,
 ESLRL,Los Rodeos la Laguna,conflicting or missing match,2514483
@@ -1012,7 +961,6 @@ ESVVR,Vivares,no explicit link,
 ETADD,Addis Ababa,conflicting or missing match,344979;6297257
 ETWAC,Waca,conflicting or missing match,7730596
 FIKIN,Grankulla (Kauniainen),conflicting or missing match,653559
-FIKUS,Gustavs (Kustavi),conflicting or missing match,649998
 FIHMY,Hameenlinna (Tavastehus),conflicting or missing match,659180
 FIHKO,Hango (Hanko),conflicting or missing match,659101
 FIHEL,Helsingfors (Helsinki),conflicting or missing match,658225;6956561;9828124
@@ -1022,17 +970,13 @@ FILHK,Luhtajoki,no explicit link,
 FISPK,Salpakangas,no explicit link,
 FISTR,Stromma,no explicit link,
 FIUUS,Uusi-Valamo/Heinavesi,no explicit link,
-FIVKO,Valko (Valkom),conflicting or missing match,632595
 FJBXL,Blue Lagoon,no explicit link,
 FJBVF,Bua,conflicting or missing match,2203651
 FJCST,Castaway,conflicting or missing match,2199530
 FKFBE,Fox Bay,conflicting or missing match,3831938
-FMTKK,Chuuk (ex Truk),conflicting or missing match,2081114;4042202;4042205
 FMFSI,Faisi,no explicit link,
 FMKSA,Kosrae (ex Kusaie),conflicting or missing match,2081169;2081694
-FMPNI,Pohnpei (ex Ponape),conflicting or missing match,2082097
 FOFAE,Faroo Islands-Vagar Apt,conflicting or missing match,2610818
-FOTOR,Torshavn,conflicting or missing match,9847694
 FOVID,Vadair,no explicit link,
 FRM3T,Montazeau,no explicit link,
 GAKGB,Kongobouma,no explicit link,
@@ -1075,7 +1019,6 @@ GBDSL,Disley,no explicit link,
 GBDNO,Donaghcloney,no explicit link,
 GBDNG,Donnington,no explicit link,
 GBDNT,Doonfoot,no explicit link,
-GBDUT,Drumintee,no explicit link,
 GBEMA,East Midlands Apt,conflicting or missing match,6296613
 GBESC,Eaton Socon,no explicit link,
 GBECH,Eccleshall,no explicit link,
@@ -1124,7 +1067,6 @@ GBLTL,Littlebrook,no explicit link,
 GBLHH,Little Heath,no explicit link,
 GBLDO,Llandudno,no explicit link,
 GBLGY,Loch Gelly,no explicit link,
-GBLCD,Loch Torridon,no explicit link,
 GBLOZ,Lode,no explicit link,
 GBLDY,Londonderry,conflicting or missing match,2643736;11886737
 GBLGN,Loughton,no explicit link,
@@ -1137,7 +1079,6 @@ GBLNE,Lyne,no explicit link,
 GBLYA,Lytham Saint Annes,conflicting or missing match,6693470
 GBMGH,Maghera,no explicit link,
 GBMDP,Market Deeping,no explicit link,
-GBMHT,Martlesham Heath,no explicit link,
 GBMTG,Matching Green,no explicit link,
 GBMEB,Menai Bridge,no explicit link,
 GBMDD,Middlefield Law,no explicit link,
@@ -1148,7 +1089,6 @@ GBMOE,Moulsoe,no explicit link,
 GBNEH,Neap House,no explicit link,
 GBNTP,Nether Poppleton,no explicit link,
 GBNDS,New Duston,no explicit link,
-GBNPT,Newport,conflicting or missing match,2641598;11886636
 GBNWO,Newton,conflicting or missing match,7294405
 GBOKM,Oakham,conflicting or missing match,6301526
 GBOAK,Oakhamness,no explicit link,
@@ -1157,7 +1097,6 @@ GBONH,Ongar Hill,no explicit link,
 GBPST,Parkeston Quay,no explicit link,
 GBPRH,Portland Harbour,no explicit link,
 GBPPE,Port Penrhyn,no explicit link,
-GBPTR,Portrush,no explicit link,
 GBOYL,Poyle,no explicit link,
 GBPYE,Poyle,no explicit link,
 GBPIT,Prittlewell,no explicit link,
@@ -1224,11 +1163,8 @@ GBWUF,Wolvey,no explicit link,
 GBWUG,Wooburn Green,no explicit link,
 GBWOH,Woodford Halse,no explicit link,
 GBWDA,Woodhall,no explicit link,
-GBYLL,Yelland,no explicit link,
-GBYKE,Yoker,no explicit link,
 GBYRK,York,conflicting or missing match,2641211
 GDGND,Grenada,conflicting or missing match,3579925
-GDHIL,"Hillsborough, Carriacou Is",no explicit link,
 GEBUS,Batumi,conflicting or missing match,615532;11361338
 GEPTI,Poti,conflicting or missing match,612366;858001
 GHAUR,Aura,no explicit link,
@@ -1240,7 +1176,6 @@ GLFHN,Kangerdluarssoruseg (Faringehavn,conflicting or missing match,3422635
 GLSFJ,Kangerlussuaq (Sondre Stromfjord,conflicting or missing match,3419714
 GLJGR,Kangilinguit (Gronnedal),conflicting or missing match,3423634
 GLJSU,Maniitsoq (Sukkertoppen),conflicting or missing match,3421982
-GLMRG,Mesters Vig,no explicit link,
 GLCNP,Neerlerit Inaat,conflicting or missing match,6295691
 GLJFR,Paamiut (Fredrikshaab),conflicting or missing match,3421193;6295695
 GLJJU,Qaqortoq (Julianehaab),conflicting or missing match,3420846;6295699
@@ -1267,19 +1202,15 @@ GRTKO,Thessi Kyrillo,no explicit link,
 GRTAL,Trachia Argolidas,no explicit link,
 GRTFP,Trachia Fafplio,no explicit link,
 GRYLI,Yali Island,no explicit link,
-GSLEH,Leith Harbour,no explicit link,
 GTSNJ,San Jose,conflicting or missing match,3589977
 GTTUC,Tecun Uman,conflicting or missing match,3588466
 GUAPR,Apra (Agana),conflicting or missing match,4043833
 GUDED,Dededo,conflicting or missing match,4043909
-GUGUM,Guam,conflicting or missing match,4043547
 GYBCG,Bemichi,conflicting or missing match,7730848
 GYKAI,Kaieteur,conflicting or missing match,7730145
 GYKKG,Konawaruk,conflicting or missing match,3377799
 GYLUB,Lumid Pau,conflicting or missing match,7731243
 GYVEG,Maikwak,conflicting or missing match,3377252
-HKTOL,Tolo Harbour,no explicit link,
-HKYUE,Yuen Long,conflicting or missing match,1818223
 HNENQ,Coronel E Soto Cano Ab,conflicting or missing match,6299819
 HNHNN,Henecan,no explicit link,
 HRXXX,RIS Inland waterways,no explicit link,
@@ -1292,7 +1223,6 @@ HUXXX,RIS Inland waterways,no explicit link,
 HUSPG,Sopron Gysev,no explicit link,
 IDADB,Adang Bay,no explicit link,
 IDAMA,"Amamapare, Ij",conflicting or missing match,11524818
-IDAMQ,"Ambon, Molucas",conflicting or missing match,1651531;6301203
 IDAMP,"Ampenan, Bali",conflicting or missing match,8534688
 IDAJN,"Arjuna, Java",conflicting or missing match,1651221
 IDARB,Aroe Bay,no explicit link,
@@ -1316,7 +1246,6 @@ IDBLL,"Blang Lancang, St",conflicting or missing match,6728206
 IDBLI,"Blinju, Banka",no explicit link,
 IDBNG,Bonggala,no explicit link,
 IDBXT,"Bontang, Kl",conflicting or missing match,1648186;7730897
-IDBUG,"Buleleng, Bali",conflicting or missing match,8051286
 IDCSA,Cape Sago,no explicit link,
 IDCEB,"Celukan Bawang, Bl",conflicting or missing match,12196121
 IDDIV,Diviematra,no explicit link,
@@ -1324,7 +1253,6 @@ IDDJA,Djankar,conflicting or missing match,1647935
 IDDUM,"Dumai, Sumatra",conflicting or missing match,7668672;11886631
 IDENE,"Ende, Flores",conflicting or missing match,1644932;7338057
 IDEWE,Ewer,conflicting or missing match,7731017
-IDFKQ,"Fak Fak, Irian Jaya",conflicting or missing match,1644833;6301205
 IDGLX,"Galela, Halmahera",conflicting or missing match,6301190
 IDGIL,"Gilimanuk, Bali",conflicting or missing match,1644079;7545225
 IDGTO,"Gorontalo, Sulawesi",conflicting or missing match,1643837;6301191
@@ -1333,8 +1261,6 @@ IDILA,Illaga,conflicting or missing match,7731113
 IDDJB,"Jambi, Sumatra",conflicting or missing match,1642858;6301244
 IDKAH,Kahayan Bay,no explicit link,
 IDKNG,"Kaimana, Irian Jaya",conflicting or missing match,6301206
-IDKAM,"Kambunong, Celebes",conflicting or missing match,1641744
-IDKAR,"Karosa, Sulawesi",conflicting or missing match,1641066
 IDKAS,"Kasim, Ij",no explicit link,
 IDKEA,Keisah,no explicit link,
 IDKEM,"Kempo, Sb",no explicit link,
@@ -1346,7 +1272,6 @@ IDKOX,Kokonao,conflicting or missing match,6301182
 IDKCI,Kon,conflicting or missing match,1639636
 IDKKA,"Kuala Kapuas, Kl",no explicit link,
 IDKKB,"Kunak, Borneo",no explicit link,
-IDKOE,"Kupang, Timor",conflicting or missing match,2057087;6301268
 IDLAT,"Lalang Terminal, St",no explicit link,
 IDLAS,"Langsa, Sumatra",no explicit link,
 IDLLA,"Lawe-Lawe, Kl",no explicit link,
@@ -1355,49 +1280,38 @@ IDMAJ,"Majene, Sv",no explicit link,
 IDMPT,Maliana,no explicit link,
 IDMLI,"Malili, Sulawesi",conflicting or missing match,1636663
 IDMKW,"Manokwari, Irian Jaya",conflicting or missing match,1636308;6301207
-IDMNT,"Mantang, Riau",conflicting or missing match,1903652
 IDMSI,Masalembo,conflicting or missing match,1635987
 IDMOF,"Maumere, Flores",conflicting or missing match,1635815;7429894
 IDMES,"Medan, Sumatra",conflicting or missing match,1214520
 IDMRK,"Merak, Java",conflicting or missing match,1960384
-IDMRB,"Merantibunting, Sumatra",no explicit link,
 IDMKQ,"Merauke, Irian Jaya",conflicting or missing match,2082539;6301188
 IDMEQ,"Meulaboh, Sumatra",conflicting or missing match,6301249
 IDONI,Moanamani,conflicting or missing match,7731368
 IDOZI,Morotai I,no explicit link,
 IDMUB,Muara Berau,conflicting or missing match,1634911
 IDMPN,Muara Pantai,no explicit link,
-IDMUP,Muara Pegah,no explicit link,
 IDMPC,Muko-Muko,conflicting or missing match,6705689
 IDMUO,"Muntok, Banka",conflicting or missing match,1634678
 IDMRI,"Musi River, Sumatra",no explicit link,
 IDNAH,Naha,conflicting or missing match,6923934
 IDNTX,Natuna Ranai,conflicting or missing match,6301241
-IDOBI,Obi Island,conflicting or missing match,1633695
 IDOKQ,"Okaba, Irian Jaya",conflicting or missing match,7731364
 IDOJA,Olah Jasa Andal/Jakarta,no explicit link,
-IDOLO,Olee Lheue,no explicit link,
 IDPAG,"Pagatan, Kalimantan",conflicting or missing match,1633303
 IDPLM,"Palembang, Sumatra",conflicting or missing match,1633070;11876762
-IDPNN,"Pamanukan, Java",conflicting or missing match,1632998
 IDPRN,"Panarukan, Java",conflicting or missing match,1632903
 IDPJM,Pandjung Mani,no explicit link,
-IDPKR,"Pangkalan Brandan, Sumatra",conflicting or missing match,1214302
 IDPKS,"Pangkalan Susu, Sumatra",conflicting or missing match,1214297
 IDPGX,"Pangkal Balam, Banka",no explicit link,
-IDPGK,"Pangkalpinang, Banka",conflicting or missing match,1632654
 IDPJG,"Panjang (Lampung, Sumatra)",conflicting or missing match,1632602
 IDPTL,"Pantoloan, Sv",no explicit link,
-IDPEX,"Pekalongan, Java",conflicting or missing match,1631766
 IDPKU,"Pekanbaru, Sumatra",conflicting or missing match,1631761;6301221
 IDPCB,Pondok Cabe,conflicting or missing match,7668675
 IDPNK,"Pontianak, Kalimantan",conflicting or missing match,1630789;6301242
-IDPMG,Port Meneng,no explicit link,
 IDSGO,Port Segoro Fajar Satryo/Jakarta,no explicit link,
 IDPSJ,"Poso, Sulawesi",conflicting or missing match,6301196;6923369
 IDPRO,"Probolinggo, Java",conflicting or missing match,1630634
 IDPNT,"Prointal, Jv",no explicit link,
-IDPSS,"Pulau Sambu, Riau",conflicting or missing match,1628936
 IDRGT,"Rengat, Sumatra",conflicting or missing match,6301248
 IDRTG,"Ruteng, Flores",conflicting or missing match,7059063
 IDSBG,"Sabang, Sumatra",conflicting or missing match,1214026
@@ -1407,7 +1321,6 @@ IDSBS,"Sambas, Kalimantan",conflicting or missing match,1628979
 IDSMQ,"Sampit, Kalimantan",conflicting or missing match,1628884;7731499
 IDSAN,"Sanang, Celebes",no explicit link,
 IDSGQ,Sanggata,conflicting or missing match,7731490
-IDSKI,"Sangkulirang, Kalimantan",conflicting or missing match,1628757
 IDSAT,"Santan Terminal, Kl",no explicit link,
 IDSAS,Sasayap,no explicit link,
 IDSEB,"Sebangan Bay, Kalimantan",no explicit link,
@@ -1426,8 +1339,6 @@ IDCGK,Soekarno-Hatta Apt/Jakarta,conflicting or missing match,6301878
 IDSKK,Soengei Kolak,no explicit link,
 IDSOC,Solo City,conflicting or missing match,6301286
 IDSQR,Soroako,conflicting or missing match,1628586
-IDSUP,"Sumenep, Madura",conflicting or missing match,7731517
-IDSUG,"Sungai Gerong, Sumatra",conflicting or missing match,1625989
 IDSUQ,"Sungai Guntung, Sumatra",no explicit link,
 IDSEQ,"Sungai Pakning, Sumatra",conflicting or missing match,1625934;7731486
 IDSUS,"Susoh, Sumatra",conflicting or missing match,1213612;11951799
@@ -1441,7 +1352,6 @@ IDTBT,"Tandjung Batu, Riau",no explicit link,
 IDTSE,"Tanjung Sekong, Jv",conflicting or missing match,11886733
 IDTJG,Tanjung Warukin,conflicting or missing match,7730232
 IDTPK,"Tapaktuan, Sumatra",conflicting or missing match,7731559
-IDTRK,"Tarakan, Kalimantan",conflicting or missing match,1624725
 IDTEG,"Tegal, Java",conflicting or missing match,1624494
 IDTKA,"Telok Ayer, Kalimantan",no explicit link,
 IDTBG,"Teluk Betung, Sumatra",no explicit link,
@@ -1487,7 +1397,6 @@ ILADM,Adam,conflicting or missing match,295761
 ILALN,Alenbi,no explicit link,
 ILSHI,Beit Hashita,no explicit link,
 ILBRN,Bitanit,no explicit link,
-ILETH,Elat (Eilath),conflicting or missing match,295277;6299658
 ILJOR,Jordan,conflicting or missing match,293004
 ILKNT,Konetra,no explicit link,
 ILMTL,Matula,no explicit link,
@@ -1508,7 +1417,6 @@ INBTR,Bitra Is,no explicit link,
 INBRM,Borliai-Mandla,no explicit link,
 INBRY,Borya,no explicit link,
 INCAR,Carijam,no explicit link,
-INCTI,Chetlat Is,no explicit link,
 INCHI,Chikaballur,no explicit link,
 INCOL,Colochel,conflicting or missing match,1266322
 INCOO,Coondapur (Ganguly),no explicit link,
@@ -1516,12 +1424,9 @@ INCRN,Cornwallis,no explicit link,
 INDHP,Dabhol Port,conflicting or missing match,1273765
 INDTW,Dantiwara,no explicit link,
 INDEG,Deogad,no explicit link,
-INDSK,Dhanu-shkodi,no explicit link,
 INDMT,Dharamtar,conflicting or missing match,1272877
-INDIU,Diu,conflicting or missing match,1272502;7668568
 INDIV,Div,no explicit link,
 INDRK,Dwarka (Rupen),no explicit link,
-INESH,Elphinstone Harbour,no explicit link,
 INGAU,Gauhati (Panidi),conflicting or missing match,1271477
 INGED,Gede,no explicit link,
 INGOI,Goa,conflicting or missing match,1271146
@@ -1535,12 +1440,10 @@ INNSA,Jawaharlal Nehru (Nhava Sheva),conflicting or missing match,11524262
 INBGK,Jodhpur-Bhagat Ki Kothi,no explicit link,
 INTHA,Jodhpur-Thar,conflicting or missing match,1268865
 INJDA,Jodia,no explicit link,
-INKDI,Kadmat Is,no explicit link,
 INKND,Kankudy,no explicit link,
 INKSG,Kasargod,conflicting or missing match,8347665
 INKVT,Kavaram Is,no explicit link,
 INKIW,Kelwa,no explicit link,
-INKTI,Kiltan Is,no explicit link,
 INKRP,Kiranpani,no explicit link,
 INKTW,Koheshwar,no explicit link,
 INKOK,Koka,no explicit link,
@@ -1571,7 +1474,6 @@ INPNM,"Panambur, Va Mangalore",no explicit link,
 INPPJ,Pellet Plant Jetty/Shiroda,no explicit link,
 INPIN,Pindhara,conflicting or missing match,6417392
 INPID,Port Indai,no explicit link,
-INPRN,Portonovo,no explicit link,
 INRKG,Rajakkamangalam,no explicit link,
 INRJP,Rajpara/Navabunder,no explicit link,
 INRAM,Rameshwaram,no explicit link,
@@ -1611,7 +1513,6 @@ IRBAH,Bandar Assaluyeh,no explicit link,
 IRBSR,Bandar Shahid Rajaee,no explicit link,
 IRGSM,Gheshm,conflicting or missing match,6649407
 IRIQH,Islam Qal'eh,no explicit link,
-IRKHK,Khark Island,conflicting or missing match,127757
 IRKHO,Khorramshahr,conflicting or missing match,127319;11886642
 IRLRR,Lar,conflicting or missing match,139873
 IRLIN,Lingah,no explicit link,
@@ -1639,15 +1540,12 @@ ISRIF,Rif-Hellisandur,conflicting or missing match,8298735
 ISSAU,Saudarkrokur - hofn,conflicting or missing match,2627309;11549865
 ISSFS,Selfoss - Apt,conflicting or missing match,8555622
 ISSIG,Siglufjordur - hofn,no explicit link,
-ISKJF,Skerjafjordur,no explicit link,
 ISSTD,Stodhvarfjordur,no explicit link,
 ISSTR,Straumsvik,no explicit link,
 ISSTY,Stykkisholmur - hofn,conflicting or missing match,3412888;6295713
 ISSUD,Sudureyri/Sugandafjord,conflicting or missing match,11549871
-ISTAL,Talknafjordur/Sveinseyri,no explicit link,
 ISTHN,Tjorneshofn,no explicit link,
 ITASM,Albisola Marina,conflicting or missing match,3183314
-ITALI,Alicudi,conflicting or missing match,8955983
 ITBAG,Bagno-Rubiera,no explicit link,
 ITBAC,Baraccola,no explicit link,
 ITBED,Bedizzole(Brescia),conflicting or missing match,6534215
@@ -1670,7 +1568,6 @@ ITDDO,Dogana do Ortonovo,no explicit link,
 ITEBA,Elba,conflicting or missing match,3169347
 ITEST,Este,conflicting or missing match,3165185
 ITFAL,Falconara,conflicting or missing match,3177250
-ITGII,Giannutri,conflicting or missing match,3176147
 ITGOR,Gorgona,conflicting or missing match,3166997
 ITLGO,Lancenigo,conflicting or missing match,3164090
 ITLTA,Lastra,conflicting or missing match,3175074
@@ -1683,10 +1580,8 @@ ITMXP,Malpensa Apt/Milano,conflicting or missing match,3174133
 ITMNC,Mandrio di Correggio,conflicting or missing match,8950127
 ITMPP,Mappano,no explicit link,
 ITMNG,Mignagola di Carbonera,conflicting or missing match,3218797
-ITMLZ,Milazzo,conflicting or missing match,2524155;11876724
 ITMBC,"Misterbianco, Catania",conflicting or missing match,2524123
 ITMCV,Molinetto-Ciliverghe,no explicit link,
-ITMNF,Monfalcone,conflicting or missing match,3173153;11886620
 ITMRE,Montale Rangone,conflicting or missing match,3173090
 ITOLO,Olona,conflicting or missing match,3172065
 ITORI,Orio Litta (Milano),no explicit link,
@@ -1699,8 +1594,6 @@ ITNIC,Pian di Macina,no explicit link,
 ITPTV,Piano Tavola,conflicting or missing match,8949115
 ITPLS,Polesine,conflicting or missing match,3182576
 ITPZO,Ponzano Magra,conflicting or missing match,8950613
-ITPDI,Porto d'Ischia,conflicting or missing match,3175453;9796798
-ITPLI,Porto Lignano,no explicit link,
 ITQTO,Quarto,conflicting or missing match,3169700
 ITXXX,RIS Inland waterways,no explicit link,
 ITRIV,Rivalta Scrivia,conflicting or missing match,3169261
@@ -1721,7 +1614,6 @@ ITSBT,Solbiate,conflicting or missing match,3166439
 ITZPZ,Spezzano,conflicting or missing match,2523022
 ITTML,Talamello,no explicit link,
 ITTEV,Tavernelle Vicentina-Altavilla Vicentina,no explicit link,
-ITTGR,Torregrande,conflicting or missing match,10339005
 ITTRS,Trieste,conflicting or missing match,3220056;9796929
 ITVAD,Vado/Bologna,conflicting or missing match,3164991
 ITVDO,Vado/Lucca,no explicit link,
@@ -1745,32 +1637,24 @@ JPAGS,Ageshima,no explicit link,
 JPAGR,Agonoura,no explicit link,
 JPAKI,Aikakita,no explicit link,
 JPAIW,"Aikawa, Nagasaki",no explicit link,
-JPAIK,"Aikawa, Niigata",conflicting or missing match,1865684
 JPAIA,Ainouraaoki/Naru,no explicit link,
 JPAIN,Ainoura/Sasebo,conflicting or missing match,1848693
 JPAII,Aio,no explicit link,
-JPAIZ,"Aizu, Kumamoto",conflicting or missing match,1865643
 JPAZR,"Ajiro, Okayama",conflicting or missing match,6417527
-JPAJR,"Ajiro, Shizuoka",conflicting or missing match,1865620
 JPAZJ,"Ajiro, Tottori",conflicting or missing match,1865619
 JPAKM,Akamizu,conflicting or missing match,1865538
-JPAKK,"Akasaki, Kumamoto",conflicting or missing match,1854998
-JPASK,"Akasaki, Tottori",conflicting or missing match,1865512
 JPAKO,Akoh,no explicit link,
 JPAKB,Akohbaru,no explicit link,
 JPAMM,"Ama, Hyogo",conflicting or missing match,1865387
 JPASJ,Amamioshima,conflicting or missing match,6300360
 JPAMS,Amasaki,no explicit link,
-JPAAM,"Ama, Shimane",conflicting or missing match,1865390
 JPAMY,Amiya,no explicit link,
 JPAMU,Amura,conflicting or missing match,11267189
 JPANB,Anbo,no explicit link,
 JPAOE,Aoe,no explicit link,
-JPAOG,Aogashima,conflicting or missing match,1865268
 JPAOS,Aoshima,no explicit link,
 JPARZ,Arouzu,no explicit link,
 JPAST,Ashitoku,no explicit link,
-JPASZ,"Ashiya, Fukuoka",conflicting or missing match,1864986
 JPASR,Ashizuri,no explicit link,
 JPATT,Atatajima,no explicit link,
 JPATK,Atsuki,no explicit link,
@@ -1778,8 +1662,6 @@ JPAWA,Awa,conflicting or missing match,1864905
 JPTBS,Awajikoryunotsubasa,no explicit link,
 JPAWM,Awashimanishi,no explicit link,
 JPAWZ,Awazu,no explicit link,
-JPBPU,"Beppu, Oita",conflicting or missing match,1864750
-JPBEP,"Beppu, Shimane",conflicting or missing match,1864751
 JPBFS,Beppushinko,no explicit link,
 JPBDM,Bohdomari,no explicit link,
 JPBYO,Byobu,conflicting or missing match,1864659
@@ -1796,54 +1678,34 @@ JPEJM,Ejima,no explicit link,
 JPENN,En,conflicting or missing match,1860827
 JPENH,Enohama,no explicit link,
 JPENR,"Enoura, Kagawa",no explicit link,
-JPENO,"Enoura, Shizuoka",conflicting or missing match,1864186
-JPESI,Esashi/Hiyama,conflicting or missing match,2130365;12954100
 JPESS,Esashi/Soya,conflicting or missing match,12954101
 JPESM,Eshima,no explicit link,
 JPETA,Etajima,conflicting or missing match,8740425
 JPEZA,Ezaki,no explicit link,
 JPFGS,Fugusaki,no explicit link,
 JPFJN,Fujino,conflicting or missing match,1864103
-JPFKH,"Fukae, Hiroshima",conflicting or missing match,1864074
 JPFAE,"Fukae, Nagasaki",conflicting or missing match,1863997
 JPFKI,Fukai,no explicit link,
 JPFRI,Fukari,no explicit link,
-JPFKK,"Fukaura, Aomori",conflicting or missing match,2038800
 JPFKR,"Fukaura, Ehime",no explicit link,
-JPFKE,"Fukue, Aichi",conflicting or missing match,1863996
-JPFUJ,"Fukue, Nagasaki",conflicting or missing match,6300345
-JPFRA,"Fukura, Hyogo",conflicting or missing match,1863953
 JPFUU,"Fukura, Kagoshima",no explicit link,
 JPFUO,Fukuro,no explicit link,
-JPFUR,"Fukuura, Ehime",conflicting or missing match,1926157
-JPFRJ,"Fukuura, Ishikawa",conflicting or missing match,1863921
-JPFUA,"Fukuura, Kumamoto",conflicting or missing match,11402750
 JPFKY,"Fukuyama, Hiroshima",conflicting or missing match,1863917;11876766
-JPFYM,"Fukuyama, Kagoshima",no explicit link,
 JPFSH,Funakakushi,no explicit link,
 JPFNR,Funaura,no explicit link,
 JPFNA,Funaya,no explicit link,
 JPFNZ,Funazu,no explicit link,
-JPFRX,"Furue, Ehime",conflicting or missing match,6417040
-JPFRU,"Furue, Kagoshima",conflicting or missing match,1863841
-JPFRM,"Furue, Miyazaki",conflicting or missing match,1863842
 JPFRE,"Furue, Nagasaki",no explicit link,
 JPFRK,Furuike,no explicit link,
 JPFRS,"Furusato, Nagasaki",conflicting or missing match,8599791
 JPFTG,Futago,no explicit link,
 JPFMT,"Futamata, Kagoshima",conflicting or missing match,8601694
 JPFTT,"Futamata, Shimane",conflicting or missing match,1863749
-JPHUT,"Futami, Niigata",conflicting or missing match,1863746
 JPHTM,"Futami, Tokyo",conflicting or missing match,2113755
-JPFTS,"Futtsu, Chiba",conflicting or missing match,1863711
 JPGPT,Gendentokai,no explicit link,
 JPGKB,Gohnokubi,no explicit link,
 JPGOT,Gohtsu,no explicit link,
-JPGOI,Goi/Ichihara,conflicting or missing match,2112864
 JPGYA,Gyohda,no explicit link,
-JPHAB,"Habu, Hiroshima",conflicting or missing match,1863473
-JPHAU,"Habu, Tokyo",conflicting or missing match,1863469
-JPHBB,"Habu, Yamaguchi",conflicting or missing match,1863474
 JPHGO,Hachigo,no explicit link,
 JPHAE,Haenohama,no explicit link,
 JPHKS,Hakatashima,conflicting or missing match,11524904
@@ -1865,38 +1727,29 @@ JPHTT,Hata,no explicit link,
 JPHMI,Hatami,no explicit link,
 JPHES,Hesaki,no explicit link,
 JPHET,Heta,conflicting or missing match,1862898
-JPHIA,Hiagari/Kitakiushu,no explicit link,
 JPHBR,Hiburi,conflicting or missing match,1862882
 JPHGH,Higashihazu,no explicit link,
 JPHHH,Higashinohama,no explicit link,
-JPHIO,Higashi-Ogishima,conflicting or missing match,11549412
 JPHIG,Higashishioya,no explicit link,
 JPHKI,Hikami,no explicit link,
 JPHDO,Himedo,no explicit link,
 JPHMK,Himekawa,conflicting or missing match,12196115
 JPHNR,Himenoura,no explicit link,
 JPHMH,Himeshima,conflicting or missing match,7414052
-JPHMJ,Himi,conflicting or missing match,1862610
 JPHNZ,Hinozu,no explicit link,
 JPHRJ,Hirai,no explicit link,
 JPHRW,Hiraiwa,conflicting or missing match,1862543
 JPHII,Hirasaki,no explicit link,
 JPHRO,Hiro,conflicting or missing match,1853717
-JPHTA,"Hirota, Iwate",conflicting or missing match,2110757
-JPHJT,"Hirota, Kagoshima",conflicting or missing match,10147367
 JPHRU,Hiroura,conflicting or missing match,1862400
 JPHMA,Hishima,no explicit link,
 JPHTS,Hitsushima,no explicit link,
 JPHIZ,Hizenohshima,no explicit link,
 JPHUD,Hoda,no explicit link,
 JPHHM,Hohomi,no explicit link,
-JPHON,"Honjo, Akita",conflicting or missing match,2112683
-JPHNJ,"Honjo, Kyoto",conflicting or missing match,1862199
 JPHKM,Honkushima,no explicit link,
-JPHNN,Honmoku,conflicting or missing match,11061021
 JPHPP,Hoppozaki,no explicit link,
 JPHSI,"Hoshika, Nagasaki",conflicting or missing match,1862124
-JPHOS,"Hoshika, Saga",conflicting or missing match,1862125
 JPHOT,Hotokegaura,no explicit link,
 JPHYR,Hyakunoura,no explicit link,
 JPHYG,Hyugadomari,no explicit link,
@@ -1904,7 +1757,6 @@ JPICD,Icchoda,no explicit link,
 JPIEJ,Iejima/Okinawa,conflicting or missing match,6300459
 JPIES,"Ieshima, Hyogo",conflicting or missing match,1861909
 JPIKR,Ikara,conflicting or missing match,1859044
-JPIKA,"Ikeda, Kagawa",conflicting or missing match,1861798
 JPIKD,"Ikeda, Wakayama",no explicit link,
 JPIKE,Ikeshima,no explicit link,
 JPIKN,Ikina,conflicting or missing match,1861757
@@ -1913,8 +1765,6 @@ JPIGR,Imagire,no explicit link,
 JPIMZ,Imazu,no explicit link,
 JPIDJ,Indohji,no explicit link,
 JPINO,Inobe,no explicit link,
-JPIUH,"Inokuchi, Ehime",conflicting or missing match,1926133
-JPINK,"Inokushi, Oita",conflicting or missing match,1861566
 JPIND,Inonada,no explicit link,
 JPINZ,Inujima,no explicit link,
 JPISB,Ishiba,no explicit link,
@@ -1924,14 +1774,10 @@ JPISA,Issai,no explicit link,
 JPISU,Isuwan,no explicit link,
 JPITU,"Itoh, Shimane",no explicit link,
 JPITJ,"Itoh, Shizuoka",conflicting or missing match,1861282;1861290
-JPIWG,"Iwagi,Ehime",conflicting or missing match,1926130
 JPIWY,Iwaya,no explicit link,
 JPIOU,"Iwojima, Kagoshima",no explicit link,
 JPIWT,"Iwojima, Nagasaki",no explicit link,
 JPIWO,"Iwojima, Tokyo",conflicting or missing match,6300315
-JPIZM,"Izumi, Aichi",conflicting or missing match,1861105
-JPIZI,"Izumi, Nagasaki",conflicting or missing match,1861106
-JPIZS,Izumisano,conflicting or missing match,7391698
 JPJKW,Jokawauchi,no explicit link,
 JPJON,Jonoshita,no explicit link,
 JPKDW,Kadokawa,no explicit link,
@@ -1940,7 +1786,6 @@ JPKJG,"Kaga, Shimane",no explicit link,
 JPKGT,Kaigata,no explicit link,
 JPKAZ,Kaizaki,no explicit link,
 JPKGR,Kamagari,conflicting or missing match,1860543
-JPKAJ,"Kama, Shimane",conflicting or missing match,8651141
 JPKEE,Kameike,no explicit link,
 JPKJM,"Kameura, Kumamoto",conflicting or missing match,11246023
 JPKMR,"Kameura, Tokushima",no explicit link,
@@ -1952,7 +1797,6 @@ JPKIX,Kansai Int Apt,conflicting or missing match,6300316
 JPKRK,Karakizaki,no explicit link,
 JPKKA,Karakuma,no explicit link,
 JPKTM,Karatomari,no explicit link,
-JPKRY,"Kariya, Saga",conflicting or missing match,1860036
 JPKRB,Karubi,no explicit link,
 JPKAN,Karuno,conflicting or missing match,1860021
 JPKSS,"Kasasa, Kagoshima",conflicting or missing match,1899179
@@ -1960,17 +1804,9 @@ JPKSY,"Kasasa, Yamaguchi",no explicit link,
 JPKDJ,Kasedo,no explicit link,
 JPKAE,Kashimae,conflicting or missing match,11524907
 JPKSM,"Kashima, Ibaraki",conflicting or missing match,1860748
-JPKSC,"Kashima, Saga",conflicting or missing match,1859941
-JPKSW,"Kashiwa, Ehime",conflicting or missing match,1926119
 JPKTK,Kataku,no explicit link,
 JPKBA,Katasoba,no explicit link,
-JPKUR,"Katsuura, Chiba",conflicting or missing match,2112309
-JPKAT,"Katsuura, Wakayama",conflicting or missing match,1859773
-JPKCH,"Kawachi, Kumamoto",conflicting or missing match,1859753
 JPKWC,"Kawachi, Nagasaki",conflicting or missing match,1864846
-JPKWJ,"Kawajiri, Hiroshima",conflicting or missing match,1859709
-JPKWR,"Kawajiri, Ibaraki",conflicting or missing match,2112292
-JPKWA,Kawanazu,no explicit link,
 JPKZH,Kazuhara,no explicit link,
 JPKZM,Kazume,no explicit link,
 JPKZS,Kazusaminato,no explicit link,
@@ -1990,21 +1826,14 @@ JPKIN,Kinwan,no explicit link,
 JPKJR,Kiriishi,conflicting or missing match,1859415
 JPKNJ,Kisane,no explicit link,
 JPKTL,Kitakijima,no explicit link,
-JPKTX,Kita/Kitadaito,conflicting or missing match,1859361
-JPKDX,Kita/Minamidaito,conflicting or missing match,1929144
 JPKTA,Kitanada,no explicit link,
 JPKJT,"Kitaura, Akita",conflicting or missing match,6822201
-JPKIR,"Kitaura, Ehime",conflicting or missing match,6417042
 JPKTR,"Kitaura, Kagawa",no explicit link,
 JPKIT,"Kitaura, Miyazaki",no explicit link,
 JPKBT,Kobato,conflicting or missing match,11524903
 JPKBS,Kobishima,no explicit link,
 JPKDK,Kodakashima,no explicit link,
-JPKOD,"Kodomari, Aomori",conflicting or missing match,2129505
-JPKDM,"Kodomari, Kumamoto",conflicting or missing match,11266720
 JPKGC,Koguchi,no explicit link,
-JPKOG,"Kogushi, Okayama",conflicting or missing match,1859066
-JPKGS,"Kogushi, Yamaguchi",conflicting or missing match,1859067
 JPKJA,Kohjima,no explicit link,
 JPKZR,Kohjiro,no explicit link,
 JPKOO,Kohmen,no explicit link,
@@ -2015,7 +1844,6 @@ JPKKL,Kohzaki,no explicit link,
 JPKOU,Kohzujima,no explicit link,
 JPKOI,Koike/Uwajima,no explicit link,
 JPKMQ,"Komatsu, Ishikawa",conflicting or missing match,6300367
-JPKMX,"Komatsu, Yamaguchi",conflicting or missing match,1858911
 JPKAX,Komoe,no explicit link,
 JPKKE,Komukae,no explicit link,
 JPKNI,Konagai,no explicit link,
@@ -2031,8 +1859,6 @@ JPKYO,Koyoh/Kawajiri,no explicit link,
 JPKZE,Kozera,no explicit link,
 JPKBU,Kubuki,no explicit link,
 JPKCF,Kuchinofukuura,no explicit link,
-JPKJI,"Kuji, Iwate",conflicting or missing match,2129427
-JPKKU,"Kuji, Kagoshima",conflicting or missing match,1858467
 JPKRR,Kujiragaura,no explicit link,
 JPKGE,Kumage,no explicit link,
 JPKMS,Kumeshima,no explicit link,
@@ -2040,8 +1866,6 @@ JPKMH,Kumihama,conflicting or missing match,1858391
 JPKNH,Kunehama,conflicting or missing match,8600637
 JPKNG,Kuniga,no explicit link,
 JPKRC,Kuramai,no explicit link,
-JPKRE,"Kure, Hiroshima",conflicting or missing match,1858296
-JPKUE,"Kure, Kochi",conflicting or missing match,1858297
 JPKHJ,Kurimamaehama,no explicit link,
 JPKRD,Kuroda,no explicit link,
 JPKRM,Kurokami,no explicit link,
@@ -2049,7 +1873,6 @@ JPKRJ,"Kuroshima, Okinawa",no explicit link,
 JPKRS,Kurushima,no explicit link,
 JPKKK,Kushiku,no explicit link,
 JPKSB,Kusubo,conflicting or missing match,8600536
-JPKNA,Kuwana,conflicting or missing match,1857966
 JPKYM,Kuyama,no explicit link,
 JPMAD,Maedomari/Iheya,conflicting or missing match,1857835
 JPMDR,Maedomari/Tarama,no explicit link,
@@ -2059,16 +1882,12 @@ JPMMM,Mageshimamisaki,no explicit link,
 JPMGC,Maguchi,no explicit link,
 JPMGU,Magusa,no explicit link,
 JPMWA,Maruiwa,no explicit link,
-JPMDJ,"Masuda, Kagoshima",conflicting or missing match,10180079
-JPMSD,"Masuda, Shimane",conflicting or missing match,1857594
 JPMAM,Matama,no explicit link,
 JPMGA,Matsugaura,no explicit link,
 JPMAO,Matsuo,no explicit link,
-JPMRA,"Matsushima, Miyagi",conflicting or missing match,2111964;12952914
 JPMAT,"Matsushima, Nagasaki",conflicting or missing match,1857490
 JPMSS,"Matsushima, Okayama",no explicit link,
 JPMAU,"Matsuura, Kagoshima",no explicit link,
-JPMTS,"Matsuura, Nagasaki",conflicting or missing match,6822144
 JPMTU,"Matsuura, Oita",no explicit link,
 JPMWR,Mawari,conflicting or missing match,8599959
 JPMGS,Megoshima,no explicit link,
@@ -2076,23 +1895,15 @@ JPMEN,Mei,conflicting or missing match,1863913
 JPMMB,Memanbetsu,conflicting or missing match,2129266
 JPMSI,MieShikimi,no explicit link,
 JPMHN,Mihowan,no explicit link,
-JPMII,"Miike, Fukuoka",conflicting or missing match,1857313
 JPMIJ,"Miike, Tokyo",no explicit link,
-JPMKW,Mikawa,no explicit link,
-JPMKR,Mikurajima,conflicting or missing match,1857241
-JPMNT,"Minato, Hyogo",conflicting or missing match,1857108
 JPMNE,Mine,conflicting or missing match,1857079
 JPMNJ,Minna/Motobu,no explicit link,
 JPMNN,Minna/Tarama,no explicit link,
-JPMSX,"Misaki, Ehime",conflicting or missing match,1926093
-JPMIK,"Misaki, Kanagawa",conflicting or missing match,1857019
 JPMKI,"Misaki, Kochi",conflicting or missing match,1853340
-JPMKX,"Mishima, Kawanoe",conflicting or missing match,11549901
 JPMSM,"Mishima, Shizuoka",conflicting or missing match,1856977
 JPMSR,Mishiro,no explicit link,
 JPMSO,Misho,no explicit link,
 JPMIS,"Misumi, Kumamoto",conflicting or missing match,1855259
-JPMMI,"Misumi, Shimane",conflicting or missing match,1856962
 JPMTC,Mitachi,no explicit link,
 JPMIT,"Mitaka, Hiroshima",no explicit link,
 JPMTA,"Mitaka, Tokyo",conflicting or missing match,1860437
@@ -2102,11 +1913,7 @@ JPMIR,Miura/Mitsushima,no explicit link,
 JPMYE,Miyakejima Apt/Tokyo,conflicting or missing match,6300411
 JPMYK,"Miyako, Iwate",conflicting or missing match,2111884
 JPMYN,Miyanoura/Azuma,no explicit link,
-JPMUY,"Miyanoura, Kagawa",conflicting or missing match,6418710
 JPMNO,Miyanoura/Kamiyaku,no explicit link,
-JPMNR,"Miyanoura, Nagasaki",conflicting or missing match,1856738
-JPMZK,"Miyazaki, Ehime",conflicting or missing match,6416963
-JPKMI,"Miyazaki, Miyazaki",conflicting or missing match,1856717
 JPMCD,Mochidoi,no explicit link,
 JPMCH,Mochiishi,no explicit link,
 JPMGN,Mogine,conflicting or missing match,1856627
@@ -2124,9 +1931,6 @@ JPMKA,Mukata,no explicit link,
 JPMRE,Mure,no explicit link,
 JPMRO,Murokita,no explicit link,
 JPMRJ,Murotomisaki,no explicit link,
-JPMRS,"Murotsu, Hyogo",conflicting or missing match,1856383
-JPMUX,"Murotsu, Kochi",conflicting or missing match,1856386
-JPMRT,"Murotsu, Yamaguchi",conflicting or missing match,1856385
 JPMSH,Musashi,no explicit link,
 JPMUT,Mutsuogawara,no explicit link,
 JPMTR,Mutsure,conflicting or missing match,1856343
@@ -2135,13 +1939,7 @@ JPNAD,Nadahama,no explicit link,
 JPNDY,Nadayama,no explicit link,
 JPNEX,"Nagae, Ehime",no explicit link,
 JPNGE,"Nagae, Shimane",no explicit link,
-JPNGH,"Nagahama, Ehime",conflicting or missing match,1926080
-JPNMA,"Nagahama, Kagoshima",conflicting or missing match,1856247
-JPNHM,"Nagahama, Shiga",conflicting or missing match,1856243
-JPNAG,"Nagahama, Shimane",conflicting or missing match,1856244
 JPNHN,Nagasakinohana,no explicit link,
-JPNGU,"Nagasu, Kumamoto",conflicting or missing match,1856120
-JPNSU,"Nagasu, Oita",conflicting or missing match,1856119
 JPNAA,"Nagaura, Nagasaki",no explicit link,
 JPNGR,Nagaura/Yokosuka,no explicit link,
 JPMGY,Nagayama,no explicit link,
@@ -2150,11 +1948,7 @@ JPNGD,Nagouda,no explicit link,
 JPNGO,"Nagoya, Aichi",conflicting or missing match,1856057;12233244
 JPNAH,"Naha, Okinawa",conflicting or missing match,1856035;6300458;9853024
 JPNGN,Naigainoura,no explicit link,
-JPNHA,"Nakahama, Hiroshima",conflicting or missing match,6417246
-JPNKJ,"Nakahama, Kyoto",conflicting or missing match,1855960
 JPNKH,"Nakahama, Tottori",no explicit link,
-JPNKL,"Nakama, Kagoshima",conflicting or missing match,10194049
-JPNKM,"Nakama, Okinawa",conflicting or missing match,1855910
 JPNMT,Nakaminato,conflicting or missing match,2111732
 JPNKN,Nakanoura,no explicit link,
 JPNKT,"Nakata, Hiroshima",no explicit link,
@@ -2166,9 +1960,7 @@ JPNRO,Narao,conflicting or missing match,1855607
 JPNRT,Narita Apt/Tokyo,conflicting or missing match,6300307
 JPNGI,Neghishi/Yokohama,conflicting or missing match,11076301
 JPNEJ,Nejime,conflicting or missing match,10178646
-JPNIH,Niigatahigashi,conflicting or missing match,11524901
 JPNIN,Niigatanishi,no explicit link,
-JPNIJ,Niijima,conflicting or missing match,1855419
 JPNSB,Nishibe,no explicit link,
 JPNSI,Nishiesan,no explicit link,
 JPNID,Nishi/Kitadaito,no explicit link,
@@ -2177,7 +1969,6 @@ JPNDI,Nishi/Minamidaito,no explicit link,
 JPNIS,Nishinaka,no explicit link,
 JPNSH,Nishishioya,no explicit link,
 JPNIA,Nita,no explicit link,
-JPNBS,Nobeokashinko,no explicit link,
 JPNBU,Nobu/Mitsushima,no explicit link,
 JPNOU,Noh,no explicit link,
 JPNJR,Nojiri,no explicit link,
@@ -2187,21 +1978,13 @@ JPNCO,"Nonoichi, Ishikawa",conflicting or missing match,1854979
 JPNNH,Nunohama,no explicit link,
 JPNYK,Nyukou,no explicit link,
 JPNYZ,Nyuzu,no explicit link,
-JPOBM,"Obama, Fukui",conflicting or missing match,1854849
-JPOBA,"Obama, Mie",conflicting or missing match,1854579
-JPOBB,"Obama, Nagasaki",conflicting or missing match,1854850
-JPOBE,"Obe, Ehime",conflicting or missing match,1926068
 JPOOC,Ochiyo,no explicit link,
 JPODA,Odahigashi,no explicit link,
 JPODO,Odoh,no explicit link,
 JPOGA,Ogasawara,conflicting or missing match,2111520
-JPOII,"Ogi, Ishikawa",conflicting or missing match,1854654
 JPOGK,"Ogi, Kagawa",conflicting or missing match,1854638
-JPOGI,"Ogi, Niigata",conflicting or missing match,1854653
 JPOGM,Ogomori,no explicit link,
-JPOHM,"Ohama, Ehime",conflicting or missing match,6416236
 JPOHA,"Ohama, Kagawa",conflicting or missing match,9273592
-JPKHM,"Ohama, Kagoshima",conflicting or missing match,10181360
 JPOOH,"Ohama, Okayama",no explicit link,
 JPOMX,"Ohama, Tottori",no explicit link,
 JPOBX,"Ohbe, Kagawa",no explicit link,
@@ -2237,38 +2020,25 @@ JPOYA,Ojoya,no explicit link,
 JPOKD,Okadama Apt/Sapporo,conflicting or missing match,6300327
 JPOKM,Okamoto,no explicit link,
 JPOOW,"Okawa, Nagasaki",conflicting or missing match,1895950
-JPOKW,"Okawa, Wakayama",conflicting or missing match,1859081
 JPOKE,Okinoerabu,conflicting or missing match,1854341
 JPOKK,Okinokojima,no explicit link,
-JPOKC,"Okitsu, Chiba",conflicting or missing match,2111453
-JPOKT,"Okitsu, Shizuoka",conflicting or missing match,1854279
-JPOIU,"Okiura, Hiroshima",conflicting or missing match,6417088
 JPOKS,Okiuranishi,no explicit link,
 JPOKX,"Okiura, Yamaguchi",no explicit link,
 JPOKG,Okogi,no explicit link,
-JPOOJ,"Okubo, Kagoshima",conflicting or missing match,10178608
-JPOKB,"Okubo, Tokyo",conflicting or missing match,1862755
 JPOCH,Okunouchi,no explicit link,
 JPOMS,Omishima,no explicit link,
 JPOJM,Omosu,no explicit link,
 JPOMH,Omotehama,no explicit link,
 JPOGC,Ongachi,no explicit link,
-JPONX,OnomichiItozaki,conflicting or missing match,1853991
 JPORG,Origami,conflicting or missing match,1853934
-JPOUK,"Osaka, Tottori",conflicting or missing match,8625032
-JPOSX,"Osaki, Kagoshima",conflicting or missing match,1895636
 JPOSN,Osaki/Mitsushima,no explicit link,
-JPOSK,"Osaki, Miyagi",conflicting or missing match,6822188
 JPOJO,Osako,no explicit link,
 JPOST,Osetoyanagi,no explicit link,
 JPOSL,"Oshima, Yamaguchi",conflicting or missing match,1858450
 JPOSE,Osoe,no explicit link,
 JPOSU,Osuki,no explicit link,
-JPOSJ,"Otsu, Ibaraki",conflicting or missing match,2111313
-JPOTU,"Otsu, Shiga",conflicting or missing match,1853574
 JPOUA,Oura/Ariake,no explicit link,
 JPOUR,Oura/Kamitsushima,no explicit link,
-JPOOR,Oura/Kasaoka,conflicting or missing match,1853534
 JPORX,Oura/Marugame,no explicit link,
 JPOOA,"Oura, Saga",conflicting or missing match,9889314
 JPORR,Oura/Uchinoura,no explicit link,
@@ -2278,18 +2048,13 @@ JPRND,Ronden,no explicit link,
 JPRYS,Ryohshida,no explicit link,
 JPRYG,Ryugamizu,no explicit link,
 JPSAB,Saba,no explicit link,
-JPSGA,"Saga, Kochi",conflicting or missing match,1853304
-JPQSG,"Saga, Saga",conflicting or missing match,1853303
 JPSAW,Sagawa,no explicit link,
-JPSJA,"Sai, Aomori",conflicting or missing match,2128363
 JPSAD,Saidoh,no explicit link,
 JPSGU,"Saigo, Nagasaki",no explicit link,
-JPSAI,"Saigo, Shimane",conflicting or missing match,1853253
 JPSAC,"Sai, Shimane",no explicit link,
 JPSSK,Saizaki,no explicit link,
 JPSBK,Sakaisenboku,conflicting or missing match,1853179
 JPSKK,Sakaki,conflicting or missing match,12908983
-JPSMU,Sakimui,conflicting or missing match,2121519
 JPSKR,Sakuraikako,no explicit link,
 JPSRZ,Sakurajima,conflicting or missing match,1858768
 JPSNX,Sanagi,conflicting or missing match,1853014
@@ -2305,36 +2070,25 @@ JPSEK,Sekinehama,no explicit link,
 JPSKY,Sekiya,no explicit link,
 JPSGM,Sendaishiogama,conflicting or missing match,11524883
 JPSXT,"Seto, Kagawa",conflicting or missing match,6418713
-JPSTT,"Seto, Kagoshima",conflicting or missing match,1852811
 JPSEZ,Sezaki,no explicit link,
 JPSBY,Shibayama,conflicting or missing match,11524882
 JPSGI,Shigetomi,no explicit link,
 JPSIN,Shiinoki,no explicit link,
-JPSIK,Shikamachi,conflicting or missing match,9985067
 JPSTJ,Shikata,no explicit link,
 JPSHZ,Shimazuya,no explicit link,
 JPSMO,"Shimoda, Kochi",no explicit link,
-JPSIA,"Shimoda, Kumamoto",conflicting or missing match,1852359
 JPSDA,"Shimoda, Nagasaki",no explicit link,
-JPSMD,"Shimoda, Shizuoka",conflicting or missing match,1852357
 JPSMR,Shimodomari/Mikame,no explicit link,
 JPSMH,Shimohisage,no explicit link,
 JPSSA,Shimotsuura,conflicting or missing match,11265380
 JPSZI,Shinjima,no explicit link,
-JPSKW,"Shinkawa, Aichi",conflicting or missing match,1852075
 JPSNK,"Shinkawa, Kagoshima",no explicit link,
 JPSNJ,Shinojima,no explicit link,
 JPSNZ,Shinzaike,no explicit link,
 JPSGT,Shiogatani,no explicit link,
 JPSOH,Shiohama,no explicit link,
 JPSYG,Shioyagamoto,no explicit link,
-JPSIO,"Shioya, Ishikawa",conflicting or missing match,1851960
-JPSYA,"Shioya, Okinawa",conflicting or missing match,1851969
-JPSRX,"Shirahama, Chiba",conflicting or missing match,1853610
 JPSRH,"Shirahama, Kagawa",conflicting or missing match,1852632
-JPSHH,"Shirahama, Kagoshima",conflicting or missing match,1858768
-JPSIR,"Shirahama, Nagasaki",conflicting or missing match,1851937
-JPSIH,"Shirahama, Okinawa",conflicting or missing match,1851939
 JPSHM,"Shirahama, Wakayama",conflicting or missing match,6300317
 JPSRT,Shirakata,no explicit link,
 JPSRA,Shiraki,no explicit link,
@@ -2361,7 +2115,6 @@ JPSUG,Suga,conflicting or missing match,1848736
 JPSGE,Suge,conflicting or missing match,1851514
 JPSUR,Sugeura,no explicit link,
 JPSMI,Sumie,no explicit link,
-JPSUH,"Sumoto, Hyogo",conflicting or missing match,1851426
 JPSUT,"Sumoto, Kumamoto",conflicting or missing match,11264767
 JPSUW,Suwa,no explicit link,
 JPTBU,Tabu,no explicit link,
@@ -2372,32 +2125,27 @@ JPTAL,Tainouchi,no explicit link,
 JPTZA,Taiza,conflicting or missing match,1851199
 JPTJR,"Tajiri, Tottori",conflicting or missing match,1851190
 JPTKD,Takada,conflicting or missing match,1851170
-JPTAH,"Takahama, Ehime",conflicting or missing match,1926036
 JPTKC,Takanokuchi,no explicit link,
 JPTJK,Takashima/Masuda,no explicit link,
 JPTSM,Takashima/Nishisonogi,no explicit link,
 JPTXK,"Takasu, Fukui",conflicting or missing match,6697542
-JPTKG,"Takasu, Kagoshima",conflicting or missing match,1850950
 JPTEE,Take,conflicting or missing match,1853972
 JPTEA,Takena,no explicit link,
 JPTKE,Takeno,conflicting or missing match,1850851
 JPTSX,Takeshima,no explicit link,
 JPTTH,Taketomihigashi,no explicit link,
 JPTKZ,Takezaki,conflicting or missing match,1850811
-JPTMS,"Tamatsu, Ehime",conflicting or missing match,1926033
 JPTMT,"Tamatsu, Okayama",no explicit link,
 JPTAN,Tanagawa,conflicting or missing match,1851272
 JPTNK,Tanasoko,conflicting or missing match,11264996
 JPTNE,Tanegashima,conflicting or missing match,6300347
 JPTUR,"Tanoura, Ehime",no explicit link,
 JPTNU,Tanoura/Kitakyushu,conflicting or missing match,1850634
-JPTNR,"Tanoura, Kumamoto",conflicting or missing match,1850636
 JPTRA,Taramajima,conflicting or missing match,6300468
 JPTET,"Tateishi, Ehime",no explicit link,
 JPTTS,"Tateishi, Kagawa",no explicit link,
 JPTYU,Tayui,no explicit link,
 JPTEK,Tekutsuku,no explicit link,
-JPTZU,Terazu/Matsue,conflicting or missing match,8624066
 JPTRZ,Terazu/Yatsuka,no explicit link,
 JPTSI,Teshima,conflicting or missing match,1861905
 JPTER,Teuri,conflicting or missing match,2127812
@@ -2406,22 +2154,15 @@ JPTOK,Tokachi,conflicting or missing match,2129202
 JPTKO,Tokonami,conflicting or missing match,11524884
 JPTKJ,Tokujin,no explicit link,
 JPTKN,Tokunoshima,conflicting or missing match,1850164
-JPTMR,"Tomari, Okinawa",conflicting or missing match,1850134
 JPTMA,Tomari/Shiribeshi,no explicit link,
-JPTMO,"Tomioka, Kumamoto",conflicting or missing match,1850093
 JPTOM,"Tomioka, Tokushima",conflicting or missing match,1850102
 JPTMU,Tomitsu,no explicit link,
 JPTNH,Tonoshohigash,no explicit link,
-JPTSZ,Tosashimizu,conflicting or missing match,1849927
-JPTJO,"Toshima, Hyogo",conflicting or missing match,1849913
 JPTOU,Touyo,no explicit link,
-JPTYJ,"Toyohama, Aichi",conflicting or missing match,1849850
-JPTYH,"Toyohama, Kagawa",conflicting or missing match,1849851
 JPTUS,Toyoshige,no explicit link,
 JPTWA,Tsukinokawa,no explicit link,
 JPTNA,Tsuna,no explicit link,
 JPTNI,Tsuneishi,conflicting or missing match,1851562
-JPTRU,"Tsurumi, Okayama",conflicting or missing match,1849572
 JPTRC,Tsuruuchi,no explicit link,
 JPTSJ,Tsushima,conflicting or missing match,6300338
 JPTTM,Tsutsumi,no explicit link,
@@ -2436,7 +2177,6 @@ JPUKJ,Ukejima,no explicit link,
 JPUMG,Umagoe,no explicit link,
 JPUOM,Uomi,conflicting or missing match,10182331
 JPUOU,"Uozu, Shimane",no explicit link,
-JPUOZ,"Uozu, Toyama",conflicting or missing match,1849237
 JPURA,Ura,conflicting or missing match,1849104
 JPUNM,Uranomae,no explicit link,
 JPURS,Urasoko,no explicit link,
@@ -2444,21 +2184,15 @@ JPUSA,Usa/Tosa,no explicit link,
 JPUSG,Ushigakubijima,no explicit link,
 JPUSI,Ushine,no explicit link,
 JPUSN,Usuno,no explicit link,
-JPUTM,"Utsumi, Aichi",conflicting or missing match,1849056
 JPUTS,"Utsumi, Hiroshima",no explicit link,
 JPWAI,Waita,no explicit link,
-JPWTU,"Wakamatsu, Nagasaki",conflicting or missing match,1848966
 JPWKT,Wakatsu,no explicit link,
 JPWMT,Wakimoto,no explicit link,
 JPWKZ,Wakizaki,no explicit link,
-JPWAN,Wan,conflicting or missing match,10194312
 JPWSB,Washibeyanoura,no explicit link,
-JPYAG,"Yagi, Hyogo",conflicting or missing match,1859531
 JPYGI,"Yagi, Iwate",conflicting or missing match,12909170
 JPYGR,Yagishiri,conflicting or missing match,2127492
 JPKUM,Yakushima,conflicting or missing match,7384012
-JPYQD,Yamada,no explicit link,
-JPYAD,"Yamada, Iwate",conflicting or missing match,2110560
 JPYMD,"Yamada, Okayama",no explicit link,
 JPYGH,Yamaguchihigashi,no explicit link,
 JPYMT,Yamatani,no explicit link,
@@ -2471,21 +2205,14 @@ JPYKT,"Yokota, Hiroshima",no explicit link,
 JPYOG,Yonegura,no explicit link,
 JPYNZ,Yonouzu,no explicit link,
 JPYSS,Yoshiase,no explicit link,
-JPYDA,"Yoshida, Aichi",conflicting or missing match,1848213
-JPYSD,"Yoshida, Ehime",conflicting or missing match,1926015
 JPYSM,Yoshima,no explicit link,
-JPYSN,Yoshinozaki,no explicit link,
 JPYSR,Yoshiura/Misumi,no explicit link,
 JPYHA,Yoshiura/Yunotsu,no explicit link,
 JPYSZ,Yoshizu,no explicit link,
 JPYOU,Youra,no explicit link,
 JPYSH,Yuasahiro,no explicit link,
 JPYNM,Yunomochiki,no explicit link,
-JPYNT,Yunotsu,conflicting or missing match,8623659
-JPYRA,"Yura, Hyogo",conflicting or missing match,1848050
 JPYUR,"Yura, Wakayama",conflicting or missing match,1854813
-JPYUJ,"Yura, Yamagata",conflicting or missing match,1848047
-JPYUA,"Yura, Yamaguchi",no explicit link,
 JPYRG,Yurigahama,no explicit link,
 JPYUS,Yusu,no explicit link,
 JPYTI,Yutai,no explicit link,
@@ -2515,7 +2242,6 @@ KRHAR,Haryana,no explicit link,
 KRHSO,Hwasong,conflicting or missing match,6575762
 KROCH,Ochang,conflicting or missing match,6797282
 KRPRY,Pry,no explicit link,
-KWKHT,As Sulaybikhat,no explicit link,
 KWJBD,Jebel Dhana,no explicit link,
 KWKWM,Khor al Mufatta,no explicit link,
 KZGUW,Atyrau (ex Guryev),conflicting or missing match,7668494
@@ -2529,7 +2255,6 @@ LAUDO,Udomxay,no explicit link,
 LAVAN,Vangtoud,no explicit link,
 LAXIE,Xienglom,conflicting or missing match,8245855
 LBOUZ,Ouzai,no explicit link,
-LBSUR,Sur (Tyre),conflicting or missing match,267008
 LBZHR,Zahrani Terminal,no explicit link,
 LKRML,Colombo/Ratmalana Apt,conflicting or missing match,6301870
 LKDEK,Dekantana,no explicit link,
@@ -2555,7 +2280,6 @@ LYBEN,Bingazi (Benghazi),conflicting or missing match,88317;88319
 LYBOU,El Bouri,no explicit link,
 LYMEH,Marsa El Hania,no explicit link,
 LYMTH,Melittah,no explicit link,
-LYSRT,Sirte (Surt),conflicting or missing match,2210554
 LYSOU,Soussah,no explicit link,
 LYTOA,Toulmeitha,no explicit link,
 LYWAX,Zwara,conflicting or missing match,7730620
@@ -2564,15 +2288,12 @@ MAGLN,Goulimime,conflicting or missing match,7731062
 MANNA,Kenitra (ex Port Lyautey),conflicting or missing match,2544572;9781243
 MAKMA,Ksar Majaz,no explicit link,
 MAEUN,Laayoune (El Aaiun),conflicting or missing match,2462881
-MAPTM,Tanger Med,conflicting or missing match,8556375;11066422
 MDBRS,Berestovitsa,no explicit link,
 MDXXX,RIS Inland waterways,no explicit link,
 MGBRR,Barren Islands,conflicting or missing match,1068733
 MGWFI,Fianarantsoa,conflicting or missing match,1064890;1064891
 MGFTU,Fort Dauphin (Toalagnaro),conflicting or missing match,6297052
 MGMJN,Majunga (Mahajanga),conflicting or missing match,1062663
-MGTMM,Tamatave (Toamasina),conflicting or missing match,1053384
-MGTLE,Tulear (Toliara),conflicting or missing match,1055429
 MGVEH,Vehiperro,no explicit link,
 MHKWA,Kwajalein,conflicting or missing match,2080185
 MHMAV,Maloelap Island,conflicting or missing match,2080201
@@ -2588,7 +2309,6 @@ MMMNU,Mawlamyine (Moulmein),conflicting or missing match,1308465
 MMMUR,Murdon,no explicit link,
 MMTAS,Tah Sala,no explicit link,
 MMTER,Terutao Island,no explicit link,
-MMSNW,Thandwe (ex Sandoway),conflicting or missing match,7910206
 MMXYE,Ye,conflicting or missing match,1285124
 MNAVK,Arvaikheer,conflicting or missing match,2032814
 MNBYN,Bayankhongor,conflicting or missing match,2032533
@@ -2618,12 +2338,8 @@ MXSJD,San Jose Cabo,conflicting or missing match,3986172
 MXSLO,San Lorenzo,no explicit link,
 MXSAF,Santa Fe,conflicting or missing match,8858085
 MXTTN,Tultilan,conflicting or missing match,3980911
-MYBWH,Bagan Luar (Butterworth),conflicting or missing match,7668676
-MYBLI,"Batu Lintang, Sarawak",conflicting or missing match,1780738
 MYBAU,"Bau, Sarawak",conflicting or missing match,1734539
 MYBLG,"Belaga, Sarawak",conflicting or missing match,7730867
-MYBNT,"Benut, Johor",conflicting or missing match,1732705
-MYBTG,"Betong, Sarawak",conflicting or missing match,1736902
 MYBIA,"Biawak, Sarawak",conflicting or missing match,1737007
 MYBNG,"Binatang, Sarawak",conflicting or missing match,1735881
 MYBTN,Bintangor,conflicting or missing match,1762637
@@ -2631,15 +2347,12 @@ MYBTU,"Bintulu, Sarawak",conflicting or missing match,1737486
 MYBBE,Bukit Beruntung,no explicit link,
 MYBGG,"Bunan Gega, Sarawak",conflicting or missing match,1770044
 MYDDW,Danjindawai,no explicit link,
-MYDRO,"Daro, Sarawak",conflicting or missing match,1736781
 MYJTA,"Jitra, Kedah",conflicting or missing match,1736302
-MYKAB,"Kabong, Sarawak",conflicting or missing match,1736719
 MYKPI,"Kapit, Sarawak",conflicting or missing match,7731184
 MYKES,Kejit,no explicit link,
 MYKRE,Krety,no explicit link,
 MYKBE,"Kuala Belud, Sabah",no explicit link,
 MYKBS,Kuala Besar,conflicting or missing match,1769620
-MYKPU,"Kuala Penyu, Sabah",conflicting or missing match,1733376
 MYKSD,Kuala Sedili,no explicit link,
 MYKSG,"Kuala Segama, Sabah",no explicit link,
 MYKUA,Kuantan (Tanjong Gelang),conflicting or missing match,1887873;6301254
@@ -2647,40 +2360,27 @@ MYKCH,"Kuching, Sarawak",conflicting or missing match,1735634
 MYKUD,"Kudat, Sabah",conflicting or missing match,1736458;6301214
 MYKUN,"Kunak, Sabah",conflicting or missing match,1733635
 MYLDU,"Lahad Datu, Sabah",conflicting or missing match,1733953;7668671
-MYLWY,"Lawas, Sarawak",conflicting or missing match,7731250
 MYLMN,"Limbang, Sarawak",conflicting or missing match,1737714
 MYLGG,"Lingga, Sarawak",conflicting or missing match,1735756
 MYLUN,"Lundu, Sarawak",conflicting or missing match,1737012
-MYLUT,"Lutong, Sarawak",conflicting or missing match,1738049
 MYMUR,"Marudi, Sarawak",conflicting or missing match,1737918
-MYMEM,"Mempakul, Sabah",conflicting or missing match,1733774
 MYMYY,"Miri, Sarawak",conflicting or missing match,1738050
-MYMKM,"Mukah, Sarawak",conflicting or missing match,7731278
 MYLPK,Northport/Pt Klang,conflicting or missing match,11524795
 MYSNP,North Pt,no explicit link,
-MYPAL,"Paloh, Sarawak",conflicting or missing match,1735841
 MYPAN,Panchang,conflicting or missing match,1766291
 MYPGU,"Pasir Gudang, Johor",conflicting or missing match,1732722;7619751
 MYPED,Pedena,conflicting or missing match,1766291
-MYPBA,"Pulau Batik, Sabah",conflicting or missing match,1733624
-MYPTB,"Pulau Tambisan, Sabah",conflicting or missing match,1733989
-MYPUN,"Punang, Sarawak",no explicit link,
 MYREJ,"Rejang, Sarawak",no explicit link,
 MYSDK,"Sandakan, Sabah",conflicting or missing match,1734052;6301213
 MYSEJ,"Sejingkat, Sarawak",conflicting or missing match,1743725
-MYSEL,"Selalang, Sarawak",conflicting or missing match,1766775
-MYBSE,"Sematan, Sarawak",conflicting or missing match,7730880
 MYSMM,"Semporna, Sabah",conflicting or missing match,7731498
 MYSPE,Sepulot,conflicting or missing match,7731501
 MYSBW,"Sibu, Sarawak",conflicting or missing match,1735902;6301211
 MYSIL,Silay,no explicit link,
-MYSMG,"Simanggang, Sarawak",conflicting or missing match,1735799
 MYSPG,"Simpangan, Sabah",conflicting or missing match,1736597
-MYSMJ,"Simunjan, Sarawak",conflicting or missing match,1735681
 MYSPT,"Sipitang, Sabah",conflicting or missing match,1733868
 MYSIR,Siran,no explicit link,
 MYSRK,"Sirikin, Sarawak",no explicit link,
-MYSDR,"Sundar, Sarawak",conflicting or missing match,1737628
 MYSRE,Sungai Rengit,conflicting or missing match,1732788
 MYGTK,Sungei Tekai,no explicit link,
 MYSXT,Taman Negara,conflicting or missing match,7796488
@@ -2694,8 +2394,6 @@ MYTRM,Telok Ramunia,conflicting or missing match,1732786
 MYTEN,"Tengku, Sabah",no explicit link,
 MYTOD,Tioman,conflicting or missing match,1734910
 MYTMB,Tumbum,no explicit link,
-MYWAL,"Wallace Bay, Sabah",conflicting or missing match,1734188
-MYWES,"Weston, Sabah",conflicting or missing match,1733861
 MZBCW,Benguera Island,conflicting or missing match,7730315
 MZMFW,Magaruque,conflicting or missing match,1041965
 MZMPM,Maputo,conflicting or missing match,1040652;11876720
@@ -2711,7 +2409,6 @@ NGDEN,Denema,no explicit link,
 NGESC,Escravos,no explicit link,
 NGGRP,Greek Port,no explicit link,
 NGLOA,Lagos Murtala Muhammed Apt,conflicting or missing match,2332458
-NGORO,Oron,conflicting or missing match,2343093
 NGOBO,Que Oboe Terminal/Eket,no explicit link,
 NIRNI,Corn Island,conflicting or missing match,3620266
 NLAJM,Anjum,conflicting or missing match,2759757
@@ -2748,12 +2445,10 @@ NLTOR,Torontostraat,no explicit link,
 NLSTO,'t Stort,no explicit link,
 NLVNE,Van Essen,no explicit link,
 NLVHA,Veldriel,no explicit link,
-NLVLL,Vlieland,conflicting or missing match,2749334
 NLVGB,Voetangelbrug,no explicit link,
 NLVDN,Vredenduin,no explicit link,
 NLWTN,Warten,no explicit link,
 NLWWR,Wijde Wormer,conflicting or missing match,2756938
-NLWKG,Wolsumerketting,no explicit link,
 NLZHU,Zevenhuizen (Friesland),conflicting or missing match,2743925
 NLZHN,Zevenhuizen (Utrecht),conflicting or missing match,2743928
 NLZGD,Zwaagdijk,conflicting or missing match,2743592
@@ -2871,75 +2566,48 @@ PHAHE,Aheron/Ozamis,no explicit link,
 PHAAV,Alah,conflicting or missing match,1685230;1731356;1731712
 PHALA,Alasang/Siain,no explicit link,
 PHALE,Aleran/Ozamis,no explicit link,
-PHANA,Anakan/Masao,no explicit link,
 PHANT,Antipolo,no explicit link,
 PHAPR,"Aparri, Luzon",conflicting or missing match,1719689
-PHBAB,Babato/Dadiangas,no explicit link,
 PHBCD,"Bacolod, Negros",conflicting or missing match,1729564;8298629
 PHBCO,Bacon/Legaspi,no explicit link,
 PHBCU,Baculin/Mati,no explicit link,
 PHBNQ,Baganga/Mati,no explicit link,
 PHBGI,Bagui Bay/San Fernando,no explicit link,
-PHBAI,Bais/Dumaguete,conflicting or missing match,1728772
 PHBAL,Balaboe,no explicit link,
 PHBLN,Balengan/Siain,no explicit link,
-PHBQA,Baler/Siain,conflicting or missing match,1728265
 PHBLT,Balintang/Puerto Princesa,no explicit link,
 PHBLG,Balogo/Batangas,conflicting or missing match,1725243
 PHBLU,Balumo/Zamboanga,no explicit link,
 PHBNW,Banawan/Dadiangas,no explicit link,
 PHBTY,Bantayon/San Jose,no explicit link,
-PHBRT,Barton/Puerto Princesa,no explicit link,
 PHBSY,Basey/Catbalogan,no explicit link,
-PHBAS,Basiauang/Dadiangas,no explicit link,
 PHBTN,"Bataan, Mariveles",conflicting or missing match,1700868
-PHBTS,Batarasa/Puerto Princesa,no explicit link,
 PHBYS,Bayabas/Bislig,no explicit link,
-PHBYW,Bayawan/Dumaguete,no explicit link,
-PHBYB,Baybay/Tacloban,conflicting or missing match,1725799
 PHBPH,"Bislig, Mindanao",conflicting or missing match,1724768
 PHBIY,Biyawa/Davao,no explicit link,
 PHBLP,Bolos Point/Aparri,no explicit link,
 PHBGR,Bucar Grande/Suriagao,no explicit link,
-PHBUD,Budbud/Davao,no explicit link,
-PHBUL,"Bulan, Luzon",no explicit link,
 PHBXU,Butuan Bay/Masao,conflicting or missing match,1727447
-PHCAB,Cabugao Bay/Legaspi,conflicting or missing match,1721419
 PHCGY,"Cagayan de Oro, Mindanao",conflicting or missing match,1715074;1721080
 PHCDY,Cagayan de Sulu,conflicting or missing match,1721077;7730761
-PHCCG,Calag-Calag/Dumaguete,no explicit link,
 PHCGT,Calaguitan/Tacloban,no explicit link,
-PHCLP,Calapan/Batangas,conflicting or missing match,1720561;1720562
 PHCDB,Caldera Bay/Zamboanga,no explicit link,
-PHCWY,Calowayan/Catabalogan,no explicit link,
-PHCGP,Calug Point/Zamboanga,conflicting or missing match,1720096
 PHCML,Camalagawan/Aparri,no explicit link,
-PHCAM,Camarines Norte/Jose Panganiban,conflicting or missing match,1710103
 PHCGM,Camiguin Island/Aparri,conflicting or missing match,1719696
 PHCNY,Canaybon/Catbalogan,no explicit link,
-PHCNT,Cantilan/Surigao,conflicting or missing match,1718866
-PHCPL,Capalonga/Siain,no explicit link,
-PHCRG,Caraga/Mati,conflicting or missing match,1700352
 PHCGG,Casiguran/Siain,no explicit link,
 PHCSB,Casul Bay/Ozamis,no explicit link,
 PHCTB,Catamon Bay/Iloilo,no explicit link,
-PHCTS,"Catbalogan, Samar",conflicting or missing match,1717911
 PHCVE,"Cavite, Luzon",conflicting or missing match,1717640
 PHCLV,Claveria/Aparri,conflicting or missing match,1717348
 PHCBO,"Cotabato, Mindanao",conflicting or missing match,1716767;1716771
-PHCUR,Curuan/Zamboanga,conflicting or missing match,1716440
 PHDCB,Dahikan Bay,no explicit link,
 PHDVO,"Davao, Mindanao",conflicting or missing match,1715348
 PHDPT,Diapitan/Siain,no explicit link,
 PHDRB,Diaraboan/Siain,no explicit link,
-PHDIC,Diculum/Zamboanga,conflicting or missing match,1714922
-PHDID,Didadongan/Aparri,no explicit link,
 PHDDW,Dinadiawan/Aparri,no explicit link,
 PHDNG,Dinagat Island/Surigao,conflicting or missing match,1714793
-PHDNL,Dinalongan/Siain,no explicit link,
-PHDGL,Dingalan/Siain,no explicit link,
 PHDIO,Diotorin/Siain,no explicit link,
-PHDPL,Dipolog/Ozamis,conflicting or missing match,1714674;7910165
 PHDIR,Dirgalan,no explicit link,
 PHDIV,Divilacan/Aparri,no explicit link,
 PHGAC,Gachitorena/Jose Panganiban,no explicit link,
@@ -2947,93 +2615,54 @@ PHGNI,General Island/Bislig,no explicit link,
 PHGIN,Gingoog/Masao,conflicting or missing match,1712875
 PHGMS,Guimaras/Iloilo,no explicit link,
 PHHYB,Hagnava Bay,no explicit link,
-PHHIJ,Hijo Wharf/Davao,no explicit link,
-PHHNT,Hinatuan/Bislig,conflicting or missing match,1711655
-PHHNG,Hinigaran/Iloilo,no explicit link,
-PHHNB,Hinobaan/Iloilo,no explicit link,
 PHHON,Hondagua/Siain,conflicting or missing match,1711537;1711538
 PHHOO,Hook Bay/Siain,no explicit link,
 PHIGN,"Iligan, Mindanao",conflicting or missing match,1711084;1711085
 PHILO,"Iloilo, Panay",conflicting or missing match,1711005;6300496
 PHIPE,Ipil/Zamboanga,conflicting or missing match,1710612;1710616
-PHJNZ,Jimenez/Ozamis,conflicting or missing match,1710181
 PHJPM,"Jose Panganiban, Luzon",no explicit link,
-PHKAR,Karomatan/Iligan,no explicit link,
 PHKAT,Katipunan/Ozamis,no explicit link,
-PHKIA,Kiamba/Dadiangas,no explicit link,
 PHKIL,Kilbay Point/Jose Panganiban,no explicit link,
-PHKIN,Kinogitan/Iligan,no explicit link,
-PHKIP,Kipit/Ozamis,no explicit link,
-PHKIW,Kiwalan/Iligan,no explicit link,
-PHKOL,Kolambugan/Iligan,no explicit link,
-PHKUM,Kumalarang/Zamboanga,conflicting or missing match,1708431
 PHLAY,Lagondy River,no explicit link,
-PHLAG,Lagonoy/Jose Panganiban,no explicit link,
 PHLAM,Lamit Bay/Jose Panganiban,no explicit link,
-PHLAN,Lanuza/Bislig,no explicit link,
 PHLPZ,La Paz/Iloilo,conflicting or missing match,1707334
 PHLRP,La Rap/Jose Panganiban,no explicit link,
-PHLIA,Lianga/Bislig,conflicting or missing match,1706781
-PHLIB,Libjo/Surigao,conflicting or missing match,1706646
 PHLIM,Limay/Bataan,conflicting or missing match,1706361
-PHLIN,"Lingayen, Luzon",conflicting or missing match,1706188
 PHLNK,Linik/Dadiangas,no explicit link,
 PHLOM,Lomuyon/Dadiangas,no explicit link,
 PHLOP,Long Point/Puerto Princesa,no explicit link,
 PHLOO,Looc Bay/San Jose,no explicit link,
-PHLUM,Lumasal/Dadiangas,no explicit link,
-PHMCO,Maco/Davao,conflicting or missing match,1704271
 PHMCJ,Macojalan/Ozamis,no explicit link,
-PHMAD,Madaum/Davao,conflicting or missing match,1704166
 PHMGA,Magalona/Iloilo,no explicit link,
 PHMLS,Magellanes/Masao,conflicting or missing match,1704058;12196110
 PHMGB,Magueda Bay/Catbalogan,no explicit link,
 PHMAI,Maitum/Dadiangas,no explicit link,
-PHMAK,Makar/Dadiangas,conflicting or missing match,1703423
-PHMLL,Malalag/Davao,conflicting or missing match,1703187
-PHMSB,Malasugat Bay/Zamboanga,conflicting or missing match,1703008
 PHMSY,Manansalay/Batangas,no explicit link,
 PHMNY,Manay/Mati,no explicit link,
-PHMGG,Mangogoy/Bislig,conflicting or missing match,1701884
 PHMVS,"Mariveles, Luzon",conflicting or missing match,1700868
 PHMSC,Masinloc/Sual,no explicit link,
 PHMAC,Matho Cortez/Bislig,no explicit link,
-PHMXI,"Mati, Mindanao",conflicting or missing match,1700361
-PHMTA,Matina Aplaya/Davao,conflicting or missing match,1700315
 PHMCD,Mercedes/Jose Panganiban,no explicit link,
-PHMIL,Milbuk/Dadiangas,no explicit link,
-PHMIO,Misamis Occ./Ozamis,conflicting or missing match,1696899;1699494
 PHMIC,Misamis Or./Cagayan de Oro,no explicit link,
 PHMSS,Mission/Aparri,no explicit link,
 PHMON,Monserrat/Mati,no explicit link,
 PHMOR,Morong/Mariveles,no explicit link,
-PHMUL,Mulanay/Siain,no explicit link,
 PHNAB,Nabulao Bay/Iloilo,no explicit link,
 PHNGH,Nagh,no explicit link,
 PHNAL,Nalungga/Iloilo,no explicit link,
-PHNAP,Napsan/Puerto Princesa,conflicting or missing match,9794407
 PHNAR,Naris Point/Puerto Princesa,no explicit link,
 PHNAS,Nasipit/Masao,conflicting or missing match,1698060
 PHNID,Nido Terminal,no explicit link,
-PHNON,Nonoc/Surigao Del Norte,conflicting or missing match,1697596
 PHORA,Orayuita,no explicit link,
-PHORC,Ormoc/Tacloban,conflicting or missing match,1697018;7668425
-PHOTE,Oteiza/Bislig,no explicit link,
 PHOZC,"Ozamis, Mindanao",conflicting or missing match,7668423
 PHPDR,Pacio de Rozas/Batangas,no explicit link,
-PHPAG,Pagadian/Zamboanga,conflicting or missing match,1696710;7668424
 PHPLB,Palamit Bay/San Jose,no explicit link,
 PHPLP,Palapag/San Jose,no explicit link,
 PHPLW,Palawan/Ozamis,no explicit link,
 PHPMT,Pamintayan/Zamboanga,conflicting or missing match,1695874
 PHPAM,Pampanga,conflicting or missing match,1690039
 PHPPL,Pamplona/Aparri,no explicit link,
-PHPNB,Panabutan/Zamboanga,conflicting or missing match,1695799
-PHPCN,Panacan/Davao,conflicting or missing match,1695752
 PHPCA,Panacosa/Puerto Princesa,no explicit link,
-PHPGT,Pangutaran/Jolo,no explicit link,
-PHPNN,Paninirongan/Sanjose,no explicit link,
-PHPAS,"Pasay, Luzon",no explicit link,
 PHPIN,Pinamalayan/Batangas,no explicit link,
 PHPLA,Plaridel/Ozamis,no explicit link,
 PHPRO,Poro/San Fernando,conflicting or missing match,1690030
@@ -3041,7 +2670,6 @@ PHPBA,Port Barton/Palawan,conflicting or missing match,1692871
 PHPPS,"Puerto Princesa, Palawan",conflicting or missing match,1692685;1692686
 PHPUG,Pugad/Bislig,no explicit link,
 PHPTL,Puntalinao/Mati,no explicit link,
-PHPNT,Punti/Aparri,no explicit link,
 PHQUE,Queson/Siain,no explicit link,
 PHQUI,Quiddiao/Aparri,no explicit link,
 PHQBL,Quinablagan/Mati,no explicit link,
@@ -3060,39 +2688,26 @@ PHSIS,San Isidro/Sanjose,conflicting or missing match,1689740
 PHSPQ,San Pio Quinto/Aparri,no explicit link,
 PHSAN,Santa Ana/Aparri,no explicit link,
 PHSCT,Santa Catalina/Dumaguete,no explicit link,
-PHSCR,Santa Cruz/Sual,no explicit link,
 PHSLU,Santa Lucia/Puerto Princesa,no explicit link,
 PHSMA,Santa Maria/Zamboanga,conflicting or missing match,1692679
 PHSTE,San Teodoro/Batangas,no explicit link,
-PHSAS,Sasa/Davao,conflicting or missing match,1687140
 PHSAY,Sayao/Batangas,no explicit link,
-PHSIN,"Siain, Luzon",no explicit link,
-PHSIR,Siari/Ozamis,no explicit link,
 PHSIY,Siay/Zamboanga,conflicting or missing match,1686862
-PHSDG,Sindangan/Ozamis,no explicit link,
-PHXSO,Siocon/Zamboanga,conflicting or missing match,1686123
 PHSGD,Sogod/Tacloban,no explicit link,
-PHSOR,Sorsogon/Legaspi,conflicting or missing match,1685755
 PHSFS,Subic Bay,conflicting or missing match,8504741
 PHSKU,Sultan Kudarat/Dadiangas,no explicit link,
 PHSUG,"Surigao, Mindanao",conflicting or missing match,1685218;1685219
 PHTBG,Tabangoa,no explicit link,
 PHTAC,"Tacloban, Leyte",conflicting or missing match,1684712;6300492
-PHTBU,Tagabuli/Davao,conflicting or missing match,1684638
 PHTAG,"Tagbilaran, Bohol",conflicting or missing match,1684497;1684498;11979349
-PHTKW,Tagkawayan/Siain,no explicit link,
 PHTGD,Tagudin/San Fernando,no explicit link,
 PHTGL,Taguilon/Ozamis,no explicit link,
 PHTGT,Taguite Bay/Zamboanga,no explicit link,
 PHTLM,Talomo/Davao,conflicting or missing match,1683779
 PHTGN,Tambungon/Davao,conflicting or missing match,1683494
 PHTNU,Tanauan/Tacloban,no explicit link,
-PHTDG,Tandag/Bislig,conflicting or missing match,1683303
 PHTWT,Tawitawi,conflicting or missing match,7668422
 PHTAY,Taytay/Puerto Princesa,no explicit link,
-PHTIB,Tibungco/Davao,conflicting or missing match,1682376
-PHTOB,Toboso/Dumaguete,no explicit link,
-PHTLD,Toledo/Cebu,conflicting or missing match,1681602
 PHTLG,Tolong/Dumaguete,no explicit link,
 PHTLP,Tolopo,no explicit link,
 PHTLS,Tolosa/Tacloban,no explicit link,
@@ -3102,7 +2717,6 @@ PHULY,Ulugan Bay,no explicit link,
 PHURR,Umrur,no explicit link,
 PHVCS,"Victorias, Negros",conflicting or missing match,1680007
 PHVTO,Vito/Iloilo,conflicting or missing match,1705565
-PHWAS,Wasag/Dadiangas,no explicit link,
 PHWAW,Wawa/Batangas,conflicting or missing match,1679648
 PKBAG,Bagh/AJK,no explicit link,
 PKGAD,Gadoon,no explicit link,
@@ -3121,12 +2735,10 @@ PKMJD,Mohenjodaro,conflicting or missing match,7668401
 PKMXC,Multan City,no explicit link,
 PKNSR,Nowshera,conflicting or missing match,1341204
 PKOKC,Okara Cantt,no explicit link,
-PKPCT,Pakistan International Container Terminal/Karachi,conflicting or missing match,11524869
 PKPAJ,Para Chinar,conflicting or missing match,1343232
 PKPSC,Peshawar Cantt,no explicit link,
 PKPSH,Peshawar City,no explicit link,
 PKPON,Poonch/AJK,no explicit link,
-PKQCT,Qasim International Container Terminal/Karachi,conflicting or missing match,11524303
 PKRCS,Risalpur Cantt,no explicit link,
 PKSMA,Samasata,no explicit link,
 PKZEO,Savi Ragha,no explicit link,
@@ -3188,9 +2800,7 @@ RSXXX,RIS Inland waterways,no explicit link,
 RUARH,Arkhangelsk,conflicting or missing match,581049;11361348
 RUARM,Arman (Magadan),conflicting or missing match,2127060
 RUAZO,Azov,conflicting or missing match,580054;11361380
-RUBLT,Baltiysk,conflicting or missing match,2609906;11361385
 RUBKH,Bektyashka,conflicting or missing match,500483
-RUBEM,Belomorsk,conflicting or missing match,577921;577922
 RUBER,"Beringovskiy, Port",conflicting or missing match,11361390
 RUCIH,Chikacheva,conflicting or missing match,2126174
 RUCKL,Chkalovsky,conflicting or missing match,8030055
@@ -3209,7 +2819,6 @@ RULAZ,Lazarev,conflicting or missing match,2123836;11361361
 RULPK,Lipetsk (Lipeck),conflicting or missing match,535121
 RULKA,Luzhaika,no explicit link,
 RUMAG,"Magadansky, Port",no explicit link,
-RUMVO,Moskalvo,conflicting or missing match,2123174;11361362
 RUMMK,Murmansk,conflicting or missing match,524305;11361357
 RUNJK,Nakhodka,conflicting or missing match,2019528;11361366
 RUNIA,Nikolayevsk-na-Amure,conflicting or missing match,2122850
@@ -3224,9 +2833,7 @@ RUPRN,Poronaisk,conflicting or missing match,11361372
 RUPRI,Primorsk (Koivisto),conflicting or missing match,505269;11361383
 RUPVX,Provedenia,no explicit link,
 RURAT,Raduzhnyi,conflicting or missing match,7668536
-RUSEW,Severodvinsk,conflicting or missing match,496285;11361349
 RUSVO,Sheremetyevo Apt/Moscow,conflicting or missing match,494811
-RUSPA,"Spafaryeva, O",no explicit link,
 RUSWT,Strzhewoi,conflicting or missing match,8531890
 RUTAG,Taganrog,conflicting or missing match,484907;11361378
 RUTRR,Trifonov Ruchey,no explicit link,
@@ -3249,13 +2856,10 @@ SASAL,Salwa,no explicit link,
 SAAWI,Waisumah,no explicit link,
 SAEJH,Wedjh,conflicting or missing match,6300032
 SAZUY,Zulayfayn,conflicting or missing match,100285
-SBALB,"Allardyce Harbour, Sta Isabel Is",no explicit link,
 SBAOB,Aola Bay,no explicit link,
-SBAKS,"Auki, Malaita Is",conflicting or missing match,2109701
 SBAVU,"Avu Avu, Guadalcanal Is",no explicit link,
 SBGEF,Geva,conflicting or missing match,7730404
 SBHIR,"Honiara, Guadalcanal Is",conflicting or missing match,2108502
-SBIRA,"Kirakira, San Cristobal Is",conflicting or missing match,7668067
 SBKWS,Kwailabesi,conflicting or missing match,8298985
 SBLOF,Lofung,no explicit link,
 SBRUS,"Marau Sound, Guadalcanal Is",conflicting or missing match,7668071
@@ -3290,11 +2894,9 @@ SEHGR,Hagersten/Stockholm,conflicting or missing match,2709227
 SEAGH,Helsingborg-Angelholm Apt,conflicting or missing match,2725901;6452618
 SEJAT,Jatterson,no explicit link,
 SEKAK,Karlsvik,no explicit link,
-SEKVH,Kopparverkshamnen,no explicit link,
 SEKUB,Kubikenborg,no explicit link,
 SELAM,Lammhult,no explicit link,
 SELAN,Langasjo,no explicit link,
-SELOU,Loudden/Stockholm,conflicting or missing match,2694051
 SEMAN,Marsviken,no explicit link,
 SENCS,Nacka Strand,conflicting or missing match,12196108
 SENBG,Norberg,no explicit link,
@@ -3316,7 +2918,6 @@ SHTDC,Tristan da Cunha,conflicting or missing match,3370751
 SIJAR,Jarenina,no explicit link,
 SISVN,Svenica,no explicit link,
 SKBCK,Beckov,no explicit link,
-SKBAB,Bratislava Port,conflicting or missing match,11524186
 SKBAA,Devinska Nova Ves/Bratislava,conflicting or missing match,3077170
 SKDOM,Domica,no explicit link,
 SKDRI,Drietoma,no explicit link,
@@ -3357,7 +2958,6 @@ SRICK,Nieuw Nickerie,conflicting or missing match,3383427;11525691
 SROEM,Paloemeu,conflicting or missing match,3382808
 SRPBM,Paramaribo,conflicting or missing match,3383330;11525692
 SRPRM,Paranam,conflicting or missing match,3383327;11525693
-STPCP,Principe,conflicting or missing match,2410877;6297078
 STTMS,Sao Tome Island,conflicting or missing match,2410763
 SVBEL,Belfast,no explicit link,
 SVTUE,Moncagua,no explicit link,
@@ -3372,9 +2972,7 @@ THSKW,Sre Kaew,no explicit link,
 TMCRZ,Tchardjou,conflicting or missing match,7730201
 TMTMZ,Termez,no explicit link,
 TNASH,Ashtart Terminal,no explicit link,
-TNDJE,Djerba,conflicting or missing match,2470181;2470384;6296470
 TNKER,Kerkena,no explicit link,
-TRADA,Adana,conflicting or missing match,325363;6299727
 TRALI,Aliaga,conflicting or missing match,324106;11361436
 TRAMA,Amasra,no explicit link,
 TRBOG,Bogazagzi,no explicit link,
@@ -3415,8 +3013,6 @@ TWYGE,Ying-Ge,no explicit link,
 TZLKY,Lake Manyara,conflicting or missing match,6354961
 TZMFA,Mafia,conflicting or missing match,7388080
 TZMIC,Michiuja,no explicit link,
-TZMIK,Mikindani,conflicting or missing match,877747;877933
-TZMKO,"Mkokotoni, Zanzibar",conflicting or missing match,153585
 TZMTS,Mtsora,no explicit link,
 TZRIJ,Rijiju,no explicit link,
 TZTUN,Tunduna,no explicit link,
@@ -3433,7 +3029,6 @@ USADK,Adak Island/Adak Apt,conflicting or missing match,5878817;6300161
 USUAX,Agoura,conflicting or missing match,5322553
 USAIE,Aiea (Oahu),no explicit link,
 USAKO,Akron,conflicting or missing match,5574204
-USALB,Albany,conflicting or missing match,5106834;11886729
 USCVO,Albany-Corvallis Apt,conflicting or missing match,5720730
 USAXN,Alexandria,conflicting or missing match,5020871
 USESF,Alexandria,conflicting or missing match,4314531
@@ -3510,7 +3105,6 @@ USBOX,Bow,conflicting or missing match,5083685
 USAPH,Bowling Green,conflicting or missing match,8112901
 USSRQ,Bradenton-Sarasota Apt,conflicting or missing match,6299118
 USBDF,Bradford,conflicting or missing match,4907610
-USPWT,Bremerton,conflicting or missing match,5788054;11886734
 USBXJ,Brewton,conflicting or missing match,4059831
 USTTO,Britton,conflicting or missing match,5226525
 USBV2,"Broadview, Summit",conflicting or missing match,5148269
@@ -4008,7 +3602,6 @@ USPUC,Price,conflicting or missing match,5536455
 USBLF,Princeton,conflicting or missing match,4814466
 USPNN,Princeton,conflicting or missing match,4976041
 USPPC,Prospect Creek,conflicting or missing match,5872116
-USPVD,Providence,conflicting or missing match,5224151;11886732
 USUKT,Quakertown,conflicting or missing match,5207382
 USNYG,Quantico,conflicting or missing match,6326865
 USUQE,Queen,conflicting or missing match,5872320
@@ -4209,26 +3802,18 @@ VEETV,El Tablazo/Maracaibo L,no explicit link,
 VEGUB,Guaranao Bay,conflicting or missing match,11550094
 VELCV,La Ceiba/Maracaibo L,no explicit link,
 VELAG,La Guaira,conflicting or missing match,3637721;11525740
-VELSV,La Salina/Maracaibo L,conflicting or missing match,11525761
-VELSP,Las Piedras,conflicting or missing match,3635464;11525759
 VEPMR,Palmarejo/Maracaibo L.,no explicit link,
 VEPRG,Pertigalete,conflicting or missing match,3630321;11525742
 VEPHO,Puerto de Hierro,conflicting or missing match,3629695;11525745
-VEMIV,Puerto Miranda/Maracaibo L.,no explicit link,
 VEPCU,Punta Cuchillo,no explicit link,
 VESFX,San Felix,conflicting or missing match,3645528
-VETJV,Tia Juana/Maracaibo L,no explicit link,
 VEWOK,Wonken,conflicting or missing match,7731623
 VGEIS,"Beef Island, Tortola",conflicting or missing match,3577757
 VGNSX,N. Sound/Virgin Gorda,conflicting or missing match,3577326
-VGRAD,"Road Town, Tortola",conflicting or missing match,3577430
 VICHA,"Charlotte Amalie, Saint Thomas",conflicting or missing match,4795467
 VIENP,Enighed Pond,no explicit link,
-VIFRD,"Frederiksted, Saint Croix",conflicting or missing match,4795761
 VIHOC,Hovic,no explicit link,
 VILIB,Limetree Bay,conflicting or missing match,12196103
-VNBEN,Benthuy,no explicit link,
-VNCRB,Camranh,no explicit link,
 VNHAA,Hoai An,conflicting or missing match,8440833
 VNVIC,"Ho Chi Minh, VICT",conflicting or missing match,11549688
 VNKHU,Khonh Hung,no explicit link,
@@ -4288,7 +3873,6 @@ ZAPIT,Point,conflicting or missing match,977717
 ZAAFD,Port Alfred,conflicting or missing match,964432;964433
 ZARKD,Rocky's Drift,no explicit link,
 ZAGSS,Sabi Sabi,conflicting or missing match,7730491
-ZASDB,Saldanha Bay,conflicting or missing match,3361934
 ZANTY,Sun City,conflicting or missing match,7668230
 ZATDT,Tanda Tula,conflicting or missing match,7731538
 ZAULX,Ulusaba,conflicting or missing match,7731584
