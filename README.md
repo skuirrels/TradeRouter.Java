@@ -469,6 +469,8 @@ Each application chooses its own road-network provider with `MovementRequest.set
 | `GoogleRoutesRoadRouteProvider` | Google's global road network | Google Maps Platform Routes API | Per request, after a monthly free allowance | Google Maps Platform Terms: limited caching, Google Map or attribution when displayed |
 | Your own `RoadRouteProvider` | Any | Any | Any | The provider's own terms |
 
+Any provider can be wrapped in a cache, subject to its terms; see [Caching road routes](#caching-road-routes).
+
 #### OSRM
 
 For network distance, run OSRM separately and configure the included HTTP adapter, which uses the JDK's `java.net.http.HttpClient` and adds no dependency. The library does not start, stop or download data for the OSRM service:
@@ -616,6 +618,52 @@ public final class MyRoadRouteProvider implements RoadRouteProvider {
 | `UNAVAILABLE` | Timeouts, transport failures or unusable responses | Falls back to the estimate with a `distance_warning` | Throws |
 
 The source is required and becomes `distance_source` in the output. The geometry is in traversal order with longitude first. Let cancellation of the returned future propagate. One provider instance may be shared by concurrent movement calculations, so keep it thread-safe.
+
+#### Caching road routes
+
+The same pickup and delivery legs recur across many movements, so a cache can save most provider calls. `CachingRoadRouteProvider`, in `io.github.skuirrels.traderouter.caching`, wraps any `RoadRouteProvider` and looks each leg up in a store before calling the provider:
+
+```java
+MovementRequest request = MovementRequest.of(plan)
+    .setRoadRouteProvider(new CachingRoadRouteProvider(
+        new OsrmRoadRouteProvider(httpClient, osrmUri),
+        new DistributedRoadRouteCache(redisCache),
+        new RoadRouteCacheOptions(config.cachePartition(), Duration.ofDays(config.cacheDays()))))
+    .setRoadRoutingMode(RoadRoutingMode.PREFER_NETWORK_THEN_ESTIMATE);
+```
+
+`DistributedRoadRouteCache` stores each result as one JSON entry in a `DistributedCache`, with an absolute expiry, so the store deletes it when its time is up. `DistributedCache` has two methods, so an adapter over the client the application already uses is a few lines. With Lettuce for Redis:
+
+```java
+RedisAsyncCommands<String, byte[]> redis = client.connect(RedisCodec.of(StringCodec.UTF8, ByteArrayCodec.INSTANCE)).async();
+
+DistributedCache redisCache = new DistributedCache() {
+    @Override
+    public CompletableFuture<byte[]> getAsync(String key) {
+        return redis.get(key).toCompletableFuture();
+    }
+
+    @Override
+    public CompletableFuture<Void> setAsync(String key, byte[] value, Duration timeToLive) {
+        return redis.set(key, value, SetArgs.Builder.px(timeToLive)).toCompletableFuture().thenApply(ok -> null);
+    }
+};
+```
+
+Keys and entries are the ones TradeRouter.Net writes, so Java and .NET services using the same partition and key prefix share entries. Implement `RoadRouteCache` instead to keep results somewhere else, such as a database table you want to query. Its two methods get and set a `RoadRouteResult` by `RoadRouteCacheKey`, which carries the partition and the rounded endpoints as well as a single string `value()`.
+
+| Option | Meaning |
+| --- | --- |
+| `partition` | Required. Names the provider, profile and road dataset, for example `osrm-driving-europe-261001`. Change it when any of them changes, so routes from the old setup are no longer served. |
+| `timeToLive` | Required. How long a successful route is kept from the time it was fetched, up to `RoadRouteCacheOptions.MAXIMUM_TIME_TO_LIVE` (100 years). Set it from the provider's terms. |
+| `negativeTimeToLive` | How long `NO_ROUTE` and `OUTSIDE_COVERAGE` results are kept. Null, the default, fetches them again every time. `UNAVAILABLE` results are never cached. |
+| `coordinateDecimals` | Decimal places the endpoints are rounded to in the key, 5 by default (about a metre). Longitude is first normalised to [-180, 180). The leg sequence and the endpoints' codes and names are not part of the key. |
+| `cacheGeometry` | Whether route geometry is stored, true by default. Without it entries are much smaller, but legs served from the cache are drawn as straight lines. |
+| `onCacheError` | Called when the store throws, fails its future or returns a result that fails the engine's checks. The leg is then routed by the wrapped provider, so a store outage costs provider calls rather than failing movements. Exceptions from the callback are ignored. |
+
+The provider reads the options once, when it is created. Cancelling the future it returns cancels the store or provider call in progress.
+
+The Google Maps Platform Service Specific Terms for billing accounts outside the European Economic Area allow only latitude and longitude values from the Routes API to be cached, for up to 30 days, so distances, durations and geometry cannot be; billing accounts in the EEA have their own [EEA terms](https://cloud.google.com/terms/maps-platform/eea/maps-service-terms). `CachingRoadRouteProvider` caches whatever the wrapped provider returns and does not check where a result came from, so do not wrap `GoogleRoutesRoadRouteProvider` in it, and check the terms of any other provider before choosing a time to live. Concurrent requests for the same uncached leg each call the provider.
 
 #### Fallback and errors
 
@@ -842,6 +890,7 @@ THIRD-PARTY-NOTICES.md      data licences and attribution
 .github/workflows/release.yml  sign and upload to Maven Central on a version tag; see docs/releasing.md
 traderouter/                the library, published as io.github.skuirrels:traderouter
   src/main/java/io/github/skuirrels/traderouter/
+    caching/                road-route caching: caching provider, cache key and options, distributed-cache store
     common/                 Coordinate, Haversine, DistanceUnit, antimeridian normaliser, point-in-polygon
     data/                   loader for the embedded marnet, ports, UN/LOCODE, rail and sea-area datasets and supplements
     geojson/                Feature, FeatureCollection, LineString/MultiLineString and serializer
@@ -862,7 +911,7 @@ traderouter/                the library, published as io.github.skuirrels:trader
                             sea-areas.json, sea-area-polygons.json.gz,
                             unlocode-supplement.json.gz, unlocode-seaport-supplement.json,
                             unlocode-rail-supplement.json, port-code-aliases.json
-  src/test/java/            JUnit 5 suite: routing, passages, sea areas, ports, spatial, graph, JSON and movements
+  src/test/java/            JUnit 5 suite: routing, passages, sea areas, ports, spatial, graph, JSON, movements and road-route caching
 traderouter-sample/         console app exercising every entry point, plus run-with-osrm.sh, the OSRM
                             container runner, its region list and the Osmium helper Dockerfile
 scripts/                    CI guard against hard-coded sample road routes
@@ -923,6 +972,9 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 | `OsrmRoadRouteProvider(HttpClient, Uri, ...)` with `HttpClient.Timeout` | `OsrmRoadRouteProvider(java.net.http.HttpClient, URI, ...)` with an explicit per-request `Duration` timeout |
 | `GoogleRoutesRoadRouteProvider(HttpClient, apiKey, travelMode:, maximumSnapDistanceMeters:, baseUri:)` with `HttpClient.Timeout` | `GoogleRoutesRoadRouteProvider(java.net.http.HttpClient, apiKey)`, or the full constructor ending in `URI baseUri` and an explicit per-request `Duration` timeout |
 | `IRoadDistanceEstimator`, init-only `RoadRouteResult` | `RoadDistanceEstimator`; `RoadRouteResult.builder(status, source)` |
+| Separate `TradeRouter.Net.Caching` package, `IRoadRouteCache`, init-only `RoadRouteCacheOptions` | `io.github.skuirrels.traderouter.caching` in the library jar, `RoadRouteCache`, `new RoadRouteCacheOptions(partition, timeToLive)` with chained setters |
+| `DistributedRoadRouteCache` over `Microsoft.Extensions.Caching.Distributed.IDistributedCache` | `DistributedRoadRouteCache` over the library's two-method `DistributedCache`; same keys and entries |
+| `InvalidDataException` for an unusable cache entry | `IllegalStateException` |
 | `System.Text.Json` | Built-in reader and writer; integral doubles are written without a decimal point, other doubles with Java's shortest round-trip form |
 
 ## Data
