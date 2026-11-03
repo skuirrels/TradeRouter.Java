@@ -2,8 +2,8 @@ name: Release
 
 # Pushing a tag such as v2.0.0 signs the parent POM and the library and uploads them to the Central Portal, where the
 # deployment waits, validated, until it is published by hand. docs/releasing.md lists the secrets this needs.
-# Running it by hand is a dry run: it builds, tests and signs with the same secrets, checks the signatures, and uploads
-# nothing.
+# Running it by hand is a dry run: it builds, tests and signs with the same secrets, checks the signatures and that the
+# Central Portal accepts the token, and uploads nothing.
 on:
   push:
     tags: ['v*']
@@ -76,3 +76,23 @@ jobs:
           exit "$failed"
         env:
           MAVEN_GPG_KEY: ${{ secrets.MAVEN_GPG_KEY }}
+
+      # The Publisher API accepts a valid token for any namespace, so this proves the token is valid, not that it may
+      # publish to io.github.skuirrels. GitHub masks the secrets but not their base64 form, hence the add-mask.
+      - name: Check the Central Portal token
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          token=$(printf '%s:%s' "$CENTRAL_TOKEN_USERNAME" "$CENTRAL_TOKEN_PASSWORD" | base64 -w0)
+          echo "::add-mask::${token}"
+          version=$(mvn -B -q org.apache.maven.plugins:maven-help-plugin:3.5.1:evaluate -Dexpression=project.version -DforceStdout)
+          response="${RUNNER_TEMP}/central-published.json"
+          status=$(curl -sS -o "$response" -w '%{http_code}' -H "Authorization: Bearer ${token}" \
+            "https://central.sonatype.com/api/v1/publisher/published?namespace=io.github.skuirrels&name=traderouter&version=${version}")
+          if [ "$status" != 200 ]; then
+            echo "The Central Portal did not accept the token: HTTP ${status} $(cat "$response")"
+            exit 1
+          fi
+          echo "Token accepted. traderouter ${version}: $(cat "$response")"
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}

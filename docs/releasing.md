@@ -41,7 +41,7 @@ Publishing goes through the [Central Portal](https://central.sonatype.com) with 
 
 ## Testing the signing setup
 
-Running the Release workflow by hand is a dry run. It builds, tests and signs with the `maven-central` secrets, checks each signature against the key in `MAVEN_GPG_KEY` and that the key is on `keys.openpgp.org`, and uploads nothing:
+Running the Release workflow by hand is a dry run. It builds, tests and signs with the `maven-central` secrets, checks each signature against the key in `MAVEN_GPG_KEY` and that the key is on `keys.openpgp.org`, checks that the Central Portal accepts the token in `CENTRAL_TOKEN_USERNAME` and `CENTRAL_TOKEN_PASSWORD`, and uploads nothing. The Publisher API accepts a valid token for any namespace, so the token check cannot show whether the token may publish to `io.github.skuirrels`:
 
 ```bash
 gh workflow run release.yml --ref main
