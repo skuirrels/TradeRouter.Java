@@ -2,7 +2,9 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
-## [Unreleased]
+## [2.9.1] - 2026-11-04
+
+A Java-only release. Routes, data and output are unchanged from 2.9.0 and still match TradeRouter.Net 2.9.0 at `09a241c`.
 
 ### Documentation
 
