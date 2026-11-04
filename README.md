@@ -463,13 +463,13 @@ request.setRoadDistanceEstimator(new CircuityRoadDistanceEstimator(configuration
 
 Each application chooses its own road-network provider with `MovementRequest.setRoadRouteProvider`. The library includes two adapters, and any other service can be plugged in through `RoadRouteProvider`:
 
-| Provider | Road data | Runs where | Cost | Result restrictions |
-| --- | --- | --- | --- | --- |
-| `OsrmRoadRouteProvider` | OpenStreetMap extract you load | Your own OSRM service | Your hosting | ODbL attribution and share-alike for derived databases |
-| `GoogleRoutesRoadRouteProvider` | Google's global road network | Google Maps Platform Routes API | Per request, after a monthly free allowance | Google Maps Platform Terms: limited caching, Google Map or attribution when displayed |
-| Your own `RoadRouteProvider` | Any | Any | Any | The provider's own terms |
+| Provider | Road data | Runs where | Cost |
+| --- | --- | --- | --- |
+| `OsrmRoadRouteProvider` | OpenStreetMap extract you load | Your own OSRM service | Your hosting |
+| `GoogleRoutesRoadRouteProvider` | Google's global road network | Google Maps Platform Routes API | Per request, after a monthly free allowance |
+| Your own `RoadRouteProvider` | Any | Any | Any |
 
-Any provider can be wrapped in a cache, subject to its terms; see [Caching road routes](#caching-road-routes).
+Any provider can be wrapped in a cache; see [Caching road routes](#caching-road-routes).
 
 #### OSRM
 
@@ -563,9 +563,7 @@ Read the key from configuration or a secret store; never commit it. The key is s
 
 The adapter requests `DRIVE` routes without live traffic, asks only for distance, duration and geometry, and receives the geometry as a GeoJSON line. Those choices keep requests on Google's Compute Routes Essentials SKU. Other travel modes are accepted through the `travelMode` argument, but Google bills two-wheeler and large-vehicle routing at a higher SKU, and `TRUCK` needs vehicle attributes this adapter does not send. Google snaps endpoints to roads without a distance limit, so the adapter compares each endpoint with the start and end of the returned route and reports `OUTSIDE_COVERAGE` when either is more than `maximumSnapDistanceMeters` away, 10 km by default. Google does not version its road data, so `routing_data_version` is empty and the same request can return a different route later.
 
-Google's terms apply to every result from this adapter, and they differ from OpenStreetMap's. Google's [Routes API policies](https://developers.google.com/maps/documentation/routes/policies) restrict caching of most Routes API content, require Routes results drawn on a map to be shown on a Google Map, and require Google Maps attribution when a result is displayed without one. A movement's GeoJSON carries Google's route geometry, so do not store it long-term or draw it on another map provider's tiles. Read the [Google Maps Platform Terms](https://cloud.google.com/maps-platform/terms) before using the adapter in production.
-
-For prototyping, Google's [Maps Demo Key](https://developers.google.com/maps/demo-key) covers Compute Routes without a billing account. It is available only to personal Google accounts, has an unpublished daily limit and is not for production use. Production use needs a project with billing enabled.
+For prototyping, Google's [Maps Demo Key](https://developers.google.com/maps/demo-key) covers Compute Routes without a billing account. It is available only to personal Google accounts and has an unpublished daily limit; beyond prototyping, use a project with billing enabled.
 
 Examples 16 and 17 in the sample repeat examples 14 and 15 with `GoogleRoutesRoadRouteProvider`. They run when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set and otherwise report that they were skipped:
 
@@ -655,15 +653,13 @@ Keys and entries are the ones TradeRouter.Net writes, so Java and .NET services 
 | Option | Meaning |
 | --- | --- |
 | `partition` | Required. Names the provider, profile and road dataset, for example `osrm-driving-europe-261001`. Change it when any of them changes, so routes from the old setup are no longer served. |
-| `timeToLive` | Required. How long a successful route is kept from the time it was fetched, up to `RoadRouteCacheOptions.MAXIMUM_TIME_TO_LIVE` (100 years). Set it from the provider's terms. |
+| `timeToLive` | Required. How long a successful route is kept from the time it was fetched, up to `RoadRouteCacheOptions.MAXIMUM_TIME_TO_LIVE` (100 years). |
 | `negativeTimeToLive` | How long `NO_ROUTE` and `OUTSIDE_COVERAGE` results are kept. Null, the default, fetches them again every time. `UNAVAILABLE` results are never cached. |
 | `coordinateDecimals` | Decimal places the endpoints are rounded to in the key, 5 by default (about a metre). Longitude is first normalised to [-180, 180). The leg sequence and the endpoints' codes and names are not part of the key. |
 | `cacheGeometry` | Whether route geometry is stored, true by default. Without it entries are much smaller, but legs served from the cache are drawn as straight lines. |
 | `onCacheError` | Called when the store throws, fails its future or returns a result that fails the engine's checks. The leg is then routed by the wrapped provider, so a store outage costs provider calls rather than failing movements. Exceptions from the callback are ignored. |
 
-The provider reads the options once, when it is created. Cancelling the future it returns cancels the store or provider call in progress.
-
-The Google Maps Platform Service Specific Terms for billing accounts outside the European Economic Area allow only latitude and longitude values from the Routes API to be cached, for up to 30 days, so distances, durations and geometry cannot be; billing accounts in the EEA have their own [EEA terms](https://cloud.google.com/terms/maps-platform/eea/maps-service-terms). `CachingRoadRouteProvider` caches whatever the wrapped provider returns and does not check where a result came from, so do not wrap `GoogleRoutesRoadRouteProvider` in it, and check the terms of any other provider before choosing a time to live. Concurrent requests for the same uncached leg each call the provider.
+The provider reads the options once, when it is created. Cancelling the future it returns cancels the store or provider call in progress. Concurrent requests for the same uncached leg each call the provider.
 
 #### Fallback and errors
 

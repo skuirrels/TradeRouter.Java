@@ -18,11 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
-/**
- * Routes road legs through the Google Maps Platform Routes API {@code computeRoutes} method.
- * Google's terms restrict caching of most Routes API content and require Routes results drawn on a map to be
- * shown on a Google Map; callers are responsible for complying with them when they store or display results.
- */
+/** Routes road legs through the Google Maps Platform Routes API {@code computeRoutes} method. */
 public final class GoogleRoutesRoadRouteProvider implements RoadRouteProvider {
     /** Base URI of the public Google Routes API. */
     public static final URI DEFAULT_BASE_URI = URI.create("https://routes.googleapis.com/");

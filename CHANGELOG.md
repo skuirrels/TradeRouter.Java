@@ -2,6 +2,12 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+### Documentation
+
+- The README and Javadoc no longer describe the terms of road-route providers, such as Google Maps Platform caching and display rules or OpenStreetMap attribution. Complying with a provider's terms is left to the application.
+
 ## [2.9.0] - 2026-11-03
 
 Ported from TradeRouter.Net 2.9.0 at `09a241c`.
@@ -10,7 +16,6 @@ Ported from TradeRouter.Net 2.9.0 at `09a241c`.
 
 - New package `io.github.skuirrels.traderouter.caching`, in the `traderouter` jar itself, since unlike the separate .NET `TradeRouter.Net.Caching` package it needs no dependency. `CachingRoadRouteProvider` wraps any `RoadRouteProvider` and serves repeated road legs from a store, keyed on a caller-chosen partition and the endpoints rounded to `coordinateDecimals`. Successful routes are kept for `timeToLive` from the time they were fetched, `NO_ROUTE` and `OUTSIDE_COVERAGE` results only when `negativeTimeToLive` is set, and `UNAVAILABLE` results never. A store failure is reported to `onCacheError` and the leg is routed without the cache. Cancelling the returned future cancels the store or provider call in progress.
 - `DistributedRoadRouteCache` stores results as JSON entries with an absolute expiry in any `DistributedCache`, a two-method interface to adapt Redis, a SQL table or an in-process cache to. Implement `RoadRouteCache` to use another store. Keys and entries are those TradeRouter.Net writes, so Java and .NET services can share one store.
-- The caching provider caches whatever the wrapped provider returns. Google Maps Platform terms do not allow Routes API results to be cached, so do not wrap `GoogleRoutesRoadRouteProvider` in it.
 - Unlike TradeRouter.Net 2.9.0, a stored success with a positive distance and a zero or negative duration is treated as unusable and routed again, as the engine would reject it, and a provider result the engine would reject is not stored at all, so later reads do not report it as a cache fault.
 
 ## [2.8.0] - 2026-10-30
@@ -90,7 +95,7 @@ Ported from TradeRouter.Net 2.2.0 at `beb64c8`.
 
 ### Documentation
 
-- The README compares the OSRM, Google and custom road providers, covers Google's caching and display terms, and shows a custom provider.
+- The README compares the OSRM, Google and custom road providers and shows a custom provider.
 
 ## [2.1.1] - 2026-10-24
 

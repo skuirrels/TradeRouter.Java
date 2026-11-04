@@ -1,6 +1,5 @@
 package io.github.skuirrels.traderouter.caching;
 
-import io.github.skuirrels.traderouter.movements.GoogleRoutesRoadRouteProvider;
 import io.github.skuirrels.traderouter.movements.RoadRouteProvider;
 import io.github.skuirrels.traderouter.movements.RoadRouteRequest;
 import io.github.skuirrels.traderouter.movements.RoadRouteResult;
@@ -22,10 +21,8 @@ import java.util.function.Consumer;
  * {@code OUTSIDE_COVERAGE} results only when {@link RoadRouteCacheOptions#getNegativeTimeToLive()} is set, and
  * {@code UNAVAILABLE} results never.
  *
- * <p>The provider caches whatever the wrapped provider returns, so check that provider's terms allow it: Google Maps
- * Platform terms do not allow Routes API distances, durations or geometry from {@link GoogleRoutesRoadRouteProvider}
- * to be cached. Concurrent requests for the same uncached leg each call the wrapped provider. Cancelling the returned
- * future cancels the store or provider call in progress.
+ * <p>Concurrent requests for the same uncached leg each call the wrapped provider. Cancelling the returned future
+ * cancels the store or provider call in progress.
  */
 public final class CachingRoadRouteProvider implements RoadRouteProvider {
     private final RoadRouteProvider inner;
