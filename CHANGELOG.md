@@ -2,6 +2,12 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+### Documentation
+
+- The README and Javadoc no longer describe the terms of road-route providers, such as Google Maps Platform caching and display rules or OpenStreetMap attribution. Complying with a provider's terms is left to the application. Releases 2.2.0 to 2.9.0 still include that text.
+
 ## [2.9.0] - 2026-11-03
 
 Ported from TradeRouter.Net 2.9.0 at `09a241c`.

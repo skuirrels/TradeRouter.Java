@@ -55,8 +55,7 @@ public final class RoadRouteCacheOptions {
     }
 
     /**
-     * Sets how long a successful route is kept. Set it from the provider's terms: some allow caching only for a
-     * limited number of days, and some not at all. It must be positive and at most {@link #MAXIMUM_TIME_TO_LIVE}.
+     * Sets how long a successful route is kept. It must be positive and at most {@link #MAXIMUM_TIME_TO_LIVE}.
      */
     public RoadRouteCacheOptions setTimeToLive(Duration timeToLive) {
         this.timeToLive = timeToLive;
