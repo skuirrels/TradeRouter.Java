@@ -563,7 +563,7 @@ Read the key from configuration or a secret store; never commit it. The key is s
 
 The adapter requests `DRIVE` routes without live traffic, asks only for distance, duration and geometry, and receives the geometry as a GeoJSON line. Those choices keep requests on Google's Compute Routes Essentials SKU. Other travel modes are accepted through the `travelMode` argument, but Google bills two-wheeler and large-vehicle routing at a higher SKU, and `TRUCK` needs vehicle attributes this adapter does not send. Google snaps endpoints to roads without a distance limit, so the adapter compares each endpoint with the start and end of the returned route and reports `OUTSIDE_COVERAGE` when either is more than `maximumSnapDistanceMeters` away, 10 km by default. Google does not version its road data, so `routing_data_version` is empty and the same request can return a different route later.
 
-For prototyping, Google's [Maps Demo Key](https://developers.google.com/maps/demo-key) covers Compute Routes without a billing account. It is available only to personal Google accounts and has an unpublished daily limit; beyond prototyping, use a project with billing enabled.
+For prototyping, Google's [Maps Demo Key](https://developers.google.com/maps/demo-key) covers Compute Routes without a billing account.
 
 Examples 16 and 17 in the sample repeat examples 14 and 15 with `GoogleRoutesRoadRouteProvider`. They run when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set and otherwise report that they were skipped:
 
@@ -659,7 +659,7 @@ Keys and entries are the ones TradeRouter.Net writes, so Java and .NET services 
 | `cacheGeometry` | Whether route geometry is stored, true by default. Without it entries are much smaller, but legs served from the cache are drawn as straight lines. |
 | `onCacheError` | Called when the store throws, fails its future or returns a result that fails the engine's checks. The leg is then routed by the wrapped provider, so a store outage costs provider calls rather than failing movements. Exceptions from the callback are ignored. |
 
-The provider reads the options once, when it is created. Cancelling the future it returns cancels the store or provider call in progress. Concurrent requests for the same uncached leg each call the provider.
+The provider reads the options once, when it is created. It caches whatever the wrapped provider returns and does not check where a result came from, so results from every service behind one provider share one entry per partition and endpoints. Cancelling the future it returns cancels the store or provider call in progress. Concurrent requests for the same uncached leg each call the provider.
 
 #### Fallback and errors
 
@@ -971,6 +971,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 | Separate `TradeRouter.Net.Caching` package, `IRoadRouteCache`, init-only `RoadRouteCacheOptions` | `io.github.skuirrels.traderouter.caching` in the library jar, `RoadRouteCache`, `new RoadRouteCacheOptions(partition, timeToLive)` with chained setters |
 | `DistributedRoadRouteCache` over `Microsoft.Extensions.Caching.Distributed.IDistributedCache` | `DistributedRoadRouteCache` over the library's two-method `DistributedCache`; same keys and entries |
 | `InvalidDataException` for an unusable cache entry | `IllegalStateException` |
+| README and XML docs describe Google Maps Platform and OpenStreetMap terms for road providers and caching | Left out on purpose: complying with a provider's terms is the application's concern, so do not port those passages |
 | `System.Text.Json` | Built-in reader and writer; integral doubles are written without a decimal point, other doubles with Java's shortest round-trip form |
 
 ## Data

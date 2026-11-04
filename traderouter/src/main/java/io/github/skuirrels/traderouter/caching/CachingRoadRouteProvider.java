@@ -21,7 +21,8 @@ import java.util.function.Consumer;
  * {@code OUTSIDE_COVERAGE} results only when {@link RoadRouteCacheOptions#getNegativeTimeToLive()} is set, and
  * {@code UNAVAILABLE} results never.
  *
- * <p>Concurrent requests for the same uncached leg each call the wrapped provider. Cancelling the returned future
+ * <p>The provider caches whatever the wrapped provider returns and does not check where a result came from.
+ * Concurrent requests for the same uncached leg each call the wrapped provider. Cancelling the returned future
  * cancels the store or provider call in progress.
  */
 public final class CachingRoadRouteProvider implements RoadRouteProvider {
