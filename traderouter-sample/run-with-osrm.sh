@@ -12,6 +12,9 @@ custom_pbf_url="${TRADEROUTER_OSRM_PBF_URL:-}"
 osrm_image="${TRADEROUTER_OSRM_IMAGE:-ghcr.io/project-osrm/osrm-backend:26.8.0-debian}"
 osrm_container="${TRADEROUTER_OSRM_CONTAINER:-traderouter-osrm}"
 osrm_data_version="${TRADEROUTER_OSRM_DATA_VERSION:-}"
+# Example 18's road-route cache: a partition naming this OSRM dataset, and how long routes are kept.
+road_cache_partition="${TRADEROUTER_ROAD_CACHE_PARTITION:-osrm-driving-$osrm_dataset}"
+road_cache_days="${TRADEROUTER_ROAD_CACHE_DAYS:-30}"
 osmium_image="${TRADEROUTER_OSMIUM_IMAGE:-traderouter-osmium-tool:bookworm}"
 sample_regions_file="${TRADEROUTER_OSRM_SAMPLE_REGIONS_FILE:-$script_dir/osrm-sample-regions.tsv}"
 local_osrm_url="http://127.0.0.1:5000"
@@ -348,5 +351,7 @@ export TRADEROUTER_OSRM_URL="$osrm_url"
 if [[ -n "$osrm_data_version" ]]; then
     export TRADEROUTER_OSRM_DATA_VERSION="$osrm_data_version"
 fi
+export TRADEROUTER_ROAD_CACHE_PARTITION="$road_cache_partition"
+export TRADEROUTER_ROAD_CACHE_DAYS="$road_cache_days"
 mvn -q -f "$repo_root/pom.xml" -DskipTests install
 exec mvn -q -f "$repo_root/pom.xml" -pl traderouter-sample exec:java -Dexec.args="$*"

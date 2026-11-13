@@ -57,16 +57,16 @@ Both cargo measurements are shown together only to demonstrate the two emissions
 Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total               Basis  Choke points
                                                                                    hours      g per t-km  kg per t cargo          kg
 1   Pickup    Road  GBLGW  GBFXT        183 km   circuity_estimate                     3.0           125.0            22.9         457  teu_average_weight
-2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network                   895.2             7.2           110.4       2,209                 teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca
-3   Main      Sea   SGSIN  AUMEL      7,300 km    maritime_network                   391.6             7.2            52.3       1,047                 teu  Sunda
+2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network                   895.2             7.3           113.0       2,261                 teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca
+3   Main      Sea   SGSIN  AUMEL      7,300 km    maritime_network                   391.6             7.3            53.6       1,072                 teu  Sunda
 4   Delivery  Road  AUMEL  AUMRS      1,011 km   circuity_estimate                    16.8           125.0           126.4       2,527  teu_average_weight
-Total                                23,896 km                                     1,306.7                           312.0       6,240                      for 12 t of cargo in 2 TEU
+Total                                23,896 km                                     1,306.7                           315.9       6,317                      for 12 t of cargo in 2 TEU
 Modelled minimum = 786.0 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,306.7 h (54.4 days)
 Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line
 Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption
 CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)
 CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg
-CO2e total     = kg of CO2e for this shipment: 71.7 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
+CO2e total     = kg of CO2e for this shipment: 73.4 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
 ```
 
 ### Sea and rail movement
@@ -94,16 +94,16 @@ The container weighs more than the GLEC average of 10 t per TEU, so the rail and
 ```text
 Leg Kind      Mode  From   To      Distance       Distance basis   Modelled transit time       CO2e rate  CO2e per tonne  CO2e total               Basis  Choke points
                                                                                    hours      g per t-km  kg per t cargo          kg
-1   Main      Sea   CNSHG  DEHAM     19,991 km    maritime_network                 1,147.7             7.2           143.3       2,867                 teu  Malacca, Bab-el-Mandeb, Suez, Gibraltar
+1   Main      Sea   CNSHG  DEHAM     19,991 km    maritime_network                 1,147.7             7.3           146.7       2,935                 teu  Malacca, Bab-el-Mandeb, Suez, Gibraltar
 2   Main      Rail  DEHAM  CZPRG        491 km        great_circle                     6.1            30.7            15.1         362              tonnes
 3   Delivery  Road  CZPRG  CZPLZ        112 km   circuity_estimate                     1.9           125.0            14.1         337              tonnes
-Total                                20,595 km                                     1,155.7                           172.5       3,566                      for 24 t of cargo in 2 TEU
+Total                                20,595 km                                     1,155.7                           175.9       3,634                      for 24 t of cargo in 2 TEU
 Modelled minimum = 682.7 h travel + 425.0 h sea operations + 48 h port handling + 0 h connections = 1,155.7 h (48.2 days)
 Distance basis = maritime_network/road_network are network routes; circuity_estimate is a planning estimate; great_circle is straight-line
 Timing         = planning lower bound from configured assumptions; excludes carrier schedules, customs and disruption
 CO2e rate      = grams of CO2e emitted moving 1 tonne 1 km (configured factor for the mode)
 CO2e per tonne = rate × leg distance: kg of CO2e for each tonne of cargo carried over the leg
-CO2e total     = kg of CO2e for this shipment: 71.7 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
+CO2e total     = kg of CO2e for this shipment: 73.4 g per TEU-km on sea legs, the greater of cargo weight and 10 t per TEU on road and rail legs, cargo weight on air legs
 ```
 
 ---
@@ -525,7 +525,7 @@ TRADEROUTER_OSRM_DATA_DIR="$PWD/osrm-data/planet" TRADEROUTER_OSRM_DATASET=plane
 
 See the Geofabrik pages for the [England](https://download.geofabrik.de/europe/united-kingdom/england.html) and [South Africa](https://download.geofabrik.de/africa/south-africa.html) extracts, and the OpenStreetMap [planet documentation](https://wiki.openstreetmap.org/wiki/Planet.osm). The runner never moves or deletes a downloaded PBF. `TRADEROUTER_OSRM_DATA_DIR`, `TRADEROUTER_OSRM_DATASET` and `TRADEROUTER_OSRM_PBF_URL` remain available when you deliberately want a different stored dataset.
 
-The script accepts `--geojson` and passes it to the sample. `TRADEROUTER_OSRM_IMAGE` and `TRADEROUTER_OSRM_CONTAINER` override the OSRM container defaults. `TRADEROUTER_OSMIUM_IMAGE` can name an existing Osmium image instead of building the included helper. `TRADEROUTER_OSRM_DATA_VERSION` optionally records an immutable provenance label; it does not select the dataset.
+The script accepts `--geojson` and passes it to the sample. `TRADEROUTER_OSRM_IMAGE` and `TRADEROUTER_OSRM_CONTAINER` override the OSRM container defaults. `TRADEROUTER_OSMIUM_IMAGE` can name an existing Osmium image instead of building the included helper. `TRADEROUTER_OSRM_DATA_VERSION` optionally records an immutable provenance label; it does not select the dataset. `TRADEROUTER_ROAD_CACHE_PARTITION` and `TRADEROUTER_ROAD_CACHE_DAYS` configure example 18's road-route cache, and default to `osrm-driving-` followed by the dataset name, and 30 days.
 
 Set `TRADEROUTER_OSRM_SAMPLE_REGIONS_FILE` to another tab-separated region file when the sample routes change. Each non-comment row contains an extract name, its download URL, an Osmium bounding box and a readiness-probe coordinate. `TRADEROUTER_OSRM_PROBE_COORDINATE` can override the probe. This keeps dataset coverage in configuration instead of embedding it in the runner.
 
@@ -538,6 +538,8 @@ TRADEROUTER_OSRM_URL=https://your-osrm-service.example mvn -q -pl traderouter-sa
 ```
 
 Example 13 always shows the built-in `ESTIMATE_ONLY` result. Examples 14 and 15 use `OsrmRoadRouteProvider` and `REQUIRE_NETWORK`, so they must return OSRM routes rather than silently fall back. Example 15 covers two continents: Cape Town to Johannesburg by road, Johannesburg to London Heathrow by air, and Heathrow to Guildford by road. When `TRADEROUTER_OSRM_URL` is not set, both OSRM examples are clearly reported as skipped and the rest of the sample still runs.
+
+Example 18 puts a [road-route cache](#caching-road-routes) in front of the same OSRM provider and calculates two movements that share the Gatwick-to-Heathrow pickup leg: Gatwick to Heathrow alone, then Gatwick to Heathrow by road, Heathrow to Johannesburg by air and Johannesburg to Cape Town by road. Three road legs take two OSRM calls, because the second movement's Gatwick-to-Heathrow leg is served from the cache. The store is a small in-memory `DistributedCache` in the sample, which lasts only for the run. The example needs `TRADEROUTER_ROAD_CACHE_PARTITION` and `TRADEROUTER_ROAD_CACHE_DAYS` as well as `TRADEROUTER_OSRM_URL`; `run-with-osrm.sh` sets them, and otherwise it reports that it was skipped.
 
 #### Google Routes API
 
@@ -779,7 +781,7 @@ The defaults stay at zero because no published figure fits them directly. Railro
 
 ### Emissions
 
-Every movement leg carries a well-to-wheel CO2e estimate, and the totals add them up. The figures are intensity-based: grams of CO2e per tonne of cargo per kilometre, from the GLEC Framework v3.2 defaults that ISO 14083 builds on. Pass cargo tonnes to get absolute kilograms as well.
+Every movement leg carries a well-to-wheel CO2e estimate, and the totals add them up. The figures are intensity-based: grams of CO2e per tonne of cargo per kilometre, from the GLEC Framework v3.3 defaults that ISO 14083 builds on. Pass cargo tonnes to get absolute kilograms as well.
 
 ```java
 var movement = TradeRoutes.calculateMovement(plan, null, 20.0, null);
@@ -794,23 +796,23 @@ System.out.printf("%.1f kg CO2e per tonne, %.0f kg for %s t%n",
 
 Each leg feature gains `co2e_g_per_tonne_km`, `co2e_kg_per_tonne` and, with a cargo weight or TEU count, `co2e_kg` and `co2e_basis`; sea legs charged per container also carry `co2e_g_per_teu_km`. The collection gains `total_co2e_kg_per_tonne`, `cargo_tonnes`, `cargo_teu` and `total_co2e_kg`.
 
-Pass a TEU count as well for containerised freight. Sea legs are then charged per container at 71.7 g CO2e per TEU-km, because a light box still occupies a whole slot; a 40-foot container counts as 2 TEU and a 40-foot high cube as 2.25. Road and rail legs are charged on the greater of the gross weight and the GLEC average of 10 t per TEU: a light container still needs a whole truck or wagon slot, and the per-tonne defaults assume an average load, so charging only the cargo inside a nearly empty box would understate the leg. A container heavier than the average is charged on its stated weight. Air legs use the gross weight, and if only a TEU count is given every non-sea leg assumes 10 t per TEU. Weights are gross physical weight, not chargeable weight, as GLEC and ISO 14083 require.
+Pass a TEU count as well for containerised freight. Sea legs are then charged per container at 73.4 g CO2e per TEU-km, because a light box still occupies a whole slot; a 40-foot container counts as 2 TEU and a 40-foot high cube as 2.25. Road and rail legs are charged on the greater of the gross weight and the GLEC average of 10 t per TEU: a light container still needs a whole truck or wagon slot, and the per-tonne defaults assume an average load, so charging only the cargo inside a nearly empty box would understate the leg. A container heavier than the average is charged on its stated weight. Air legs use the gross weight, and if only a TEU count is given every non-sea leg assumes 10 t per TEU. Weights are gross physical weight, not chargeable weight, as GLEC and ISO 14083 require.
 
 | Mode | Default, g CO2e per tonne-km, well-to-wheel | GLEC source |
 |---|---|---|
-| Sea, per tonne | 7.17 | Table 18, industry-average dry container, 71.7 g per TEU-km at the GLEC average of 10 t per TEU |
-| Sea, per container | 71.7 per TEU-km | Table 18, industry-average dry container, end-user intensity, used when a TEU count is given |
-| Road | 125 | Europe starting value for an HGV over 20 t gross vehicle weight, including GLEC's +5% distance adjustment |
+| Sea, per tonne | 7.34 | Table 18, industry-average dry container, 73.4 g per TEU-km at the GLEC average of 10 t per TEU |
+| Sea, per container | 73.4 per TEU-km | Table 18, industry-average dry container, end-user intensity, used when a TEU count is given |
+| Road | 125 | Europe and South America starting value for an HGV over 20 t gross vehicle weight, including GLEC's +5% distance adjustment |
 | Rail, North America | 16.1 | Module 2 rail, North America: US average diesel from Class I railroad fuel reporting. Used when both ends of a rail leg lie within `getRailNetworkSnapKm()` of the embedded North American rail network |
 | Rail, elsewhere | 30.7 | Table 4, European diesel traction, average/mixed load |
-| Air freighter, under 1,500 km | 1,516 | v3.2 Table 1 |
-| Air freighter, 1,500 km and over | 608 | v3.2 Table 1 |
-| Air belly freight, under 1,500 km | 1,239 | v3.2 Table 1, passenger aircraft |
-| Air belly freight, 1,500 km and over | 936 | v3.2 Table 1, passenger aircraft |
-| Air, service unknown, under 1,500 km | 1,363 | v3.2 Table 1, 55% belly freight and 45% freighter |
-| Air, service unknown, 1,500 km and over | 788 | v3.2 Table 1, as above |
+| Air freighter, under 1,500 km | 1,512 | Table 1 |
+| Air freighter, 1,500 km and over | 638 | Table 1 |
+| Air belly freight, under 1,500 km | 1,332 | Table 1, passenger aircraft |
+| Air belly freight, 1,500 km and over | 930 | Table 1, passenger aircraft |
+| Air, service unknown, under 1,500 km | 1,413 | Table 1, 55% belly freight and 45% freighter |
+| Air, service unknown, 1,500 km and over | 799 | Table 1, as above |
 
-Source: Smart Freight Centre, [GLEC Framework v3.2, October 2025](https://smart-freight-centre-media.s3.amazonaws.com/documents/GLEC_FRAMEWORK_v3.2_21_10_25_1.pdf), Module 2: Table 1 for air, Table 4 and the North American rail text for rail, the European road starting values and Table 18 for sea. An air leg is charged for its `MovementLeg.airService()`, `FREIGHTER`, `BELLY` or `UNKNOWN` (the default), on its great-circle distance: GLEC's air factors already include its +95 km distance adjustment, so none is added. The leg reports the service it was charged for in `air_service`. These are defaults for when carrier data is unavailable; the sea figure assumes an average dry container on an unknown trade lane, and reefer or trade-lane-specific values differ. The North American rail value is GLEC's US figure and also applies to Canadian and Mexican legs on the network, and the rail value elsewhere assumes diesel traction; GLEC's European average for unknown traction is 18.4 g. The road factor includes GLEC's +5% distance adjustment, so like the air factors it applies to the leg distance as it stands. Set `MovementRequest.setEmissions` to your own `EmissionFactors` to override any of them; `setRailNorthAmericaGramsPerTonneKm` and `setRailGramsPerTonneKm` hold the two rail values.
+Source: Smart Freight Centre, [GLEC Framework v3.3, October 2026](https://smartfreightcentre.org/news/13311209) (SFC-GUID-001 v3.3, ISBN 978-90-833629-0-8), Module 2: Table 1 for air, Table 4 and the North American rail text for rail, the Europe and South America road starting values and Table 18 for sea. Against v3.2, the sea container value rises from 71.7 to 73.4 g per TEU-km and the air values change; the road and rail values are the same. An air leg is charged for its `MovementLeg.airService()`, `FREIGHTER`, `BELLY` or `UNKNOWN` (the default), on its great-circle distance: GLEC's air factors already include its +95 km distance adjustment, so none is added. The leg reports the service it was charged for in `air_service`. These are defaults for when carrier data is unavailable; the sea figure assumes an average dry container on an unknown trade lane, and reefer or trade-lane-specific values differ. The North American rail value is GLEC's US figure and also applies to Canadian and Mexican legs on the network, and the rail value elsewhere assumes diesel traction; GLEC's European average for unknown traction is 18.4 g. The road factor includes GLEC's +5% distance adjustment, so like the air factors it applies to the leg distance as it stands. Set `MovementRequest.setEmissions` to `EmissionFactors.glecV32Defaults()` to keep figures comparable with a v3.2 baseline, or to your own `EmissionFactors` to override any of them; `setRailNorthAmericaGramsPerTonneKm` and `setRailGramsPerTonneKm` hold the two rail values.
 
 ## Known limitations and judgement calls
 
@@ -942,7 +944,7 @@ To prepare or reuse the default local OSRM container and run the same sample:
 ./traderouter-sample/run-with-osrm.sh
 ```
 
-The sample contains seventeen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Examples 16 and 17 repeat them with the Google Routes API when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set. Add `-Dexec.args=--geojson` to print a full feature.
+The sample contains eighteen numbered examples covering coordinates, port codes, restrictions, terminal resolution, area weighting, A*, blocked routes, GeoJSON output, the Shanghai to London walkthrough and multi-leg movements. Examples 13 and 14 compare the built-in road estimate with OSRM for the same Gatwick-to-Heathrow leg. Example 15 demonstrates OSRM-backed road legs in South Africa and the United Kingdom around a Johannesburg-to-Heathrow air leg. Examples 14 and 15 run when `TRADEROUTER_OSRM_URL` is set as shown in [Road routing](#road-routing); otherwise they report that they were skipped. Examples 16 and 17 repeat them with the Google Routes API when `TRADEROUTER_GOOGLE_MAPS_API_KEY` is set. Example 18 runs the OSRM provider through `CachingRoadRouteProvider` and shows a repeated road leg served from the cache. Add `-Dexec.args=--geojson` to print a full feature.
 
 `mvn install` places `traderouter-2.9.1.jar`, with its sources and Javadoc jars, in your local Maven repository.
 

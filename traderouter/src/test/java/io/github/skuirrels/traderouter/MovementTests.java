@@ -26,7 +26,9 @@ import io.github.skuirrels.traderouter.passages.Passage;
 import io.github.skuirrels.traderouter.ports.Port;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
@@ -34,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -526,17 +529,60 @@ class MovementTests {
     void emissionsUseGlecDefaultsPerModeAndAirDistanceBand() {
         EmissionFactors f = EmissionFactors.glecDefaults();
 
-        assertThat(f.gramsPerTonneKm(TransportMode.SEA, 15000)).isEqualTo(7.17);
+        assertThat(f.gramsPerTonneKm(TransportMode.SEA, 15000)).isEqualTo(7.34);
         assertThat(f.gramsPerTonneKm(TransportMode.ROAD, 100)).isEqualTo(125.0);
         assertThat(f.gramsPerTonneKm(TransportMode.RAIL, 500)).isEqualTo(30.7);
-        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1499)).isEqualTo(1363.0);
-        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1500)).isEqualTo(788.0);
-        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1499, AirCargoService.FREIGHTER)).isEqualTo(1516.0);
-        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 9000, AirCargoService.FREIGHTER)).isEqualTo(608.0);
-        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1499, AirCargoService.BELLY)).isEqualTo(1239.0);
-        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 9000, AirCargoService.BELLY)).isEqualTo(936.0);
+        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1499)).isEqualTo(1413.0);
+        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1500)).isEqualTo(799.0);
+        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1499, AirCargoService.FREIGHTER)).isEqualTo(1512.0);
+        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 9000, AirCargoService.FREIGHTER)).isEqualTo(638.0);
+        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 1499, AirCargoService.BELLY)).isEqualTo(1332.0);
+        assertThat(f.gramsPerTonneKm(TransportMode.AIR, 9000, AirCargoService.BELLY)).isEqualTo(930.0);
         assertThat(f.gramsPerTonneKm(TransportMode.ROAD, 100, AirCargoService.FREIGHTER))
                 .as("only air legs depend on the service").isEqualTo(125.0);
+    }
+
+    @ParameterizedTest(name = "GLEC {0}")
+    @MethodSource("glecFactorSets")
+    void emissionsGlecDefaultsAreInternallyConsistent(String version, EmissionFactors f) {
+        assertThat(f.getSeaGramsPerTonneKm())
+                .as("GLEC %s per-tonne sea value is the per-TEU value at the average tonnes per TEU", version)
+                .isCloseTo(f.getSeaGramsPerTeuKm() / f.getAverageTonnesPerTeu(), within(1e-9));
+        assertThat(f.getAirUnknownShortHaulGramsPerTonneKm())
+                .as("GLEC %s unknown air service is 55%% belly freight and 45%% freighter, rounded to whole grams", version)
+                .isCloseTo(0.55 * f.getAirBellyShortHaulGramsPerTonneKm()
+                        + 0.45 * f.getAirFreighterShortHaulGramsPerTonneKm(), within(1.0));
+        assertThat(f.getAirUnknownLongHaulGramsPerTonneKm())
+                .as("GLEC %s unknown air service is 55%% belly freight and 45%% freighter, rounded to whole grams", version)
+                .isCloseTo(0.55 * f.getAirBellyLongHaulGramsPerTonneKm()
+                        + 0.45 * f.getAirFreighterLongHaulGramsPerTonneKm(), within(1.0));
+    }
+
+    static Stream<Arguments> glecFactorSets() {
+        return Stream.of(
+                Arguments.of("v3.3", EmissionFactors.glecDefaults()),
+                Arguments.of("v3.2", EmissionFactors.glecV32Defaults()));
+    }
+
+    @Test
+    void emissionsGlecV32DefaultsDifferFromV33OnlyForSeaAndAir() {
+        EmissionFactors v32 = EmissionFactors.glecV32Defaults();
+        EmissionFactors v33 = EmissionFactors.glecDefaults();
+
+        assertThat(v32.getSeaGramsPerTeuKm()).isEqualTo(71.7);
+        assertThat(v32.getSeaGramsPerTonneKm()).isEqualTo(7.17);
+        assertThat(v32.gramsPerTonneKm(TransportMode.AIR, 1499, AirCargoService.FREIGHTER)).isEqualTo(1516.0);
+        assertThat(v32.gramsPerTonneKm(TransportMode.AIR, 9000, AirCargoService.FREIGHTER)).isEqualTo(608.0);
+        assertThat(v32.gramsPerTonneKm(TransportMode.AIR, 1499, AirCargoService.BELLY)).isEqualTo(1239.0);
+        assertThat(v32.gramsPerTonneKm(TransportMode.AIR, 9000, AirCargoService.BELLY)).isEqualTo(936.0);
+        assertThat(v32.gramsPerTonneKm(TransportMode.AIR, 1499)).isEqualTo(1363.0);
+        assertThat(v32.gramsPerTonneKm(TransportMode.AIR, 9000)).isEqualTo(788.0);
+
+        assertThat(v32.getRoadGramsPerTonneKm()).isEqualTo(v33.getRoadGramsPerTonneKm());
+        assertThat(v32.getRailGramsPerTonneKm()).isEqualTo(v33.getRailGramsPerTonneKm());
+        assertThat(v32.getRailNorthAmericaGramsPerTonneKm()).isEqualTo(v33.getRailNorthAmericaGramsPerTonneKm());
+        assertThat(v32.getAverageTonnesPerTeu()).isEqualTo(v33.getAverageTonnesPerTeu());
+        assertThat(v32.getAirShortHaulMaxKm()).isEqualTo(v33.getAirShortHaulMaxKm());
     }
 
     @Test
@@ -545,12 +591,12 @@ class MovementTests {
         LegResult belly = fly(AirCargoService.BELLY);
         LegResult unknown = fly(AirCargoService.UNKNOWN);
 
-        assertThat(freighter.feature().properties().getCo2eGramsPerTonneKm()).isEqualTo(608.0);
+        assertThat(freighter.feature().properties().getCo2eGramsPerTonneKm()).isEqualTo(638.0);
         assertThat(freighter.feature().properties().getCo2eKg())
                 .as("the GLEC air factors already include the +95 km adjustment, so no distance is added")
-                .isCloseTo(608.0 * 2.0 * freighter.length() / 1000.0, within(1e-6));
+                .isCloseTo(638.0 * 2.0 * freighter.length() / 1000.0, within(1e-6));
         assertThat(freighter.feature().properties().getAirService()).isEqualTo("freighter");
-        assertThat(belly.feature().properties().getCo2eGramsPerTonneKm()).isEqualTo(936.0);
+        assertThat(belly.feature().properties().getCo2eGramsPerTonneKm()).isEqualTo(930.0);
         assertThat(unknown.feature().properties().getAirService()).isEqualTo("unknown");
     }
 
@@ -572,8 +618,8 @@ class MovementTests {
         assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * 20.0, within(1e-9));
 
         LegResult sea = result.legs().get(1);
-        assertThat(sea.co2eGramsPerTonneKm()).isEqualTo(7.17);
-        assertThat(sea.co2eKgPerTonne()).isCloseTo(7.17 * sea.length() / 1000.0, within(1e-9));
+        assertThat(sea.co2eGramsPerTonneKm()).isEqualTo(7.34);
+        assertThat(sea.co2eKgPerTonne()).isCloseTo(7.34 * sea.length() / 1000.0, within(1e-9));
 
         assertThat(result.cargoTonnes()).isEqualTo(20.0);
         assertThat(result.totalCo2eKgPerTonne()).isCloseTo(result.legs().stream().mapToDouble(LegResult::co2eKgPerTonne).sum(), within(1e-9));
@@ -587,11 +633,11 @@ class MovementTests {
         assertThat(result.cargoTonnes()).isNull();
         assertThat(result.totalCo2eKg()).isNull();
         assertThat(result.legs().get(0).co2eKg()).isNull();
-        assertThat(result.legs().get(0).co2eKgPerTonne()).as("15,400 km at 7.17 g per tonne-km").isGreaterThan(100.0);
+        assertThat(result.legs().get(0).co2eKgPerTonne()).as("15,400 km at 7.34 g per tonne-km").isGreaterThan(100.0);
 
         JsonNode doc = JSON.readTree(result.toJson());
         JsonNode props = doc.get("features").get(0).get("properties");
-        assertThat(props.get("co2e_g_per_tonne_km").asDouble()).isEqualTo(7.17);
+        assertThat(props.get("co2e_g_per_tonne_km").asDouble()).isEqualTo(7.34);
         assertThat(props.has("co2e_kg")).isFalse();
         assertThat(doc.get("properties").get("total_co2e_kg_per_tonne").asDouble()).isGreaterThan(100.0);
     }
@@ -618,13 +664,30 @@ class MovementTests {
     }
 
     @Test
+    void emissionsGlecV32DefaultsChargeMovementsAtTheV32Rates() {
+        MovementRequest request = MovementRequest.of(MELBOURNE_MOVEMENT)
+                .setCargoTonnes(12.0)
+                .setCargoTeu(2.0)
+                .setEmissions(EmissionFactors.glecV32Defaults());
+
+        MovementResult result = engine().calculateMovement(request);
+
+        LegResult sea = result.legs().get(1);
+        assertThat(sea.co2eGramsPerTonneKm()).isEqualTo(7.17);
+        assertThat(sea.feature().properties().getCo2eGramsPerTeuKm()).isEqualTo(71.7);
+        assertThat(sea.co2eKg()).isCloseTo(71.7 * 2.0 * sea.length() / 1000.0, within(1e-9));
+        assertThat(result.legs().get(0).co2eGramsPerTonneKm()).as("road is the same in v3.2 and v3.3").isEqualTo(125.0);
+        assertThat(result.toText()).contains("71.7 g per TEU-km on sea legs");
+    }
+
+    @Test
     void emissionsSeaLegsUsePerTeuRateWhenTeuIsGiven() throws Exception {
         MovementResult result = TradeRoutes.calculateMovement(MELBOURNE_MOVEMENT, null, 12.0, 2.0);
 
         LegResult sea = result.legs().get(1);
         assertThat(sea.co2eBasis()).isEqualTo("teu");
-        assertThat(sea.feature().properties().getCo2eGramsPerTeuKm()).isEqualTo(71.7);
-        assertThat(sea.co2eKg()).isCloseTo(71.7 * 2.0 * sea.length() / 1000.0, within(1e-9));
+        assertThat(sea.feature().properties().getCo2eGramsPerTeuKm()).isEqualTo(73.4);
+        assertThat(sea.co2eKg()).isCloseTo(73.4 * 2.0 * sea.length() / 1000.0, within(1e-9));
 
         LegResult road = result.legs().get(0);
         assertThat(road.co2eBasis()).as("12 t in 2 TEU is below the 20 t a pair of average containers carries")
@@ -637,7 +700,7 @@ class MovementTests {
         JsonNode doc = JSON.readTree(result.toJson());
         JsonNode seaProps = doc.get("features").get(1).get("properties");
         assertThat(seaProps.get("co2e_basis").asString()).isEqualTo("teu");
-        assertThat(seaProps.get("co2e_g_per_teu_km").asDouble()).isEqualTo(71.7);
+        assertThat(seaProps.get("co2e_g_per_teu_km").asDouble()).isEqualTo(73.4);
         assertThat(doc.get("properties").get("cargo_teu").asDouble()).isEqualTo(2.0);
     }
 
