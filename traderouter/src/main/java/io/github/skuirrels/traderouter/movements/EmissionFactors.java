@@ -2,32 +2,50 @@ package io.github.skuirrels.traderouter.movements;
 
 /**
  * Well-to-wheel CO2e emission intensity per transport mode, in grams of CO2e per tonne-kilometre. Defaults are
- * the GLEC Framework v3.2 default values (Smart Freight Centre, October 2025, Module 2), which ISO 14083 builds on.
+ * the GLEC Framework v3.3 default values (Smart Freight Centre, October 2026, Module 2), which ISO 14083 builds on.
  * Override any property to use carrier-specific or newer factors.
  */
 public final class EmissionFactors {
-    private double seaGramsPerTeuKm = 71.7;
+    private double seaGramsPerTeuKm = 73.4;
     private double averageTonnesPerTeu = 10.0;
-    private double seaGramsPerTonneKm = 7.17;
+    private double seaGramsPerTonneKm = 7.34;
     private double roadGramsPerTonneKm = 125.0;
     private double railGramsPerTonneKm = 30.7;
     private double railNorthAmericaGramsPerTonneKm = 16.1;
     private double airShortHaulMaxKm = 1500.0;
-    private double airFreighterShortHaulGramsPerTonneKm = 1516.0;
-    private double airFreighterLongHaulGramsPerTonneKm = 608.0;
-    private double airBellyShortHaulGramsPerTonneKm = 1239.0;
-    private double airBellyLongHaulGramsPerTonneKm = 936.0;
-    private double airUnknownShortHaulGramsPerTonneKm = 1363.0;
-    private double airUnknownLongHaulGramsPerTonneKm = 788.0;
+    private double airFreighterShortHaulGramsPerTonneKm = 1512.0;
+    private double airFreighterLongHaulGramsPerTonneKm = 638.0;
+    private double airBellyShortHaulGramsPerTonneKm = 1332.0;
+    private double airBellyLongHaulGramsPerTonneKm = 930.0;
+    private double airUnknownShortHaulGramsPerTonneKm = 1413.0;
+    private double airUnknownLongHaulGramsPerTonneKm = 799.0;
 
-    /** A fresh instance carrying the GLEC default values. */
+    /** A fresh instance carrying the GLEC v3.3 default values. */
     public static EmissionFactors glecDefaults() {
         return new EmissionFactors();
     }
 
     /**
-     * Deep-sea container shipping per container. GLEC v3.2 Table 18, industry average dry container, end-user
-     * intensity, 71.7 g CO2e per TEU-km WTW. Used for sea legs when the request states a TEU count.
+     * A fresh instance carrying the GLEC Framework v3.2 defaults (October 2025), for reporting that must stay
+     * comparable with a baseline calculated before v3.3. Only the sea and air values differ from
+     * {@link #glecDefaults()}; road and rail are the same in both versions.
+     */
+    public static EmissionFactors glecV32Defaults() {
+        return new EmissionFactors()
+                .setSeaGramsPerTeuKm(71.7)
+                .setSeaGramsPerTonneKm(7.17)
+                .setAirFreighterShortHaulGramsPerTonneKm(1516.0)
+                .setAirFreighterLongHaulGramsPerTonneKm(608.0)
+                .setAirBellyShortHaulGramsPerTonneKm(1239.0)
+                .setAirBellyLongHaulGramsPerTonneKm(936.0)
+                .setAirUnknownShortHaulGramsPerTonneKm(1363.0)
+                .setAirUnknownLongHaulGramsPerTonneKm(788.0);
+    }
+
+    /**
+     * Deep-sea container shipping per container. GLEC v3.3 Table 18, industry average dry container, end-user
+     * intensity, 73.4 g CO2e per TEU-km WTW. Used for sea legs when the request states a TEU count. Setting it does
+     * not change {@link #getSeaGramsPerTonneKm()}; set both to keep the two sea bases consistent.
      */
     public double getSeaGramsPerTeuKm() {
         return seaGramsPerTeuKm;
@@ -52,7 +70,9 @@ public final class EmissionFactors {
 
     /**
      * Deep-sea container shipping per tonne: {@link #getSeaGramsPerTeuKm()} divided by
-     * {@link #getAverageTonnesPerTeu()}. Used for sea legs when only a cargo weight is known.
+     * {@link #getAverageTonnesPerTeu()}, 7.34 g CO2e per tonne-km. Used for sea legs when only a cargo weight is
+     * known. It is stored rather than computed so the reported rate stays exactly the published figure, and it does
+     * not follow changes to the other two.
      */
     public double getSeaGramsPerTonneKm() {
         return seaGramsPerTonneKm;
@@ -65,8 +85,8 @@ public final class EmissionFactors {
     }
 
     /**
-     * Road haulage. GLEC v3.2 Europe starting value for an HGV over 20 t GVW, 125 g CO2e per tonne-km WTW, including
-     * GLEC's +5% distance adjustment.
+     * Road haulage. GLEC v3.3 Europe and South America starting value for an HGV over 20 t GVW, 125 g CO2e per
+     * tonne-km WTW, including GLEC's +5% distance adjustment.
      */
     public double getRoadGramsPerTonneKm() {
         return roadGramsPerTonneKm;
@@ -79,7 +99,7 @@ public final class EmissionFactors {
     }
 
     /**
-     * Rail freight outside North America. GLEC v3.2 Table 4, European diesel traction, average/mixed load,
+     * Rail freight outside North America. GLEC v3.3 Table 4, European diesel traction, average/mixed load,
      * 30.7 g CO2e per tonne-km WTW.
      */
     public double getRailGramsPerTonneKm() {
@@ -94,7 +114,7 @@ public final class EmissionFactors {
 
     /**
      * Rail freight in North America: a rail leg whose ends both lie within
-     * {@link MovementRequest#getRailNetworkSnapKm()} of the embedded North American rail network. GLEC v3.2
+     * {@link MovementRequest#getRailNetworkSnapKm()} of the embedded North American rail network. GLEC v3.3
      * Module 2, North America, US average diesel, 16.1 g CO2e per tonne-km WTW, derived from Class I railroad fuel
      * reporting.
      */
@@ -109,7 +129,7 @@ public final class EmissionFactors {
     }
 
     /**
-     * Great-circle length below which an air leg is short-haul, 1,500 km as in GLEC v3.2 Table 1 (SBTi and ISO 14083
+     * Great-circle length below which an air leg is short-haul, 1,500 km as in GLEC v3.3 Table 1 (SBTi and ISO 14083
      * definitions). The air factors already include GLEC's +95 km distance adjustment, so they apply to the
      * great-circle distance of the leg as it stands.
      */
@@ -123,7 +143,7 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Freighter, short-haul. GLEC v3.2 Table 1, 1,516 g CO2e per tonne-km WTW. */
+    /** Freighter, short-haul. GLEC v3.3 Table 1, 1,512 g CO2e per tonne-km WTW. */
     public double getAirFreighterShortHaulGramsPerTonneKm() {
         return airFreighterShortHaulGramsPerTonneKm;
     }
@@ -134,7 +154,7 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Freighter, long-haul. GLEC v3.2 Table 1, 608 g CO2e per tonne-km WTW. */
+    /** Freighter, long-haul. GLEC v3.3 Table 1, 638 g CO2e per tonne-km WTW. */
     public double getAirFreighterLongHaulGramsPerTonneKm() {
         return airFreighterLongHaulGramsPerTonneKm;
     }
@@ -145,7 +165,7 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Belly freight on a passenger aircraft, short-haul. GLEC v3.2 Table 1, 1,239 g CO2e per tonne-km WTW. */
+    /** Belly freight on a passenger aircraft, short-haul. GLEC v3.3 Table 1, 1,332 g CO2e per tonne-km WTW. */
     public double getAirBellyShortHaulGramsPerTonneKm() {
         return airBellyShortHaulGramsPerTonneKm;
     }
@@ -156,7 +176,7 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Belly freight on a passenger aircraft, long-haul. GLEC v3.2 Table 1, 936 g CO2e per tonne-km WTW. */
+    /** Belly freight on a passenger aircraft, long-haul. GLEC v3.3 Table 1, 930 g CO2e per tonne-km WTW. */
     public double getAirBellyLongHaulGramsPerTonneKm() {
         return airBellyLongHaulGramsPerTonneKm;
     }
@@ -167,7 +187,7 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Air freight on an unknown service, short-haul. GLEC v3.2 Table 1, 1,363 g CO2e per tonne-km WTW. */
+    /** Air freight on an unknown service, short-haul. GLEC v3.3 Table 1, 1,413 g CO2e per tonne-km WTW. */
     public double getAirUnknownShortHaulGramsPerTonneKm() {
         return airUnknownShortHaulGramsPerTonneKm;
     }
@@ -178,7 +198,7 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** Air freight on an unknown service, long-haul. GLEC v3.2 Table 1, 788 g CO2e per tonne-km WTW. */
+    /** Air freight on an unknown service, long-haul. GLEC v3.3 Table 1, 799 g CO2e per tonne-km WTW. */
     public double getAirUnknownLongHaulGramsPerTonneKm() {
         return airUnknownLongHaulGramsPerTonneKm;
     }

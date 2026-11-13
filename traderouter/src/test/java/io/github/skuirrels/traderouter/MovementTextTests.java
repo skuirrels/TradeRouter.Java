@@ -47,7 +47,7 @@ class MovementTextTests {
         assertThat(text).contains(String.format(Locale.ROOT, "%,.1f", result.totalTransitHours()));
         assertThat(text).contains(String.format(Locale.ROOT, "%,.0f", result.totalCo2eKg()));
         assertThat(text).contains("for 12 t of cargo in 2 TEU");
-        assertThat(text).contains("71.7 g per TEU-km on sea legs");
+        assertThat(text).contains("73.4 g per TEU-km on sea legs");
         assertThat(text).as("12 t in 2 TEU is charged at 10 t per TEU inland, in a column wide enough for the basis")
                 .contains("  teu_average_weight");
         assertThat(text).contains("the greater of cargo weight and 10 t per TEU on road and rail legs");
@@ -74,6 +74,10 @@ class MovementTextTests {
         assertThat(lines[2]).endsWith("457  teu_average_weight  ");
         assertThat(lines[3]).endsWith("teu  Gibraltar, Suez, Bab-el-Mandeb, Malacca");
         assertThat(lines[3]).startsWith("2   Main      Sea   GBFXT  SGSIN     15,402 km    maritime_network");
+        assertThat(lines[3]).as("GLEC v3.3 sea rate, per-tonne and total figures shown in the README")
+                .contains("895.2             7.3           113.0       2,261");
+        assertThat(lines[4]).contains("391.6             7.3            53.6       1,072");
+        assertThat(lines[6]).contains("1,306.7                           315.9       6,317");
         assertThat(lines[6]).startsWith("Total                                23,896 km");
         assertThat(lines[6]).endsWith("for 12 t of cargo in 2 TEU");
         assertThat(lines[7]).startsWith("Modelled minimum = 786.0 h travel + 376.7 h sea operations + 96 h port handling + 48 h connections = 1,306.7 h (54.4 days)");

@@ -146,7 +146,11 @@ public final class MovementRequest {
         return this;
     }
 
-    /** CO2e intensity per mode used for the emission figures on each leg. Defaults to the GLEC values. */
+    /**
+     * CO2e intensity per mode used for the emission figures on each leg. Defaults to the GLEC v3.3 values,
+     * {@link EmissionFactors#glecDefaults()}; set {@link EmissionFactors#glecV32Defaults()} to stay comparable with a
+     * v3.2 baseline.
+     */
     public EmissionFactors getEmissions() {
         return emissions;
     }

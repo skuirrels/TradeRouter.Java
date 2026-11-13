@@ -3,6 +3,10 @@ package io.github.skuirrels.traderouter.sample;
 import io.github.skuirrels.traderouter.DefaultTradeRouterEngine;
 import io.github.skuirrels.traderouter.TradeRouterOptions;
 import io.github.skuirrels.traderouter.TradeRoutes;
+import io.github.skuirrels.traderouter.caching.CachingRoadRouteProvider;
+import io.github.skuirrels.traderouter.caching.DistributedCache;
+import io.github.skuirrels.traderouter.caching.DistributedRoadRouteCache;
+import io.github.skuirrels.traderouter.caching.RoadRouteCacheOptions;
 import io.github.skuirrels.traderouter.common.Coordinate;
 import io.github.skuirrels.traderouter.common.DistanceUnit;
 import io.github.skuirrels.traderouter.common.Haversine;
@@ -14,6 +18,9 @@ import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
 import io.github.skuirrels.traderouter.movements.OsrmRoadRouteProvider;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
+import io.github.skuirrels.traderouter.movements.RoadRouteProvider;
+import io.github.skuirrels.traderouter.movements.RoadRouteRequest;
+import io.github.skuirrels.traderouter.movements.RoadRouteResult;
 import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.movements.Waypoint;
@@ -26,10 +33,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 /**
  * TradeRouter.Java sample: exercises each public entry point and prints the results.
@@ -41,6 +53,10 @@ public final class Program {
     }
 
     private static final String OSRM_URL_VARIABLE = "TRADEROUTER_OSRM_URL";
+    private static final String CACHE_PARTITION_VARIABLE = "TRADEROUTER_ROAD_CACHE_PARTITION";
+    private static final String CACHE_DAYS_VARIABLE = "TRADEROUTER_ROAD_CACHE_DAYS";
+    private static final String CACHED_OSRM_TITLE =
+            "18. Two movements sharing the Gatwick to Heathrow leg through a road-route cache";
     private static final String GOOGLE_API_KEY_VARIABLE = "TRADEROUTER_GOOGLE_MAPS_API_KEY";
 
     public static void main(String[] args) {
@@ -197,17 +213,23 @@ public final class Program {
                 .setRoadRoutingMode(RoadRoutingMode.ESTIMATE_ONLY);
         printMovementResult("13. Gatwick to Heathrow using the built-in road estimate", TradeRoutes.calculateMovement(estimatedRoadRequest));
 
-        printOsrmExamples(roadPlan);
-        printGoogleRoutesExamples(roadPlan);
+        // The JDK 21 HttpClient is AutoCloseable; closing it stops its selector thread, as .NET disposes its client.
+        // Example 18 reuses the OSRM provider from examples 14 and 15, so the client stays open until it has run.
+        try (HttpClient osrmHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
+            OsrmRoadRouteProvider osrmRoadRouteProvider = printOsrmExamples(roadPlan, osrmHttpClient);
+            printGoogleRoutesExamples(roadPlan);
+            printCachedOsrmExample(roadPlan, osrmRoadRouteProvider);
+        }
     }
 
-    private static void printOsrmExamples(MovementPlan roadPlan) {
+    // Prints examples 14 and 15 and returns the OSRM provider, or null when TRADEROUTER_OSRM_URL is not set.
+    private static OsrmRoadRouteProvider printOsrmExamples(MovementPlan roadPlan, HttpClient osrmHttpClient) {
         String osrmUrl = System.getenv(OSRM_URL_VARIABLE);
         if (osrmUrl == null || osrmUrl.isBlank()) {
             String skippedOsrm = "Skipped: set " + OSRM_URL_VARIABLE + "=http://127.0.0.1:5000 after starting OSRM as shown in the README.";
             print("14. Gatwick to Heathrow using an OSRM container", skippedOsrm);
             print("15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container", skippedOsrm);
-            return;
+            return null;
         }
 
         URI osrmBaseUri;
@@ -220,34 +242,100 @@ public final class Program {
             throw new IllegalArgumentException(OSRM_URL_VARIABLE + " must be an absolute HTTP or HTTPS URI. Received: " + osrmUrl);
         }
 
-        // The JDK 21 HttpClient is AutoCloseable; closing it stops its selector thread, as .NET disposes its client.
-        try (HttpClient osrmHttpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
-            var osrmRoadRouteProvider = new OsrmRoadRouteProvider(
-                    osrmHttpClient,
-                    osrmBaseUri,
-                    OsrmRoadRouteProvider.DEFAULT_PROFILE,
-                    System.getenv("TRADEROUTER_OSRM_DATA_VERSION"),
-                    OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
-                    Duration.ofSeconds(5));
-            MovementRequest osrmRoadRequest = MovementRequest.of(roadPlan)
-                    .setCargoTonnes(20.0)
-                    .setRoadRouteProvider(osrmRoadRouteProvider)
-                    .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
-            printMovementResult("14. Gatwick to Heathrow using an OSRM container", TradeRoutes.calculateMovementAsync(osrmRoadRequest).join());
+        var osrmRoadRouteProvider = new OsrmRoadRouteProvider(
+                osrmHttpClient,
+                osrmBaseUri,
+                OsrmRoadRouteProvider.DEFAULT_PROFILE,
+                System.getenv("TRADEROUTER_OSRM_DATA_VERSION"),
+                OsrmRoadRouteProvider.DEFAULT_MAXIMUM_SNAP_DISTANCE_METERS,
+                Duration.ofSeconds(5));
+        MovementRequest osrmRoadRequest = MovementRequest.of(roadPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRouteProvider(osrmRoadRouteProvider)
+                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+        printMovementResult("14. Gatwick to Heathrow using an OSRM container", TradeRoutes.calculateMovementAsync(osrmRoadRequest).join());
 
-            MovementPlan capeTownToGuildfordPlan = MovementPlan
-                    .from(Waypoint.place("ZACPT"))
-                    .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
-                    .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
-                    .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
-            MovementRequest capeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
-                    .setCargoTonnes(20.0)
-                    .setRoadRouteProvider(osrmRoadRouteProvider)
-                    .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
-            printMovementResult(
-                    "15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container",
-                    TradeRoutes.calculateMovementAsync(capeTownToGuildfordRequest).join());
+        MovementPlan capeTownToGuildfordPlan = MovementPlan
+                .from(Waypoint.place("ZACPT"))
+                .pickupTo(Waypoint.airport("ZAJNB"), TransportMode.ROAD)
+                .thenTo(Waypoint.airport("GBLHR"), TransportMode.AIR)
+                .deliverTo(Waypoint.place("GBGDD"), TransportMode.ROAD);
+        MovementRequest capeTownToGuildfordRequest = MovementRequest.of(capeTownToGuildfordPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRouteProvider(osrmRoadRouteProvider)
+                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK);
+        printMovementResult(
+                "15. Cape Town to Guildford via Johannesburg and Heathrow using an OSRM container",
+                TradeRoutes.calculateMovementAsync(capeTownToGuildfordRequest).join());
+        return osrmRoadRouteProvider;
+    }
+
+    // 18. A road-route cache in front of the OSRM provider from examples 14 and 15. The cache partition and how long
+    //     routes are kept are deployment settings, so they come from the environment; run-with-osrm.sh sets both. The
+    //     store here is an in-memory DistributedCache, which lasts only for this run; an application adapts Redis, a
+    //     SQL table or another shared store.
+    private static void printCachedOsrmExample(MovementPlan roadPlan, OsrmRoadRouteProvider osrmRoadRouteProvider) {
+        String cachePartition = System.getenv(CACHE_PARTITION_VARIABLE);
+        String cacheDays = System.getenv(CACHE_DAYS_VARIABLE);
+        if (osrmRoadRouteProvider == null) {
+            print(CACHED_OSRM_TITLE, "Skipped: set " + OSRM_URL_VARIABLE + " as for examples 14 and 15.");
+            return;
         }
+        if (cachePartition == null || cachePartition.isBlank() || cacheDays == null || cacheDays.isBlank()) {
+            print(CACHED_OSRM_TITLE, "Skipped: set " + CACHE_PARTITION_VARIABLE + " and " + CACHE_DAYS_VARIABLE
+                    + ", or run run-with-osrm.sh, as shown in the README.");
+            return;
+        }
+
+        int days = parseCacheDays(cacheDays);
+        var countedOsrm = new CountingRoadRouteProvider(osrmRoadRouteProvider);
+        var cachedOsrm = new CachingRoadRouteProvider(
+                countedOsrm,
+                new DistributedRoadRouteCache(new InMemoryDistributedCache()),
+                new RoadRouteCacheOptions(cachePartition, Duration.ofDays(days)));
+
+        // Gatwick to Heathrow by road, then the same pickup leg ahead of a flight to Johannesburg and a road leg
+        // to Cape Town. The second movement's Gatwick to Heathrow leg is served from the cache.
+        MovementResult heathrowOnly = TradeRoutes.calculateMovementAsync(MovementRequest.of(roadPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRouteProvider(cachedOsrm)
+                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK)).join();
+        MovementPlan onToCapeTownPlan = MovementPlan
+                .from(Waypoint.place("GBLGW"))
+                .pickupTo(Waypoint.airport("GBLHR"), TransportMode.ROAD)
+                .thenTo(Waypoint.airport("ZAJNB"), TransportMode.AIR)
+                .deliverTo(Waypoint.place("ZACPT"), TransportMode.ROAD);
+        MovementResult onToCapeTown = TradeRoutes.calculateMovementAsync(MovementRequest.of(onToCapeTownPlan)
+                .setCargoTonnes(20.0)
+                .setRoadRouteProvider(cachedOsrm)
+                .setRoadRoutingMode(RoadRoutingMode.REQUIRE_NETWORK)).join();
+
+        long roadLegs = Stream.concat(heathrowOnly.legs().stream(), onToCapeTown.legs().stream())
+                .filter(leg -> leg.leg().mode() == TransportMode.ROAD)
+                .count();
+        printMovementResult(CACHED_OSRM_TITLE, onToCapeTown);
+        System.out.println("   " + roadLegs + " road legs across the two movements took " + countedOsrm.calls()
+                + " OSRM calls; Gatwick to Heathrow was " + n1(heathrowOnly.legs().get(0).length())
+                + " km both times, the second from cache partition " + cachePartition + ".");
+    }
+
+    // As .NET int.TryParse with NumberStyles.None: ASCII digits only, no sign or spaces, and at least 1.
+    private static int parseCacheDays(String cacheDays) {
+        IllegalArgumentException invalid = new IllegalArgumentException(
+                CACHE_DAYS_VARIABLE + " must be a whole number of days of at least 1. Received: " + cacheDays);
+        if (!cacheDays.matches("[0-9]+")) {
+            throw invalid;
+        }
+        int days;
+        try {
+            days = Integer.parseInt(cacheDays);
+        } catch (NumberFormatException e) {
+            throw invalid;
+        }
+        if (days < 1) {
+            throw invalid;
+        }
+        return days;
     }
 
     private static void printGoogleRoutesExamples(MovementPlan roadPlan) {
@@ -290,7 +378,7 @@ public final class Program {
 
     private static void printMovement(String title, MovementPlan plan, Double tonnes, Double teu) {
         // CO2e per leg uses GLEC well-to-wheel defaults per mode. With a TEU count, sea legs are charged per
-        // container (71.7 g per TEU-km) rather than per tonne, so a light box is not under-counted.
+        // container (73.4 g per TEU-km) rather than per tonne, so a light box is not under-counted.
         MovementRequest request = MovementRequest.of(plan)
                 .setSeaOptions(new TradeRouterOptions().setReturnPassages(true))
                 .setCargoTonnes(tonnes)
@@ -336,5 +424,53 @@ public final class Program {
         System.out.println();
         System.out.println(title);
         System.out.println("   " + detail);
+    }
+
+    // Counts the calls that reach the wrapped provider, so example 18 can show how many legs the cache answered.
+    private static final class CountingRoadRouteProvider implements RoadRouteProvider {
+        private final RoadRouteProvider inner;
+        private final AtomicInteger calls = new AtomicInteger();
+
+        CountingRoadRouteProvider(RoadRouteProvider inner) {
+            this.inner = inner;
+        }
+
+        int calls() {
+            return calls.get();
+        }
+
+        @Override
+        public CompletableFuture<RoadRouteResult> routeAsync(RoadRouteRequest request) {
+            calls.incrementAndGet();
+            return inner.routeAsync(request);
+        }
+    }
+
+    // A process-local DistributedCache, standing in for the .NET MemoryDistributedCache. Entries expire at an
+    // absolute time and are dropped when read after it.
+    private static final class InMemoryDistributedCache implements DistributedCache {
+        private record Entry(byte[] value, Instant expiresAt) {
+        }
+
+        private final ConcurrentHashMap<String, Entry> entries = new ConcurrentHashMap<>();
+
+        @Override
+        public CompletableFuture<byte[]> getAsync(String key) {
+            Entry entry = entries.get(key);
+            if (entry == null) {
+                return CompletableFuture.completedFuture(null);
+            }
+            if (!Instant.now().isBefore(entry.expiresAt())) {
+                entries.remove(key, entry);
+                return CompletableFuture.completedFuture(null);
+            }
+            return CompletableFuture.completedFuture(entry.value().clone());
+        }
+
+        @Override
+        public CompletableFuture<Void> setAsync(String key, byte[] value, Duration timeToLive) {
+            entries.put(key, new Entry(value.clone(), Instant.now().plus(timeToLive)));
+            return CompletableFuture.completedFuture(null);
+        }
     }
 }

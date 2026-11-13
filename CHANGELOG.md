@@ -2,6 +2,25 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.10.0 at `c1328f0`: the GLEC Framework v3.3 change (`ec082c1`) and sample example 18 (`c8d2d71`).
+
+### Added
+
+- `EmissionFactors.glecV32Defaults()` returns the GLEC Framework v3.2 values, for reporting that must stay comparable with a baseline calculated before v3.3. Pass it to `MovementRequest.setEmissions`.
+
+### Changed
+
+- `EmissionFactors.glecDefaults()` and a new `EmissionFactors` now carry the [GLEC Framework v3.3](https://smartfreightcentre.org/news/13311209) (Smart Freight Centre, October 2026) Module 2 defaults, so default CO2e figures for sea and air legs change.
+- Sea: 73.4 g per TEU-km from Table 18, industry-average dry container, end-user intensity, up from 71.7, or 7.34 g per tonne-km at 10 t per TEU, up from 7.17.
+- Air, Table 1, including the +95 km distance adjustment: freighter 1,512 g per tonne-km under 1,500 km and 638 from 1,500 km (were 1,516 and 608), belly freight 1,332 and 930 (were 1,239 and 936), service unknown 1,413 and 799 (were 1,363 and 788).
+- Road, 125 g, and rail, 30.7 g in Europe and 16.1 g in North America, are unchanged in v3.3.
+
+### Sample
+
+- Sample example 18, ported from TradeRouter.Net 2.10.0 (`c8d2d71`), sends two movements that share the Gatwick to Heathrow leg through `CachingRoadRouteProvider` in front of OSRM, and reports how many OSRM calls the cache saved. It needs `TRADEROUTER_OSRM_URL`, `TRADEROUTER_ROAD_CACHE_PARTITION` and `TRADEROUTER_ROAD_CACHE_DAYS`, which `run-with-osrm.sh` sets. The store is an in-memory `DistributedCache` that lasts for the run. The README describes it under OSRM road routing and the sample section.
+
 ## [2.9.1] - 2026-11-04
 
 A Java-only release. Routes, data and output are unchanged from 2.9.0 and still match TradeRouter.Net 2.9.0 at `09a241c`.
@@ -160,6 +179,7 @@ First release on Maven Central, ported from TradeRouter.Net 2.0.0 at `de93a0e`.
 - Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
+[2.9.1]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.9.1
 [2.9.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.9.0
 [2.8.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.8.0
 [2.7.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.7.0
