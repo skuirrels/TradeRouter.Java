@@ -104,7 +104,9 @@ class AddedCoordinateFillTests {
             "ILTAB | Wikipedia, Taba Border Crossing | 34.90 | 29.49",
             "GBDNG | GeoNames, Donnington, geonameId 13269858 | -2.44 | 52.72",
             "CNYCG | GeoNames, Yichang, geonameId 1786764 | 111.28 | 30.71",
-            "CZPRB | GeoNames, Pardubice, geonameId 3068582 | 15.78 | 50.04"
+            "CZPRB | GeoNames, Pardubice, geonameId 3068582 | 15.78 | 50.04",
+            // Replaces a generated row at St. Charles, Illinois.
+            "USILC | GeoNames, Charleston, geonameId 4235668 | -88.18 | 39.50"
     })
     void locatePlacesHandReviewedCodes(String code, String source, double lon, double lat) {
         UnLocode record = DefaultTradeRouterEngine.getDefault().unLocodes().getByCode(code);

@@ -113,8 +113,9 @@ public final class MovementRequest {
      * Functions to add to a location's recorded UN/LOCODE functions, keyed case-insensitively by code. The UNECE
      * list under-records many terminals, and the embedded sea-port and rail supplements cover only reviewed codes,
      * so a leg to another rail-served place can still be rejected. Declaring {@link LocationFunction#RAIL_TERMINAL}
-     * here lets the waypoint and mode checks accept it. The functions are added only for validation; they do not
-     * change how the code resolves. The map is live and may be modified.
+     * here lets the waypoint and mode checks accept it. The functions are added for validation and change how a code
+     * resolves in one case only: declaring {@link LocationFunction#SEA_PORT} for a code that UN/LOCODE records as a
+     * named airport keeps the port-list record under that code. The map is live and may be modified.
      */
     public Map<String, Set<LocationFunction>> getAdditionalLocationFunctions() {
         return additionalLocationFunctions;

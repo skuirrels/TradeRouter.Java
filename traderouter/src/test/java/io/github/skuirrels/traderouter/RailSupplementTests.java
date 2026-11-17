@@ -31,10 +31,10 @@ class RailSupplementTests {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final String RESOURCE_ROOT = "/io/github/skuirrels/traderouter/data/";
 
-    private record Entry(String code, String name, String source) {
+    record Entry(String code, String name, String source) {
     }
 
-    private static List<Entry> loadEntries() throws IOException {
+    static List<Entry> loadEntries() throws IOException {
         try (InputStream stream = TradeRouterEngine.class.getResourceAsStream(RESOURCE_ROOT + "unlocode-rail-supplement.json")) {
             if (stream == null) {
                 throw new IllegalStateException("Rail supplement is not embedded.");
@@ -82,6 +82,8 @@ class RailSupplementTests {
     @Test
     void entriesAddOnlyTheRailFunctionWhereUnecePublishesNone() throws IOException {
         Map<String, Set<LocationFunction>> published = loadPublishedFunctions();
+        Set<String> airports = new java.util.HashSet<>();
+        AirportSupplementTests.loadEntries().forEach(entry -> airports.add(entry.code()));
 
         for (Entry entry : loadEntries()) {
             Set<LocationFunction> original = published.get(entry.code());
@@ -91,6 +93,9 @@ class RailSupplementTests {
             Set<LocationFunction> expected = EnumSet.noneOf(LocationFunction.class);
             expected.addAll(original);
             expected.add(LocationFunction.RAIL_TERMINAL);
+            if (airports.contains(entry.code())) {
+                expected.add(LocationFunction.AIRPORT);
+            }
             assertThat(DefaultTradeRouterEngine.getDefault().unLocodes().getByCode(entry.code()).functions())
                     .as("%s must keep its published functions", entry.code())
                     .isEqualTo(expected);

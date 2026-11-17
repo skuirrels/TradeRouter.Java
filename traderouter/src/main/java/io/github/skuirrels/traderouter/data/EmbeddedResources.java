@@ -109,6 +109,7 @@ public final class EmbeddedResources {
         Map<String, Supplement> supplement = loadUnLocodeSupplement();
         Set<String> confirmedSeaPorts = loadFunctionSupplement("unlocode-seaport-supplement.json");
         Set<String> confirmedRailTerminals = loadFunctionSupplement("unlocode-rail-supplement.json");
+        Set<String> confirmedAirports = loadFunctionSupplement("unlocode-airport-supplement.json");
         List<UnLocode> entries = new ArrayList<>(items.size());
         for (Object item : items) {
             List<Object> row = JsonParser.asArray(item);
@@ -125,6 +126,10 @@ public final class EmbeddedResources {
             // Codes UNECE lists without the rail function but that are documented freight rail terminals.
             if (confirmedRailTerminals.contains(code.toUpperCase(Locale.ROOT))) {
                 flags |= LocationFunction.RAIL_TERMINAL.bit();
+            }
+            // Codes a newer UNECE release lists as airports that the embedded row does not.
+            if (confirmedAirports.contains(code.toUpperCase(Locale.ROOT))) {
+                flags |= LocationFunction.AIRPORT.bit();
             }
             var functions = LocationFunction.fromFlags(flags);
             String coordinateSource = coordinate != null ? "UNECE" : "";
@@ -165,7 +170,8 @@ public final class EmbeddedResources {
     /**
      * Loads a function supplement: {@code unlocode-seaport-supplement.json} lists codes that UNECE publishes without
      * the sea-port function but that cited sources document as sea ports; {@code unlocode-rail-supplement.json} does
-     * the same for freight rail terminals. Each entry only adds its function and never removes one.
+     * the same for freight rail terminals and {@code unlocode-airport-supplement.json} for airports. Each entry only
+     * adds its function and never removes one.
      */
     private static Set<String> loadFunctionSupplement(String fileName) {
         Set<String> result = new HashSet<>();
