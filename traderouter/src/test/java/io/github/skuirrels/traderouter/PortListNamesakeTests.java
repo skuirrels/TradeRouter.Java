@@ -7,6 +7,7 @@ import io.github.skuirrels.traderouter.graph.MaritimeGraph;
 import io.github.skuirrels.traderouter.locations.LocationFunction;
 import io.github.skuirrels.traderouter.locations.UnLocode;
 import io.github.skuirrels.traderouter.movements.LegResult;
+import io.github.skuirrels.traderouter.movements.MovementParser;
 import io.github.skuirrels.traderouter.movements.MovementPlan;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
@@ -293,5 +294,80 @@ class PortListNamesakeTests {
         assertThat(leg.feature().properties().getDistanceBasis()).isEqualTo("rail_network");
         assertThat(leg.feature().properties().getRailroads()).contains("CPKC");
         assertThat(leg.length()).isBetween(250.0, 400.0);
+    }
+
+    // UN/LOCODE files these as airports, under the IATA code the port list uses for the city or its port.
+    @ParameterizedTest
+    @CsvSource({
+            "CNNGB, 121.462, 29.827",  // Ningbo Lishe; the port list's CNNGB is the port of Ningbo, 11 km away.
+            "CNSHA, 121.336, 31.198",  // Shanghai Hongqiao, 27 km from the port list's Shanghai.
+            "CNTAO, 120.088, 36.362",  // Qingdao Jiaodong, 42 km from the port list's Qingdao.
+            "USJFK, -73.779, 40.640",  // John F. Kennedy, 39 km from the port list's position.
+            "BHBAH, 50.638, 26.267"    // Bahrain International Airport.
+    })
+    void locatePrefersUnLocodeWhenItRecordsANamedAirport(String code, double lon, double lat) {
+        ResolvedLocation resolved = TradeRoutes.locate(code);
+
+        assertThat(resolved.source()).isEqualTo("unlocode");
+        assertThat(resolved.port()).isNull();
+        assertThat(Haversine.distanceKm(resolved.coordinate(), new Coordinate(lon, lat))).isLessThan(2.0);
+    }
+
+    @Test
+    void locateKeepsThePortListForAnAirportWithACityName() {
+        // UN/LOCODE files USATL as Atlanta, an airport without "Apt" in its name, so the port list's Atlanta stands.
+        assertThat(TradeRoutes.locate("USATL").source()).isEqualTo("ports");
+    }
+
+    @Test
+    void movementAirLegFromNingboAirportStartsAtTheAirport() {
+        List<LegResult> legs = TradeRoutes.calculateMovement("CNNGB to GBLHR Air").legs();
+
+        assertThat(legs).hasSize(1);
+        assertThat(Haversine.distanceKm(legs.get(0).from().coordinate(), new Coordinate(121.462, 29.827))).isLessThan(1.0);
+    }
+
+    @Test
+    void movementSeaLegFromAnAirportCodeDeclaredASeaPortStartsAtThePortListPort() {
+        // Declared in lower case: the map is keyed case-insensitively, as in .NET.
+        MovementRequest request = new MovementRequest(MovementParser.parse("CNNGB to NLRTM Sea"))
+                .addLocationFunctions("cnngb", LocationFunction.SEA_PORT);
+
+        LegResult leg = DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs().get(0);
+
+        assertThat(leg.from().source()).as("the caller declared CNNGB a sea port, so it means the port of Ningbo").isEqualTo("ports");
+        assertThat(leg.feature().properties().getPortOrigin().name()).isEqualTo("Ningbo");
+    }
+
+    @Test
+    void movementAirLegFromAnAirportCodeDeclaredAnotherFunctionStaysAtTheAirport() {
+        // Only the sea-port function means the port; any other declaration leaves the code at the airport.
+        MovementRequest request = new MovementRequest(MovementParser.parse("USJFK to GBLHR Air"))
+                .addLocationFunctions("USJFK", LocationFunction.AIRPORT, LocationFunction.RAIL_TERMINAL);
+
+        LegResult leg = DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs().get(0);
+
+        assertThat(leg.from().source()).isEqualTo("unlocode");
+        assertThat(Haversine.distanceKm(leg.from().coordinate(), new Coordinate(-73.779, 40.640))).isLessThan(2.0);
+    }
+
+    @Test
+    void movementCoordinateOverrideForAnAirportCodeIsUsedAsGiven() {
+        Coordinate supplied = new Coordinate(121.5, 29.9);
+        MovementRequest request = new MovementRequest(MovementParser.parse("CNNGB to GBLHR Air"))
+                .putCoordinate("CNNGB", supplied);
+
+        LegResult leg = DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs().get(0);
+
+        assertThat(leg.from().source()).isEqualTo("coordinates");
+        assertThat(leg.from().coordinate()).isEqualTo(supplied);
+    }
+
+    @Test
+    void calculateRouteStillRoutesAnAirportCodeFromThePortList() {
+        // The port-code route API reads the port list alone, so CNNGB stays the port of Ningbo there.
+        GeoJsonFeature route = TradeRoutes.calculate("CNNGB", "NLRTM");
+
+        assertThat(route.properties().getPortOrigin().name()).isEqualTo("Ningbo");
     }
 }

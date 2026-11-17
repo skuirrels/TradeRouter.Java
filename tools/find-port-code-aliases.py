@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """List candidate aliases from official UN/LOCODE sea-port codes to port-list codes that UN/LOCODE lacks.
 
-Reads the embedded ports.json.gz and unlocode.json.gz and prints JSON candidates for manual review. A candidate
-pairs a port-list code absent from UN/LOCODE with a UN/LOCODE sea port in the same country that is not itself in
-the port list, within --max-km, scored by name similarity. Nothing is written into the library; reviewed pairs
-are copied by hand into traderouter/src/main/resources/io/github/skuirrels/traderouter/data/port-code-aliases.json.
+Reads the embedded ports.json.gz, unlocode.json.gz and unlocode-supplement.json.gz and prints JSON candidates for
+manual review. A candidate pairs a port-list code with a UN/LOCODE sea port in the same country that is not itself
+in the port list, within --max-km, scored by name similarity. The port-list code is either absent from UN/LOCODE
+("kind": "absent") or one UN/LOCODE records as a named airport ("kind": "named_airport": the airport function
+without the sea-port function, and Apt or Airport in the name), because the resolver then places the code at the
+airport and the port-list record is reachable by port code only through an alias, as the port of Ningbo is from
+CNNBO when the port list files it under the airport code CNNGB. A sea port's position is its supplement row when it
+has one, else its UNECE coordinate. Nothing is written into the library; reviewed pairs are copied by hand into
+traderouter/src/main/resources/io/github/skuirrels/traderouter/data/port-code-aliases.json.
 """
 import argparse
 import difflib
@@ -45,22 +50,32 @@ def main():
 
     ports = json.load(gzip.open(DATA / "ports.json.gz"))
     unlocodes = {row[0]: row for row in json.load(gzip.open(DATA / "unlocode.json.gz"))}
+    supplement = {item["code"]: (item["lon"], item["lat"]) for item in json.load(gzip.open(DATA / "unlocode-supplement.json.gz"))}
     port_codes = {p["port"] for p in ports}
-    free_sea_ports = [row for row in unlocodes.values() if row[4] & 1 and row[2] is not None and row[0] not in port_codes]
+    free_sea_ports = []
+    for row in unlocodes.values():
+        position = supplement.get(row[0]) or ((row[2], row[3]) if row[2] is not None else None)
+        if row[4] & 1 and position and row[0] not in port_codes:
+            free_sea_ports.append((row, position))
 
     candidates = []
     for port in ports:
-        if port["port"] in unlocodes:
+        listed = unlocodes.get(port["port"])
+        if listed is None:
+            kind = "absent"
+        elif listed[4] & 8 and not listed[4] & 1 and re.search(r"\b(apt|airport)\b", listed[1], re.IGNORECASE):
+            kind = "named_airport"
+        else:
             continue
-        for row in free_sea_ports:
+        for row, (lon, lat) in free_sea_ports:
             if row[0][:2] != port["port"][:2]:
                 continue
-            km = distance_km(port["x"], port["y"], row[2], row[3])
+            km = distance_km(port["x"], port["y"], lon, lat)
             score = similarity(port["name"], row[1])
             if km <= args.max_km and score >= args.min_similarity:
                 candidates.append({
                     "unlocode": row[0], "unlocode_name": row[1], "port_code": port["port"],
-                    "port_name": port["name"], "km": round(km, 1), "name_similarity": round(score, 2)})
+                    "port_name": port["name"], "kind": kind, "km": round(km, 1), "name_similarity": round(score, 2)})
 
     candidates.sort(key=lambda c: (-c["name_similarity"], c["km"]))
     print(json.dumps(candidates, ensure_ascii=False, indent=1))

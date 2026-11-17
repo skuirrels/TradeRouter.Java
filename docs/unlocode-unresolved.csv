@@ -2,27 +2,34 @@ code,name,reason,geoname_ids
 ADFMO,La Farga de Moles,no explicit link,
 AEDAS,Das Island,conflicting or missing match,292274
 AEFAT,Fateh Terminal,no explicit link,
+AEHIL,Hail,"UNECE 2025-1 coordinate held back, outside its country",
 AEIND,Indooroodilly,no explicit link,
 AEJEA,Jebel Ali,conflicting or missing match,8469747;8469749
-AEKHA,Khalidia,conflicting or missing match,8476505
+AEMAS,Masfut,added from UNECE 2025-1 without a coordinate,
 AEMUB,Mubarek Terminal,no explicit link,
 AFKUR,Kuran-O-Munjan,conflicting or missing match,9031064
+AFSRO,Sharona,added from UNECE 2025-1 without a coordinate,
 AGANU,Antigua,conflicting or missing match,3575954;3576396
 AGBBQ,Barbuda,conflicting or missing match,3576396
 AIROA,The Road,no explicit link,
 AIWLL,Wall Blake,conflicting or missing match,3573371
+ALSHZ,Shkozet,added from UNECE 2025-1 without a coordinate,
+ALTEN,Tenes,added from UNECE 2025-1 without a coordinate,
 AOKTI,Kiame Terminal,no explicit link,
 AOLIE,Lieura,no explicit link,
 AOPAT,Palanca Terminal,no explicit link,
 AOSOQ,Soyo-Quinfuquena Terminal,conflicting or missing match,12196068
 AOTAK,Takula Terminal,no explicit link,
 ARATU,Atucha,conflicting or missing match,3433312
+ARBAS,Barrancas,added from UNECE 2025-1 without a coordinate,
 ARXOS,Mosconi,conflicting or missing match,3855116;6300559
 ARRAM,Ramallo,conflicting or missing match,3839444;11525583
 ARSLO,San Lorenzo,conflicting or missing match,3837097;11525591
 ARSMT,San Mateo,no explicit link,
 ARXPD,San Pedro,conflicting or missing match,3836772;8298731
-ATKYB,Kematen Ybbs,conflicting or missing match,2774550
+ATEUH,Eurenhausen,added from UNECE 2025-1 without a coordinate,
+ATHSN,Hansenhutte,added from UNECE 2025-1 without a coordinate,
+ATOAL,Oneal,added from UNECE 2025-1 without a coordinate,
 ATXXX,RIS Inland waterways,no explicit link,
 ATVDD,Vienna Danubepier Hov,conflicting or missing match,11549387
 AUADA,Adelaide Apt,conflicting or missing match,6301322
@@ -33,7 +40,6 @@ AUCLR,Clarence River,no explicit link,
 AUCLL,Collan Islands,no explicit link,
 AUFBN,Fairbarn,no explicit link,
 AUGOI,Goods Is,conflicting or missing match,2165034
-AUGDF,Guildford,conflicting or missing match,9972700
 AUHRN,Heron Island,conflicting or missing match,2163541;6354955;12129123
 AUHOT,Hope Tun,no explicit link,
 AUJOV,Jabiru Venture (oil terminal),no explicit link,
@@ -43,6 +49,7 @@ AUMHC,Macmahon Camp 4,no explicit link,
 AUMIB,Milner Bay,no explicit link,
 AUMXQ,Mitchell River,no explicit link,
 AUMON,Montara Field,no explicit link,
+AUNAR,Narracoopa,added from UNECE 2025-1 without a coordinate,
 AUNTE,Northern Endeavour,conflicting or missing match,2071959
 AUODR,Ord River,conflicting or missing match,8607689
 AUORS,Orpheus Island Resort,conflicting or missing match,8299176
@@ -55,17 +62,14 @@ AUPSY,Port Stanley,no explicit link,
 AUPST,Port Stanvac,no explicit link,
 AUPWL,Port Walcott,no explicit link,
 AUPRB,Proper Bay,no explicit link,
-AURBY,Rosebery/Sydney,conflicting or missing match,2151129
 AUSVM,Saint Paul's Mission,conflicting or missing match,8299257
 AUSMT,Saladin Marine Terminal,no explicit link,
-AUSBY,Salisbury/Brisbane,conflicting or missing match,8349401
 AUSKV,Skua Venture (oil terminal),no explicit link,
 AUSPB,Spring Bay,conflicting or missing match,7839670
 AUSTG,Stag Platform,no explicit link,
 AUSQP,Starcke,no explicit link,
 AUTOB,Towford Bay,no explicit link,
 AUTRB,Trial Bay,no explicit link,
-AUWLS,Wallis,conflicting or missing match,2151849
 AUWNT,Wandoo Terminal,no explicit link,
 AUWAN,Waverney,conflicting or missing match,8298988
 AUVIT,Wishart,no explicit link,
@@ -73,8 +77,9 @@ AUWOG,Woodgreen,conflicting or missing match,8260968
 AUYAM,Yampi,no explicit link,
 AUKYB,Yangoonabie,no explicit link,
 AZDJU,Djulfa,no explicit link,
-BAPJR,Prnjavor,conflicting or missing match,3192321
+BDCDG,Chuadanga,added from UNECE 2025-1 without a coordinate,
 BDKAM,Kamalapur/Dhaka,conflicting or missing match,1203533
+BDMON,Monella,added from UNECE 2025-1 without a coordinate,
 BDMGL,Mongla,conflicting or missing match,1194124;1341778
 BEABK,Albertkanaal ports,no explicit link,
 BETTJ,Heultje,no explicit link,
@@ -82,10 +87,11 @@ BEXXX,RIS Inland waterways,no explicit link,
 BGBOJ,Burgas,conflicting or missing match,732770;6699146
 BGBYL,Byala,conflicting or missing match,732717
 BGGOV,Gorna Oryahovica,no explicit link,
+BGLIA,Liaskovec,added from UNECE 2025-1 without a coordinate,
+BGBLO,Lyuliakovo,added from UNECE 2025-1 without a coordinate,
 BGOLT,Oltomantsi,no explicit link,
 BGXXX,RIS Inland waterways,no explicit link,
 BGSWG,Svilengrad,no explicit link,
-BGZLA,Zlatarevo,conflicting or missing match,725299
 BJSEM,Seme Terminal,no explicit link,
 BNLUM,Lumut,conflicting or missing match,1820422
 BSGBI,Grand Bahama,conflicting or missing match,8030546
@@ -97,39 +103,37 @@ CAYNR,Arnes,conflicting or missing match,8261011
 CAYAF,Asbestos Hill,conflicting or missing match,5912593
 CABAD,Baddeck,conflicting or missing match,5955678
 CABGT,Bagotville,no explicit link,
+CABRS,Barrs Corner,added from UNECE 2025-1 without a coordinate,
+CABAS,Bayside,added from UNECE 2025-1 without a coordinate,
 CABAY,Bayside (St Roberts),no explicit link,
 CAYBO,Bobquinn Lake,conflicting or missing match,8555876
-CABCL,Bon Conseil,conflicting or missing match,6091439
 CAYBM,Bronson Creek,conflicting or missing match,8554808
 CABRT,Broughton Is,conflicting or missing match,6296303
-CABDT,Burdett,no explicit link,
 CABTF,Butterfly Bay,no explicit link,
 CACPB,Campobello,conflicting or missing match,5914495
 CAYCJ,Cape-Saint-James,conflicting or missing match,5916297
+CACAR,Carcon City/Toronto,added from UNECE 2025-1 without a coordinate,
 CACLT,Carleton,conflicting or missing match,6693777
 CACHS,Cohasset,no explicit link,
 CACLB,Colborne,conflicting or missing match,6111704
 CACFL,Cooper Cliff,no explicit link,
 CACWI,Cornwallis Is,no explicit link,
 CACOH,Country Harbour,conflicting or missing match,5933199
+CADEC,Decker,added from UNECE 2025-1 without a coordinate,
 CAYDS,Desolation Sound,conflicting or missing match,7910277
 CAYDX,Doc Creek,conflicting or missing match,8260804
 CAZEM,East Main,conflicting or missing match,6296353
-CAERI,Erin,conflicting or missing match,5949258
 CAFAP,Father Point,no explicit link,
-CAFWC,Fenwick,conflicting or missing match,5952180
-CAFLV,Florenceville,conflicting or missing match,8581594
 CAFRR,Fraser River,no explicit link,
 CAYGA,Gagnon,conflicting or missing match,8260814
 CAYGS,Germansen,conflicting or missing match,5960660
 CAGDW,Goodwood,no explicit link,
+CAGTD,Grand Toys Dorval,added from UNECE 2025-1 without a coordinate,
 CAGCA,Gros Cacouna,no explicit link,
 CAHID,Hilda,conflicting or missing match,5975132
 CAHST,Holstein,no explicit link,
 CAHYO,Holyrood,no explicit link,
 CAHWS,Howe Sound,no explicit link,
-CAIBV,Iberville,conflicting or missing match,6137774
-CAIPE,Ile Perrot,conflicting or missing match,6091369
 CAYIV,Island Lk/Garden Hill,conflicting or missing match,6296211
 CAJPR,Jasper,conflicting or missing match,5985934
 CAJEI,Jervis Inlet,no explicit link,
@@ -143,8 +147,9 @@ CAYLF,Laforges,conflicting or missing match,8260845
 CAYAH,Lagrande 4,conflicting or missing match,6296152
 CALAH,Lake Harbour,no explicit link,
 CAYLA,Langara,conflicting or missing match,6049348
+CALGT,Langton,added from UNECE 2025-1 without a coordinate,
 CAXLF,Leaf Bay,no explicit link,
-CALEN,Lennoxville,no explicit link,
+CAOCH,Locusthill,added from UNECE 2025-1 without a coordinate,
 CAMGD,Magdalen Is,no explicit link,
 CAYMC,Maricourt Airstrip,no explicit link,
 CAYTO,Metropolitan Area Apt/Toronto,conflicting or missing match,11549704
@@ -152,13 +157,10 @@ CAYML,Murray Bay,conflicting or missing match,6296232
 CAZNG,Negginan,conflicting or missing match,8299200
 CANPU,Nepeau,no explicit link,
 CANPH,Nephton,no explicit link,
-CANDK,New Denmark,no explicit link,
 CAYNK,Nootka Sound,conflicting or missing match,8298740
-CANRN,Noranda,conflicting or missing match,6128577
 CANAF,North Arm Fraser,no explicit link,
 CAORT,Northbrook,no explicit link,
 CANSY,North Sydney,conflicting or missing match,6172503
-CANWC,Norwich (Ontario),conflicting or missing match,6091191
 CAYUF,Pelly Bay,conflicting or missing match,6301441
 CAZPO,Pine House,conflicting or missing match,8260884
 CAPPC,Pointe au Pic,no explicit link,
@@ -166,57 +168,46 @@ CAESX,Point-Escuminac,no explicit link,
 CAQUE,Quebec,conflicting or missing match,6325494;11886671
 CAQUL,Quliqura,no explicit link,
 CARST,Restoule,no explicit link,
-CAREX,Rexdale/Toronto,conflicting or missing match,6121648
-CARIC,Richelieu,conflicting or missing match,6138495
 CAROA,Roaches Line,no explicit link,
 CARSN,Robertson,no explicit link,
 CARUI,Rupert Inlet,no explicit link,
+CARUV,Ruthven,added from UNECE 2025-1 without a coordinate,
 CASKE,Saint-Anne-de-Kent,no explicit link,
 CASBD,Saint-Bernard,conflicting or missing match,6137511
-CASCM,Saint-Come,conflicting or missing match,6137631
 CADDS,Saint-Davids,conflicting or missing match,6155790
 CASCO,Sainte-Clothilde,no explicit link,
 CASVE,Sainte-Veronique,no explicit link,
-CASTG,Saint-George,no explicit link,
 CAGER,Saint-German,no explicit link,
 CASID,Saint-Isidore,conflicting or missing match,6138402
-CAXTJ,Saint-Jules,conflicting or missing match,8672579
 CAYAW,Shearwater,conflicting or missing match,6301440
 CASHP,Shippegan,conflicting or missing match,11789760
 CAYXF,Snake River,no explicit link,
 CAZFL,South Trout Lake,conflicting or missing match,8299020
 CAYSQ,Spring Island,conflicting or missing match,6139826
 CAYTC,Sturdee,conflicting or missing match,6082886
-CATAB,Tabusintac,no explicit link,
 CATAS,Tasu,conflicting or missing match,6161843
 CATLB,Tilbury Is,no explicit link,
 CATNG,Tingwick,conflicting or missing match,6138996
-CATRA,Tracadie,conflicting or missing match,7302644
 CATRC,Tracy,no explicit link,
 CATRB,Trinity Bay,no explicit link,
 CAYTI,Triple Island,no explicit link,
 CATRR,Trois-Rivieres (Three Rivers),conflicting or missing match,6169141;7668141
 CATUC,Tucks,no explicit link,
 CAYTK,Tulugak,no explicit link,
-CAWNH,Wanham,no explicit link,
 CAWAI,Watson Is,no explicit link,
 CAWCM,Wicomico,no explicit link,
 CAWND,Windsor,conflicting or missing match,6182962;11886739
-CAWIN,Winona,conflicting or missing match,6183250
 CDKLI,Kota Koli,conflicting or missing match,7730560
 CFKWD,Kawadjia,no explicit link,
 CFKOL,Koumala,conflicting or missing match,8298741
 CGDJE,Djeno Terminal,no explicit link,
 CHBSG,Bisingen,no explicit link,
 CHCSM,Chezard-St-Martin,no explicit link,
-CHGPM,Granges-pres-Marnand,no explicit link,
-CHOHI,Oberhasli,conflicting or missing match,6458842
 CHXXX,RIS Inland waterways,no explicit link,
 CIAFI,Amalfi,no explicit link,
 CLPPD,Punta Padrones,no explicit link,
 CMKOL,Kole Terminal,no explicit link,
 CMLIT,Limboh Terminal,no explicit link,
-CNARS,Aershan,conflicting or missing match,8054538
 CNAHK,Aheitubieke,no explicit link,
 CNART,Arhaxat,no explicit link,
 CNASM,Asjman,no explicit link,
@@ -225,21 +216,18 @@ CNBSI,Baishi,conflicting or missing match,8558819
 CNBKT,Baketu,no explicit link,
 CNBLI,Bali,no explicit link,
 CNBJD,Beijingdong Railway Station,no explicit link,
-CNBJZ,Beijing Railway Station,no explicit link,
 CNBJX,Beijingxi Railway Station,no explicit link,
 CNBLG,Beilun Pt,no explicit link,
 CNBIY,Beiyao,no explicit link,
 CNCYB,Caiyuanba,no explicit link,
-CNCCD,Changchun Xinglong,conflicting or missing match,8644110
+CNCHO,Chang on,added from UNECE 2025-1 without a coordinate,
 CNCSD,Changshadibg Railway Station,no explicit link,
 CNCTM,Chaotianmen,no explicit link,
 CNCHE,Chengaogang,no explicit link,
 CNCJN,Chenjian,no explicit link,
-CNCQD,Chongqingdong Railway Station,conflicting or missing match,11902781
 CNCHQ,Chongqing Pt,conflicting or missing match,11902786
 CNDIZ,Dadingzi,conflicting or missing match,8523696
 CNDHP,Dahuangpu,no explicit link,
-CNDAG,Dalian Pt,conflicting or missing match,1552896
 CNFZL,Dantou,no explicit link,
 CNDZM,Danzhimatou,no explicit link,
 CNDSA,Dasha,no explicit link,
@@ -269,13 +257,11 @@ CNHGG,Hongguang Pt,conflicting or missing match,1547668
 CNHDG,Huadu Pt,conflicting or missing match,12195571
 CNHUA,Huangpu Pt,conflicting or missing match,1807291;1807295
 CNHAQ,Huangqi/Nanhai,no explicit link,
-CNHIS,Huangshi,conflicting or missing match,1808392
 CNHNS,Huanshi,no explicit link,
 CNHQG,Huiqiang,no explicit link,
 CNHUP,Huo Pt,no explicit link,
 CNJAN,Jiangan Railway Station,no explicit link,
 CNJGJ,Jiangjin,conflicting or missing match,1805798
-CNJSU,Jiangsiu,conflicting or missing match,1806260
 CNJSG,Jiaoshan Pt,no explicit link,
 CNJXN,Jiao Xin,conflicting or missing match,1916864
 CNJLZ,Jilin Railway Station,no explicit link,
@@ -288,7 +274,6 @@ CNJZU,Jiuzhou Pt,conflicting or missing match,11494321
 CNKZG,Kangzhou Pt,no explicit link,
 CNKUY,Kuytun Railway Station,no explicit link,
 CNLDK,Laodukou,no explicit link,
-CNLHS,Laohushao,no explicit link,
 CNLTP,Letianxi Pt,no explicit link,
 CNLIJ,Lijiang,no explicit link,
 CNLJD,Liujiadu,no explicit link,
@@ -313,7 +298,6 @@ CNMSG,Meishan Pt,no explicit link,
 CNMZW,Meizhouwan,no explicit link,
 CNMYM,Moupingyangmadao,no explicit link,
 CNMZT,Muzhaerte,no explicit link,
-CNNIG,Nanning Pt,no explicit link,
 CNNSY,Nianshanyapojiao,no explicit link,
 CNNZG,Nianzigou,no explicit link,
 CNPHN,Pinghu'Nan,no explicit link,
@@ -328,16 +312,15 @@ CNRJN,Runjiang,conflicting or missing match,1798008
 CNSBM,Sanbaimen,no explicit link,
 CNNHS,Sanshan pt,no explicit link,
 CNSAL,Shalingzhuang,no explicit link,
+CNSQS,Shangqiu,added from UNECE 2025-1 without a coordinate,
 CNSSG,Shashangang,no explicit link,
 CNSYC,Shayuchong,no explicit link,
 CNSYD,Shenyangdong Railway Station,no explicit link,
 CNSZZ,Shenzhen Railway Station,no explicit link,
-CNSHU,Shihu,conflicting or missing match,6732204
 CNSJJ,Shijingjiaoxin,no explicit link,
 CNSLG,Shiliugang,no explicit link,
 CNSIP,Shiqu Pt,no explicit link,
 CNSFE,Suifenhe Railway Station,no explicit link,
-CNSGG,Suijiang,conflicting or missing match,6648024
 CNTKK,Taykexkin,no explicit link,
 CNTBS,Tianjinbaoshuiqu,no explicit link,
 CNTZH,Tongzhong,conflicting or missing match,1793287
@@ -360,15 +343,12 @@ CNXUM,Xuanmen,no explicit link,
 CNXTZ,Xuetangzhou,no explicit link,
 CNXUI,Xuhuiqu,no explicit link,
 CNYPE,Yangpeng,no explicit link,
-CNYGG,Yanguan,conflicting or missing match,1787531
 CNYXT,Yangxifengtou,no explicit link,
 CNYJP,Yaojia Pt,no explicit link,
-CNYCG,Yichang Pt,conflicting or missing match,1787746
 CNYKS,Yierkeshi,no explicit link,
 CNYRK,Yierkeshitan,no explicit link,
 CNYLN,Yilan Apt,conflicting or missing match,8260943
 CNYCA,Yingchuan,no explicit link,
-CNYGJ,Yingjiang,conflicting or missing match,1784818
 CNYXN,Yuexiunan,no explicit link,
 CNYYP,Yuyue Pt,no explicit link,
 CNYUZ,Yuzhou,no explicit link,
@@ -376,123 +356,78 @@ CNZAG,Zhanghu,no explicit link,
 CNZQN,Zhaoqing Railway Station,no explicit link,
 CNZPK,Zhapoyouku,no explicit link,
 CNZOU,Zhenzhou,no explicit link,
+CNZGC,Zhongguancun,added from UNECE 2025-1 without a coordinate,
 CNZXN,Zhongxian,no explicit link,
 CNZQJ,Zhouqujia,no explicit link,
 CNZHU,Zhuao,conflicting or missing match,1783873
 CNZIY,Ziyuan Pt,conflicting or missing match,12196127
 COPOC,Pozos Colorados,conflicting or missing match,11048852;11525609
 COSJG,San Pedro Jagua,conflicting or missing match,3812788
+CRHSB,Santa Barbaraa,added from UNECE 2025-1 without a coordinate,
 CUGUB,Guantanamo Bay,conflicting or missing match,3557689
 CUICR,Nicaro,conflicting or missing match,3546023
-CZBIL,Bila,conflicting or missing match,3079374
-CZBHD,Bohdanec,conflicting or missing match,3337421
-CZHNJ,Haje nad Jizerou,conflicting or missing match,11468382
-CZHNO,Hnojni,conflicting or missing match,3075684
+CVPOP,Porto Preguica,added from UNECE 2025-1 without a coordinate,
+CZKNY,Konojedy,added from UNECE 2025-1 without a coordinate,
+CZKKL,Lisice,"UNECE 2025-1 coordinate held back, outside its country",
 CZLOD,Lodenice,conflicting or missing match,3075309
 CZMED,Medlesic,no explicit link,
-CZOSA,Olesna,conflicting or missing match,3069670
-CZPRB,Pardubice,conflicting or missing match,3068582;7668321
 CZPOT,Potucky-silnice,no explicit link,
 CZRUP,Ricany u Prahy,conflicting or missing match,3066878
 CZXXX,RIS Inland waterways,no explicit link,
-CZRPR,Roznov pod Radhosthem,conflicting or missing match,3066651
 CZZNM,Zabreh na Morave,no explicit link,
-DEASH,Ahrenshoft,conflicting or missing match,2889818
-DEAUE,Auerbach/Vogtland,conflicting or missing match,2954602
-DEBDK,Bad Krozingen,conflicting or missing match,2819974
-DEBGH,Bergheim-Westfalen,conflicting or missing match,2950448
 DETXL,Berlin-Tegel Apt,conflicting or missing match,3208806
-DEBRF,Brebach-Fechingen,no explicit link,
 DETLD,Bresteland,no explicit link,
-DEBUH,Burbach/Siegen,conflicting or missing match,2941595
 DECLE,Cable,no explicit link,
 DECHI,Chiemsee,conflicting or missing match,2913942
-DEECH,Eching/Freising,conflicting or missing match,2933799
-DEEHR,Ehringshausen/Lahn-Dill,conflicting or missing match,2932788
 DEEEU,Elfershausen,no explicit link,
-DEERB,Erbach/Odenwald,conflicting or missing match,2929802
 DEGEM,Gemunden,conflicting or missing match,2921379
-DEGNE,Gernrode/Harz,conflicting or missing match,2920999
 DEGLD,Goeland,no explicit link,
-DEHAI,Haibach/Aschaffenburg,conflicting or missing match,2912159
-DEHDN,Heiden/Borken,conflicting or missing match,2907889
-DEHES,Heiligenhaus/Mettmann,conflicting or missing match,2907585
-DEHDL,Hindelang,conflicting or missing match,2904473
 DEIND,Inden-Lamersdorf,no explicit link,
 DEINM,Ingelheim,conflicting or missing match,2863240
 DEJOH,Johannisberg,no explicit link,
-DEKDF,Kirchdorf (Iller),conflicting or missing match,6556018
-DEKIR,Kirchheim/Teck,conflicting or missing match,2890473
-DEKIN,Kirn/Nahe,conflicting or missing match,2890314
 DEKOB,Koblenz am Rhein,conflicting or missing match,2886946
-DEKOE,Kotz,conflicting or missing match,2847237
 DELNG,Langen bei Bremerhaven,no explicit link,
 DECCC,Leimbach,no explicit link,
-DELLD,Leinefelde,conflicting or missing match,2879193
 DELKE,Linken,no explicit link,
-DELKH,Linkenheim,conflicting or missing match,3272461
 DELUG,Ludwigsburg,no explicit link,
-DEMAX,Maxdorf/Pfalz,conflicting or missing match,2872686
-DENCH,Nachrodt,conflicting or missing match,2867252
-DENSU,Nassau/Lahn,conflicting or missing match,2867037
-DENEI,Neidenfels/Pfalz,conflicting or missing match,2866608
-DENCN,Neunkirchen/Siegen,conflicting or missing match,2864425
-DENSA,Neustadt/Aisch,conflicting or missing match,2864057
-DENFN,Niefern,conflicting or missing match,3206254
+DEZZA,Neustetten,added from UNECE 2025-1 without a coordinate,
 DEOEA,Oelsa/Freital,no explicit link,
 DEORT,Orth/Fehmarn,conflicting or missing match,2857004
 DEOTL,Otzberg Lengfeld,no explicit link,
-DEREK,Reken,conflicting or missing match,2888344
-DERHI,"Rheinau, Ortenaukreis",conflicting or missing match,3209262
-DERHT,Rhodt,conflicting or missing match,2847558
-DERDB,Rieden (Amberg-Sulzbach),conflicting or missing match,2847242
 DEXXX,RIS Inland waterways,no explicit link,
-DERSG,Rosenberg/Ostalb,conflicting or missing match,2845056
 DESDE,"Sande, Friesland",conflicting or missing match,2934132
-DESAH,Saulheim,conflicting or missing match,2859199
-DESHS,Schloss Holte-Stukenbrock,conflicting or missing match,3207384
-DESLH,Schopfloch/Freudenstadt,conflicting or missing match,2836409
 DESEH,Sehestedt/Eider,no explicit link,
 DESEP,Sostrop,no explicit link,
 DESPR,Sprendlingen/Rheinhessen,no explicit link,
-DESTO,Stolberg/Harz,conflicting or missing match,2826594
-DESWA,Swisttal,conflicting or missing match,2928767
-DETHM,Thalheim/Erzgebirge,conflicting or missing match,2823081
-DETUI,Thuringen,conflicting or missing match,2867996
 DETCH,Toepchin,no explicit link,
 DETOL,Torfplatz Oldenburg,no explicit link,
 DEWMA,Weimar/Giessen,conflicting or missing match,2811103
-DEWRC,Werneuchen,no explicit link,
-DEWBG,Westerburg/Westerwaldkreis,conflicting or missing match,2810413
-DEWHN,Westhofen/Rheinhessen,conflicting or missing match,2810110
 DETTR,Wettringen,no explicit link,
 DEWTG,Wittenberg,no explicit link,
-DEWON,Wolfstein/Pfalz,conflicting or missing match,2806523
-DEWUG,Wunnenberg,conflicting or missing match,2805785
-DEZEU,Zeulenroda-Triebes,conflicting or missing match,2804654
 DJDCT,Doraleh Container Terminal,conflicting or missing match,12196071
 DKROR,Aalborg Portland Cementfabrikk,no explicit link,
 DKARK,Aroskobing,conflicting or missing match,2625001
 DKAGH,Agger Havn,no explicit link,
 DKANB,Ans by,no explicit link,
-DKASS,Asnas,conflicting or missing match,2624521
 DKASV,Asnasvarkets Havn,no explicit link,
 DKAVE,Avedorevarkets Havn,no explicit link,
 DKBGO,Baago,conflicting or missing match,2624391
 DKBRH,Branden Havn,no explicit link,
+DKBDY,Brody,added from UNECE 2025-1 without a coordinate,
 DKDAN,Cementfabriken Dania,no explicit link,
 DKKON,Cementfabrikken Kongsdal Havn,no explicit link,
 DKDAS,Dansk Salts Havn,no explicit link,
+DKDRS,Drosby,added from UNECE 2025-1 without a coordinate,
 DKENH,Ebenhausen,no explicit link,
 DKFAK,Fakse Ladeplads Havn,conflicting or missing match,2622369
 DKFGS,Feggesund,no explicit link,
-DKFNS,Fornas,conflicting or missing match,2621996
 DKFDV,Frederiksvark,conflicting or missing match,2621910;12196386
+DKGJS,Gjessing,added from UNECE 2025-1 without a coordinate,
 DKGFH,Gulfhavn,no explicit link,
+DKHVG,Havnegade,added from UNECE 2025-1 without a coordinate,
 DKHBK,Holbak,conflicting or missing match,2620147
-DKHON,Hornbak,conflicting or missing match,2619807
+DKHBG,Houborg,added from UNECE 2025-1 without a coordinate,
 DKHOH,Hou Havn,conflicting or missing match,9845551
-DKKIB,Kibak,conflicting or missing match,2618931
 DKKRB,Kirkeby,no explicit link,
 DKKRA,Kragenas,conflicting or missing match,2618322
 DKKVR,Kvarndrup,conflicting or missing match,2618070
@@ -501,25 +436,25 @@ DKMRB,Marbak Havn,no explicit link,
 DKNUD,Nassund,no explicit link,
 DKNDB,"Nordby Havn, Fano",no explicit link,
 DKVSV,Norjyllandsvarkets havn,no explicit link,
+DKAAI,Oelsted,"UNECE 2025-1 coordinate held back, outside its country",
 DKORE,"Orehoved, Falster",no explicit link,
+DKSKI,Stenkilde,added from UNECE 2025-1 without a coordinate,
 DKSLV,Salvig Havn,conflicting or missing match,9828954
 DKKII,Saint Kilian,no explicit link,
 DKSSK,Skalskor,conflicting or missing match,2613694
 DKSDO,Skaro/Drejo,conflicting or missing match,2613862
 DKSOB,Soby Havn,conflicting or missing match,2613196
-DKSND,Sonder,conflicting or missing match,2613106
 DKSPP,Sporup,no explicit link,
 DKSVV,Stalvalsevarket,no explicit link,
 DKSTT,Statoil-Havnen,no explicit link,
 DKSTG,Stignasvarkets Havn,no explicit link,
 DKSTN,Stigsnas,conflicting or missing match,3221881
 DKSSV,Studstrupvarkets Havn,no explicit link,
-DKTBA,Taarbak,conflicting or missing match,2611867
+DKSYD,Sydborg,added from UNECE 2025-1 without a coordinate,
 DKTRS,Tars,conflicting or missing match,9828957
 DKTNO,Tuno,conflicting or missing match,2611120
 DKVNG,Vang Havn,no explicit link,
 DKVEN,Veno Havn,no explicit link,
-DKVAS,Vigsnas,conflicting or missing match,2610275
 DOOCO,Ocoa Bay,no explicit link,
 DOPUO,Puerto Libertador,no explicit link,
 DOHAI,Rio Haina,conflicting or missing match,3504831
@@ -531,304 +466,289 @@ DZSKI,Skikda (ex Philippeville),conflicting or missing match,6296372;9847500
 DZTEE,Tbessa,conflicting or missing match,6296373
 ECWSE,Santa Cecillia,no explicit link,
 ECTEP,Tepre,no explicit link,
+EEKOM,Komsi,added from UNECE 2025-1 without a coordinate,
+EGABE,Al Bahr El Ahmer,added from UNECE 2025-1 without a coordinate,
+EGAMA,Al Monofiya,added from UNECE 2025-1 without a coordinate,
+EGAWE,Al Wadi El Gedeed,added from UNECE 2025-1 without a coordinate,
+EGBEH,El Beheirah,added from UNECE 2025-1 without a coordinate,
 EGEDK,El Dekheila,conflicting or missing match,361819
+EGEOB,El Obour,added from UNECE 2025-1 without a coordinate,
+EGBHE,Ezbet Osman Murtada,added from UNECE 2025-1 without a coordinate,
 EGGEI,Geisum Terminal,no explicit link,
 EGQGX,Gerga,no explicit link,
 EGHAM,Hamrawein,conflicting or missing match,356156
+EGKEN,Kenna,added from UNECE 2025-1 without a coordinate,
 EGMAH,Mersa El Hamra,conflicting or missing match,357888
+EGMMU,Mersa Matru,added from UNECE 2025-1 without a coordinate,
 EGSKT,Sidi Kerir Terminal,conflicting or missing match,348359
+EGSHG,Sohag,added from UNECE 2025-1 without a coordinate,
 EGSIN,South Sinai (Ganoub Sinai),no explicit link,
-ESADA,Aldea,conflicting or missing match,3130521
+ESABR,Abronigal,added from UNECE 2025-1 without a coordinate,
+ESANX,Acerinox,added from UNECE 2025-1 without a coordinate,
 ESADL,Aldea de los rios,no explicit link,
+ESACP,Aldeanueva Del Campo,added from UNECE 2025-1 without a coordinate,
 ESALG,Algeciras,conflicting or missing match,2522013;8436022;9796219
-ESARL,Arrubal (La Rioja),conflicting or missing match,3129350
+ESAGC,Argoncillo,added from UNECE 2025-1 without a coordinate,
 ESBNL,Baonoles,no explicit link,
-ESBAV,Barco de Valdeorras,conflicting or missing match,3123658
+ESBAZ,Bazalote,added from UNECE 2025-1 without a coordinate,
 ESNNN,Bunuiel,no explicit link,
 ESBRJ,Burjasot,no explicit link,
+ESCAC,Cabezo Cortado,added from UNECE 2025-1 without a coordinate,
 ESCBS,Cala Sabina,no explicit link,
-ESCND,Canada,conflicting or missing match,3105247
-ESSVL,Cervello,conflicting or missing match,3109983
+ESCBB,Castilbisbal,added from UNECE 2025-1 without a coordinate,
 ESCRI,Cierbena,no explicit link,
-ESCFR,Cofrentes,conflicting or missing match,2510520
-ESCOL,Colmenar,conflicting or missing match,3124769
-ESCZQ,Coria,conflicting or missing match,2519233
-ESEUX,Esparraguera,conflicting or missing match,3122912
+ESCO9,Corcos,"UNECE 2025-1 coordinate held back, outside its country",
+ESEAF,Elavega,added from UNECE 2025-1 without a coordinate,
+ESEFQ,El Farque,added from UNECE 2025-1 without a coordinate,
+ESEGD,El Gador,added from UNECE 2025-1 without a coordinate,
 ESFJN,Fuentejalon,no explicit link,
-ESGTS,Getares,conflicting or missing match,10342229
 ESGJI,Granja de San Idelfonso,no explicit link,
 ESGTA,Guantarajal,no explicit link,
 ESHDA,Horta de Avinyo,conflicting or missing match,3109796
-ESHDI,Hospitalet del Infant,conflicting or missing match,3120620
+ESHWV,Huerto-Vega,added from UNECE 2025-1 without a coordinate,
+ESLBT,La Albatalia,added from UNECE 2025-1 without a coordinate,
 ESLJM,La Ametlla del Vall,no explicit link,
+ESLRJ,La Arboleja,added from UNECE 2025-1 without a coordinate,
+ESLCI,La Cruz de Illas,"UNECE 2025-1 coordinate held back, outside its country",
 ESLES,La Estaca,conflicting or missing match,2512195
+ESLXF,La Foya,added from UNECE 2025-1 without a coordinate,
 ESLMC,La Maruca,no explicit link,
 ESMAT,La Matanza,no explicit link,
 ESLAN,Lanciego,no explicit link,
 ESRON,Lantaron,no explicit link,
-ESLPL,La Palma,conflicting or missing match,2511180
+ESSNA,La Salineta,added from UNECE 2025-1 without a coordinate,
 ESVAD,La Vall d'Uxo,no explicit link,
 ESLSF,Les Franquesese,no explicit link,
-ESLRL,Los Rodeos la Laguna,conflicting or missing match,2514483
-ESMAM,Malgrat,conflicting or missing match,3117636
-ESMLL,Mallorca,conflicting or missing match,2512989
-ESMLP,Malpartida Plasencia,conflicting or missing match,2514225
+ESLJQ,Les Presses,added from UNECE 2025-1 without a coordinate,
+ESMXX,Maraleda,added from UNECE 2025-1 without a coordinate,
+ESMXH,Maraleja,added from UNECE 2025-1 without a coordinate,
 ESMPG,"Marin, Pontevedra",conflicting or missing match,3117409;11979713
 ESMDB,Massies de Voltrega,no explicit link,
-ESMML,Montmell,conflicting or missing match,6361332
-ESMSM,Mostoles-Madrid,conflicting or missing match,3116025
+ESMFH,Menjibar,added from UNECE 2025-1 without a coordinate,
+ESMBM,Molla Del Penedes,added from UNECE 2025-1 without a coordinate,
+ESMJU,Muelva,added from UNECE 2025-1 without a coordinate,
 ESPAF,Pajara Fuerteventura,no explicit link,
-ESPDQ,Palma Del Condado,conflicting or missing match,2515679
-ESPUW,Paracuellos,conflicting or missing match,3114397
 ESPEP,Parque Empresarial Pereiro de Aguiar,no explicit link,
+ESPBB,"Pasito Blanco, Canary Is",added from UNECE 2025-1 without a coordinate,
+ESPAI,Patino,added from UNECE 2025-1 without a coordinate,
+ESPDZ,Pedraneras,added from UNECE 2025-1 without a coordinate,
+ESPNR,Penarrolla,added from UNECE 2025-1 without a coordinate,
 ESPGI,Poligono Industrial,no explicit link,
+ESPOA,Porullena,added from UNECE 2025-1 without a coordinate,
+ESPBN,Pueblo Nuevo del Guadian,added from UNECE 2025-1 without a coordinate,
+ESRMN,Ramoneda,added from UNECE 2025-1 without a coordinate,
 ESRDP,Renedo de Pielago,no explicit link,
-ESROJ,Rojales,no explicit link,
 ESROS,Rosas,conflicting or missing match,3118848
 ESVEZ,Rossburgh,no explicit link,
 ESSAT,Salinetas,no explicit link,
-ESENR,San Enrique de Guadiaro,no explicit link,
+ESSDB,San Andreas de La Barca,added from UNECE 2025-1 without a coordinate,
+ESSBG,San Bartolome D/Grau,added from UNECE 2025-1 without a coordinate,
 ESSNB,San Esteban de Bas,no explicit link,
 ESSEU,San Eugenio,no explicit link,
 ESSID,San Isidro de Duenas,no explicit link,
 ESSJN,San Juan de Nivea,no explicit link,
-ESZLM,San Lucar La Mayor,no explicit link,
-ESSND,Santa Andreu de la b,conflicting or missing match,3110876
+ESSJD,San Juan Despi (Dupl. SJN),added from UNECE 2025-1 without a coordinate,
+ESSJF,San Juan Le Fonts,added from UNECE 2025-1 without a coordinate,
+ESSMT,San Martin Del Teso,added from UNECE 2025-1 without a coordinate,
+ESSPD,San Pedro de Premia,added from UNECE 2025-1 without a coordinate,
+ESSPR,San Pedro Riudevitlles,added from UNECE 2025-1 without a coordinate,
+ESSQU,San Quirico Del Vall,added from UNECE 2025-1 without a coordinate,
+ESSSY,San Sadurni D Noya,added from UNECE 2025-1 without a coordinate,
+ESSSR,San Sebastian D/L Reyes,added from UNECE 2025-1 without a coordinate,
+ESSGJ,Santa Margarita Monjos,added from UNECE 2025-1 without a coordinate,
 ESSPB,Santa Perpetua de Bogota,no explicit link,
-ESTSX,Tarrasa,conflicting or missing match,3110101
 ESTPQ,Torrepacheco,no explicit link,
-ESTRA,Trapaga,conflicting or missing match,3110052
+ESTXQ,Tuitar D/Caudillo,added from UNECE 2025-1 without a coordinate,
+ESVAR,Valderubio,added from UNECE 2025-1 without a coordinate,
 ESVCP,Valencia de la Concepcion,no explicit link,
-ESVDU,Vall de Uxo,conflicting or missing match,2509927
+ESVDQ,Vara de Quart,added from UNECE 2025-1 without a coordinate,
+ESVGC,Vega de Celin,added from UNECE 2025-1 without a coordinate,
 ESCVJ,Victoria de Acentejo,no explicit link,
-ESVSS,Vilasana,no explicit link,
+ESVDC,Vilar del Caudillo,added from UNECE 2025-1 without a coordinate,
 ESVGQ,Villafranco Del Guadalqu,no explicit link,
+ESVGU,Villafranco Del Guadiana,added from UNECE 2025-1 without a coordinate,
 ESDGS,Villandangos,no explicit link,
+ESVPS,Villa Presente,added from UNECE 2025-1 without a coordinate,
+ESVAK,Visos Del Alcor,added from UNECE 2025-1 without a coordinate,
 ESVVR,Vivares,no explicit link,
 ETWAC,Waca,conflicting or missing match,7730596
-FIKIN,Grankulla (Kauniainen),conflicting or missing match,653559
-FIHMY,Hameenlinna (Tavastehus),conflicting or missing match,659180
 FIHKO,Hango (Hanko),conflicting or missing match,659101
 FIHEL,Helsingfors (Helsinki),conflicting or missing match,658225;6956561;9828124
 FIINK,Inga (Inkoo),conflicting or missing match,656652
 FIJKA,Jokela,no explicit link,
 FILHK,Luhtajoki,no explicit link,
-FISPK,Salpakangas,no explicit link,
 FISTR,Stromma,no explicit link,
 FIUUS,Uusi-Valamo/Heinavesi,no explicit link,
 FJBVF,Bua,conflicting or missing match,2203651
+FJLUC,Laucala Is,added from UNECE 2025-1 without a coordinate,
+FJPHR,Pacific Harbor,added from UNECE 2025-1 without a coordinate,
+FJAQS,Saqani,added from UNECE 2025-1 without a coordinate,
 FKFBE,Fox Bay,conflicting or missing match,3831938
 FMFSI,Faisi,no explicit link,
 FOVID,Vadair,no explicit link,
+FRNSJ,Lussan,added from UNECE 2025-1 without a coordinate,
 FRM3T,Montazeau,no explicit link,
 GAKGB,Kongobouma,no explicit link,
 GALUC,Lucina,no explicit link,
 GAMBY,M'bya Terminal,no explicit link,
-GBATF,Athelstaneford,no explicit link,
 GBBDX,Baldirton,no explicit link,
 GBBAW,Baltic Wharf,no explicit link,
-GBBAO,Bascote,no explicit link,
-GBBED,Bedfont,conflicting or missing match,2641725
 GBVVE,Belgrave,no explicit link,
 GBBNF,Benfield,no explicit link,
-GBIGE,Billinge,no explicit link,
 GBBNL,Binley,no explicit link,
-GBITA,Binstead,no explicit link,
 GBBDC,Bordon Camp,no explicit link,
+GBZTT,Bottesford,added from UNECE 2025-1 without a coordinate,
 GBBBB,Breaston,no explicit link,
 GBOOR,Buntingford,no explicit link,
-GBBGR,Burnham Green,no explicit link,
 GBBWR,Burrow,no explicit link,
-GBBEM,Burslem,no explicit link,
+GBZST,Castlederg,added from UNECE 2025-1 without a coordinate,
 GBCDE,Chadwell Saint Mary,no explicit link,
-GBCSG,Chalfont Saint Giles,conflicting or missing match,2653394
 GBCHN,Charlton,conflicting or missing match,2653324
 GBCEH,Cheadle Heath,no explicit link,
-GBCME,Cheam,no explicit link,
 GBCER,Chesterton,no explicit link,
+GBXPP,Chipperfield,added from UNECE 2025-1 without a coordinate,
 GBCPT,Clipstone,no explicit link,
 GBCKX,Clydebank/Exeter,no explicit link,
 GBCYP,Clydeport,no explicit link,
+GBCOZ,Colney Heath,added from UNECE 2025-1 without a coordinate,
+GBXCM,Comber,added from UNECE 2025-1 without a coordinate,
 GBCGT,Covent Garden,no explicit link,
-GBCYL,Crays Hill,no explicit link,
+GBXCS,Crossmaglen,added from UNECE 2025-1 without a coordinate,
+GBWFH,Cwmfelinfach,added from UNECE 2025-1 without a coordinate,
 GBDNQ,Dean Quarry,no explicit link,
-GBDSL,Disley,no explicit link,
-GBDNO,Donaghcloney,no explicit link,
-GBDNG,Donnington,no explicit link,
-GBDNT,Doonfoot,no explicit link,
-GBESC,Eaton Socon,no explicit link,
 GBECH,Eccleshall,no explicit link,
 GBLEW,Edgeware,no explicit link,
 GBELV,Elvington,no explicit link,
-GBEMB,Emberton,no explicit link,
 GBEVY,Eversley,no explicit link,
-GBEXN,Exning,no explicit link,
 GBFFH,Felinfach,no explicit link,
-GBFCL,Finchley,no explicit link,
-GBFSE,Fossebridge,no explicit link,
+GBFSN,Forest Town,added from UNECE 2025-1 without a coordinate,
 GBDFN,Foston,conflicting or missing match,7298174
 GBFOS,Foston,no explicit link,
 GBFRE,Fowlmere,no explicit link,
 GBNFR,Friden,no explicit link,
-GBFRL,Fritchley,no explicit link,
 GBFLF,Fulford,no explicit link,
 GBGAW,Gaerwen,no explicit link,
-GBGFO,Goff's Oak,no explicit link,
 GBWWL,Gowdall,no explicit link,
 GBGYS,Grays,no explicit link,
 GBGDF,Great Driffield,no explicit link,
 GBGYD,Great Yeldham,no explicit link,
 GBGFD,Greenfield,no explicit link,
 GBHFR,Halliford,no explicit link,
-GBHLG,Halling,no explicit link,
-GBHBR,Hambridge,conflicting or missing match,7297752
-GBHNL,Hanley,no explicit link,
 GBAEW,Hanwell,no explicit link,
-GBHAR,Hardley,no explicit link,
-GBHHF,Heathfield,conflicting or missing match,3345367
+GBHEO,Headley Down,added from UNECE 2025-1 without a coordinate,
 GBHEI,Heighington,no explicit link,
 GBHNO,Henton,no explicit link,
 GBHOK,Hook,no explicit link,
 GBHOX,Hooton,no explicit link,
 GBHWG,Hounslow Green,no explicit link,
-GBHMR,Humber,conflicting or missing match,2656240
 GBKEL,Kells,no explicit link,
-GBKST,Keston,no explicit link,
+GBKYW,Keyworth,added from UNECE 2025-1 without a coordinate,
 GBKRA,Kilkardy,no explicit link,
+GBXKL,Kilrea,added from UNECE 2025-1 without a coordinate,
 GBKKH,Kirkheaton,no explicit link,
-GBKPT,Knapton,conflicting or missing match,10104782
-GBLWO,Lambourn Woodlands,no explicit link,
+GBKTG,Kitt Green,added from UNECE 2025-1 without a coordinate,
 GBLDD,Liddington,no explicit link,
 GBLTL,Littlebrook,no explicit link,
-GBLHH,Little Heath,no explicit link,
 GBLDO,Llandudno,no explicit link,
-GBLGY,Loch Gelly,no explicit link,
 GBLOZ,Lode,no explicit link,
 GBLGN,Loughton,no explicit link,
-GBLXW,Lower Stondon,no explicit link,
 GBLWM,Low Moor,no explicit link,
-GBURL,Lurgan,no explicit link,
 GBLUT,Luton,conflicting or missing match,6296589
-GBLMM,Lymm,no explicit link,
 GBLNE,Lyne,no explicit link,
-GBLYA,Lytham Saint Annes,conflicting or missing match,6693470
 GBMGH,Maghera,no explicit link,
-GBMDP,Market Deeping,no explicit link,
 GBMTG,Matching Green,no explicit link,
 GBMEB,Menai Bridge,no explicit link,
 GBMDD,Middlefield Law,no explicit link,
 GBRGN,Mid Glamorgan,no explicit link,
-GBMSM,Midsomer Norton,no explicit link,
-GBMTZ,Mortlake,no explicit link,
-GBMOE,Moulsoe,no explicit link,
+GBMCE,Mitchem,"UNECE 2025-1 coordinate held back, outside its country",
 GBNEH,Neap House,no explicit link,
-GBNTP,Nether Poppleton,no explicit link,
+GBXNH,Netherfield,added from UNECE 2025-1 without a coordinate,
 GBNDS,New Duston,no explicit link,
-GBNWO,Newton,conflicting or missing match,7294405
 GBOKM,Oakham,conflicting or missing match,6301526
 GBOAK,Oakhamness,no explicit link,
-GBOBM,Ogbourne Maizey,no explicit link,
 GBONH,Ongar Hill,no explicit link,
+GBXPA,Parkend,added from UNECE 2025-1 without a coordinate,
 GBPST,Parkeston Quay,no explicit link,
 GBPRH,Portland Harbour,no explicit link,
 GBPPE,Port Penrhyn,no explicit link,
 GBOYL,Poyle,no explicit link,
-GBPYE,Poyle,no explicit link,
-GBPIT,Prittlewell,no explicit link,
 GBPFT,Purfleet,conflicting or missing match,2639845
 GBRAV,Ravensthorpe Dewsbury,no explicit link,
 GBRDB,Redbourn,no explicit link,
 GBRPH,Reepham,no explicit link,
 GBRID,Ridham Dock,no explicit link,
 GBRSS,Ross,no explicit link,
+GBRRW,Rotherwas,added from UNECE 2025-1 without a coordinate,
 GBXAS,Saxby-All-Sts,no explicit link,
-GBSYC,Sayers Common,conflicting or missing match,7292759
 GBSCS,Scatsta,conflicting or missing match,6296631
 GBSHS,Sheerness,conflicting or missing match,2638081;12196032
 GBSHF,Shefford,no explicit link,
-GBSYN,Shoeburyness,no explicit link,
-GBSHD,South Darenth,conflicting or missing match,7295310
 GBSND,Southend,conflicting or missing match,11153458
-GBSWO,South Weston,no explicit link,
-GBSPE,Spellbrook,no explicit link,
-GBSCY,Stirchley,no explicit link,
 GBSAK,Stocklake,no explicit link,
-GBSFL,Stotfold,no explicit link,
-GBSML,Stramshall,no explicit link,
-GBSBT,Stubbington,no explicit link,
 GBSBO,Sutton Bonnington,no explicit link,
 GBWOB,Suttonheath,no explicit link,
-GBSWK,Swanwick,conflicting or missing match,9430896
 GBTEZ,Talbot Green,no explicit link,
 GBTHS,Thames Haven,no explicit link,
 GBTHP,Thamesport,conflicting or missing match,11549513
-GBTHN,Thornton,conflicting or missing match,8299615
-GBTKG,Throcking,no explicit link,
-GBTPP,Thrupp,conflicting or missing match,7293609
+GBTHB,Thornbridge,added from UNECE 2025-1 without a coordinate,
 GBTIL,Tilbury,conflicting or missing match,2635835;2635836;12196031
-GBTSW,Tilsworth,no explicit link,
 GBTDN,Toddington,no explicit link,
-GBTWD,Trawden,conflicting or missing match,7299070
-GBTNL,Tunstall,no explicit link,
+GBTFX,Turnford,added from UNECE 2025-1 without a coordinate,
 GBTLG,Tylers Green,no explicit link,
-GBUPD,Upper Dicker,no explicit link,
 GBVGI,Varg field,no explicit link,
-GBVOB,Vobster,no explicit link,
 GBWDD,Waddington,conflicting or missing match,6296675
 GBWLA,Wallasea,conflicting or missing match,2634874
 GBWRL,Warton,no explicit link,
-GBWAW,Warwick,conflicting or missing match,2634724
 GBFUC,Waterfoot,no explicit link,
+GBWAV,Watford Village,added from UNECE 2025-1 without a coordinate,
 GBWFO,Westcliffe on Sea,no explicit link,
 GBWCU,Whitchurch,no explicit link,
 GBWHB,Whitebooth Roads,no explicit link,
-GBWHT,Whitton,conflicting or missing match,7296772
-GBWGS,Wigston,conflicting or missing match,2633936
 GBMBN,Wimeborne,no explicit link,
 GBWEH,Winchmore Hill,no explicit link,
-GBWDM,Windermere,conflicting or missing match,2655049
-GBWBN,Woburn,no explicit link,
-GBWOS,Woburn Sands,no explicit link,
 GBWUF,Wolvey,no explicit link,
-GBWUG,Wooburn Green,no explicit link,
-GBWOH,Woodford Halse,no explicit link,
 GBWDA,Woodhall,no explicit link,
 GBYRK,York,conflicting or missing match,2641211
 GDGND,Grenada,conflicting or missing match,3579925
 GEPTI,Poti,conflicting or missing match,612366;858001
 GHAUR,Aura,no explicit link,
+GHKTP,Kotoka,added from UNECE 2025-1 without a coordinate,
 GLDAN,Daneborg,no explicit link,
 GLFHN,Kangerdluarssoruseg (Faringehavn,conflicting or missing match,3422635
 GNSBY,Moresby,no explicit link,
 GQBUL,Butuku-Luba,no explicit link,
-GRARG,Argos (Argolis),conflicting or missing match,264670
-GRAGY,Argyroupoli,no explicit link,
 GREPS,Eginio Pierias,no explicit link,
-GRHRI,Halandri,conflicting or missing match,8133842
-GRMHO,Marathonas,no explicit link,
+GRELL,Ellasona,added from UNECE 2025-1 without a coordinate,
+GRIKN,Ikonian,added from UNECE 2025-1 without a coordinate,
+GRMAL,Malaoi,added from UNECE 2025-1 without a coordinate,
+GRMIS,Missimi,added from UNECE 2025-1 without a coordinate,
+GRNKL,Neohorion Kyllinis,added from UNECE 2025-1 without a coordinate,
+GRPAT,Panetolion,added from UNECE 2025-1 without a coordinate,
 GRPPK,Papadianika/Asopos,no explicit link,
 GRPKE,Poros Kefallinias,conflicting or missing match,254864
 GRPTR,Poros Trizinias,no explicit link,
 GRSOR,Soupri,no explicit link,
-GRSAP,Stavros Agias Paraskevis,conflicting or missing match,8986655
 GRSHA,Stavros Halkidikis,no explicit link,
+GRSTE,Steni Evvias,added from UNECE 2025-1 without a coordinate,
+GRSTY,Stylinda,added from UNECE 2025-1 without a coordinate,
 GRSUD,Suda Bay,no explicit link,
 GRJSY,Syra (Syros),conflicting or missing match,264839
 GRTKO,Thessi Kyrillo,no explicit link,
 GRTAL,Trachia Argolidas,no explicit link,
 GRTFP,Trachia Fafplio,no explicit link,
 GRYLI,Yali Island,no explicit link,
+GTADU,Aduana,added from UNECE 2025-1 without a coordinate,
 GTSNJ,San Jose,conflicting or missing match,3589977
 GTTUC,Tecun Uman,conflicting or missing match,3588466
 GUAPR,Apra (Agana),conflicting or missing match,4043833
-GUDED,Dededo,conflicting or missing match,4043909
+GYTHI,Thimery,added from UNECE 2025-1 without a coordinate,
 HNENQ,Coronel E Soto Cano Ab,conflicting or missing match,6299819
 HNHNN,Henecan,no explicit link,
 HRXXX,RIS Inland waterways,no explicit link,
-HUALG,Algyo,conflicting or missing match,715429
 HUZAR,Aszar,no explicit link,
 HUHRY,Hater,no explicit link,
 HUCSK,Kaszok,no explicit link,
+HUMIR,Mirelite,added from UNECE 2025-1 without a coordinate,
 HURJB,Rajkabrany,no explicit link,
 HUXXX,RIS Inland waterways,no explicit link,
 HUSPG,Sopron Gysev,no explicit link,
@@ -865,6 +785,7 @@ IDLAT,"Lalang Terminal, St",no explicit link,
 IDLAS,"Langsa, Sumatra",no explicit link,
 IDLLA,"Lawe-Lawe, Kl",no explicit link,
 IDLIF,Lifamatola,conflicting or missing match,1637755
+IDLMB,Lombok Strait,added from UNECE 2025-1 without a coordinate,
 IDMAJ,"Majene, Sv",no explicit link,
 IDMPT,Maliana,no explicit link,
 IDMLI,"Malili, Sulawesi",conflicting or missing match,1636663
@@ -883,6 +804,7 @@ IDPKS,"Pangkalan Susu, Sumatra",conflicting or missing match,1214297
 IDPGX,"Pangkal Balam, Banka",no explicit link,
 IDPJG,"Panjang (Lampung, Sumatra)",conflicting or missing match,1632602
 IDPTL,"Pantoloan, Sv",no explicit link,
+IDPTO,Port Okha,added from UNECE 2025-1 without a coordinate,
 IDSGO,Port Segoro Fajar Satryo/Jakarta,no explicit link,
 IDPRO,"Probolinggo, Java",conflicting or missing match,1630634
 IDPNT,"Prointal, Jv",no explicit link,
@@ -921,6 +843,7 @@ IEALQ,Alexandra Quay,no explicit link,
 IEARO,Alexandra Road Oil,no explicit link,
 IEARH,Arklow Head (Ie009),no explicit link,
 IEBAL,Baldonnel,conflicting or missing match,6296699
+IEBYY,Ballyhahil,"UNECE 2025-1 coordinate held back, outside its country",
 IEBIF,B & I Ferryport,no explicit link,
 IEBIT,B & I Terminal,no explicit link,
 IEEBF,Broadford,no explicit link,
@@ -934,9 +857,7 @@ IEHAU,Haulbowline,conflicting or missing match,2963800
 IEHOL,Holywood,no explicit link,
 IEIRD,Irish Rail Freight Depot,no explicit link,
 IEJMT,Jamestown,no explicit link,
-IEKIK,"Kill, Kildare",conflicting or missing match,3314724
 IEKKA,Kilmokea,no explicit link,
-IEKSL,Kinsealy,no explicit link,
 IELAR,Lurganm Armagh,no explicit link,
 IEMOT,Moneypoint,no explicit link,
 IEMLL,Mulligan,no explicit link,
@@ -944,86 +865,121 @@ IEPAT,Pandoro Terminal,no explicit link,
 IEPAP,Parnell Place,no explicit link,
 IERVM,River Moy,no explicit link,
 IEWIL,Wilton,no explicit link,
-ILADM,Adam,conflicting or missing match,295761
 ILALN,Alenbi,no explicit link,
 ILSHI,Beit Hashita,no explicit link,
 ILBRN,Bitanit,no explicit link,
-ILJOR,Jordan,conflicting or missing match,293004
 ILKNT,Konetra,no explicit link,
 ILMTL,Matula,no explicit link,
-ILNZN,Nizana,conflicting or missing match,294015
 ILRFH,Rafiach,no explicit link,
 ILSED,Sedom,conflicting or missing match,250711
-ILTAB,Taba Border Crossing,no explicit link,
+ILSUK,Sukrier,added from UNECE 2025-1 without a coordinate,
 INALA,Alang SBY,conflicting or missing match,12196119
+INACT,Ambala Cantonment,added from UNECE 2025-1 without a coordinate,
 INAMI,Andorth Is,no explicit link,
 INADI,Androth Is,no explicit link,
 INANG,Anijengo,no explicit link,
 INATT,Attari,no explicit link,
+INATR,Attari Road,added from UNECE 2025-1 without a coordinate,
 INBBP,Bahabal Pur,no explicit link,
+INBLT,Balet,added from UNECE 2025-1 without a coordinate,
 INBND,Banddar,conflicting or missing match,11524809
+INBRA,Barsora,added from UNECE 2025-1 without a coordinate,
 INBSN,Bassain,no explicit link,
+INBNY,Berhni,added from UNECE 2025-1 without a coordinate,
 INBYT,Beyt,conflicting or missing match,1276402
+INBTM,Bhithamore (Sursnad),added from UNECE 2025-1 without a coordinate,
+INBID,Bidar,added from UNECE 2025-1 without a coordinate,
 INBTR,Bitra Is,no explicit link,
+INBOL,Bolanganj,added from UNECE 2025-1 without a coordinate,
 INBRM,Borliai-Mandla,no explicit link,
 INBRY,Borya,no explicit link,
 INCAR,Carijam,no explicit link,
+INCHP,Champai,added from UNECE 2025-1 without a coordinate,
+INCHM,Chamurci,added from UNECE 2025-1 without a coordinate,
 INCHI,Chikaballur,no explicit link,
 INCOL,Colochel,conflicting or missing match,1266322
 INCOO,Coondapur (Ganguly),no explicit link,
 INCRN,Cornwallis,no explicit link,
 INDHP,Dabhol Port,conflicting or missing match,1273765
 INDTW,Dantiwara,no explicit link,
+INDMR,Demagir,added from UNECE 2025-1 without a coordinate,
 INDEG,Deogad,no explicit link,
+INDHL,Dhalaighat,added from UNECE 2025-1 without a coordinate,
 INDMT,Dharamtar,conflicting or missing match,1272877
+INDHB,Dhubri Steamerghat,added from UNECE 2025-1 without a coordinate,
 INDIV,Div,no explicit link,
 INDRK,Dwarka (Rupen),no explicit link,
 INGAU,Gauhati (Panidi),conflicting or missing match,1271477
+INGAI,Gauriphanta,added from UNECE 2025-1 without a coordinate,
 INGED,Gede,no explicit link,
+INGTZ,Getandah,added from UNECE 2025-1 without a coordinate,
+INGHP,Ghasuapara,added from UNECE 2025-1 without a coordinate,
+INGJX,Ghojadanga,added from UNECE 2025-1 without a coordinate,
+INGTG,Gitaldah Road,added from UNECE 2025-1 without a coordinate,
 INGOI,Goa,conflicting or missing match,1271146
-INGUM,Gummidipoondi,conflicting or missing match,1270718
+INGJI,Gunji,added from UNECE 2025-1 without a coordinate,
 INHAL,Haldia,conflicting or missing match,1270506;1344377
 INHLD,Haldibari,no explicit link,
+INHTS,Hatisar,added from UNECE 2025-1 without a coordinate,
+INHLI,Hilli,added from UNECE 2025-1 without a coordinate,
 INHIP,Himachal Pradesh,no explicit link,
 INJGD,Jaigad,no explicit link,
 INKKU,Jaipur-Kanakpura,conflicting or missing match,7001571
 INNSA,Jawaharlal Nehru (Nhava Sheva),conflicting or missing match,11524262
 INBGK,Jodhpur-Bhagat Ki Kothi,no explicit link,
-INTHA,Jodhpur-Thar,conflicting or missing match,1268865
 INJDA,Jodia,no explicit link,
 INKND,Kankudy,no explicit link,
+INKAP,Kapadra (Surat),added from UNECE 2025-1 without a coordinate,
 INKSG,Kasargod,conflicting or missing match,8347665
+INKTG,Katarniyaghat,added from UNECE 2025-1 without a coordinate,
+INKTR,Kathinhar,added from UNECE 2025-1 without a coordinate,
 INKVT,Kavaram Is,no explicit link,
+INKEL,Kel Sahar Subdivision,added from UNECE 2025-1 without a coordinate,
 INKIW,Kelwa,no explicit link,
+INKWG,Khowaighat,added from UNECE 2025-1 without a coordinate,
+INKWA,Khunwa,added from UNECE 2025-1 without a coordinate,
 INKRP,Kiranpani,no explicit link,
 INKTW,Koheshwar,no explicit link,
 INKOK,Koka,no explicit link,
 INKLR,Kolar,no explicit link,
 INKON,Konarak,no explicit link,
 INKDP,Kondiapetnam,no explicit link,
+INMHD,Kotawalighat (Mohedipur),added from UNECE 2025-1 without a coordinate,
 INKTD,Kotda,conflicting or missing match,1266017
 INKSP,Kulasekarapanam,no explicit link,
 INKMB,Kumbharu,no explicit link,
 INLAK,Lalakua,no explicit link,
+INLGL,Lalgola Town,added from UNECE 2025-1 without a coordinate,
+INLTB,Latu Bazar,added from UNECE 2025-1 without a coordinate,
 INLPR,Leapuram,no explicit link,
 INMHN,Mahisasan,no explicit link,
+INMHG,Mahurighat,added from UNECE 2025-1 without a coordinate,
 INMLP,Mallipuram,no explicit link,
 INMNU,Manu,no explicit link,
 INMDW,Meadows,no explicit link,
 INMTW,Metwad,no explicit link,
 INMCI,Minicoi I,no explicit link,
+INMRE,Moreh,added from UNECE 2025-1 without a coordinate,
 INMUB,MUB,no explicit link,
+INNPG,Nampong,added from UNECE 2025-1 without a coordinate,
 INNAN,Nancowrie,no explicit link,
 INNVB,Navabunder,no explicit link,
 INNVP,Navaspur,no explicit link,
+INNMT,Neamari Stemerghat,added from UNECE 2025-1 without a coordinate,
+INNGR,Nepalgunj Road,added from UNECE 2025-1 without a coordinate,
 INNWP,Newapur,no explicit link,
 INNVT,Nivti,no explicit link,
+INRGB,Old Raghna Bazar,added from UNECE 2025-1 without a coordinate,
 INONJ,Onjal,no explicit link,
 INPAN,Panaji Port,no explicit link,
 INPNM,"Panambur, Va Mangalore",no explicit link,
+INPNT,Panitankit (Nazalbari),added from UNECE 2025-1 without a coordinate,
 INPPJ,Pellet Plant Jetty/Shiroda,no explicit link,
+INPTP,Petrapole Road,added from UNECE 2025-1 without a coordinate,
+INPHB,Phulbari,added from UNECE 2025-1 without a coordinate,
 INPIN,Pindhara,conflicting or missing match,6417392
 INPID,Port Indai,no explicit link,
+INRPL,Raddipalam,added from UNECE 2025-1 without a coordinate,
 INRKG,Rajakkamangalam,no explicit link,
 INRJP,Rajpara/Navabunder,no explicit link,
 INRAM,Rameshwaram,no explicit link,
@@ -1031,9 +987,9 @@ INRGT,Ranghat Bay,no explicit link,
 INRNR,Ranpar,no explicit link,
 INRAY,Rayapalayam,no explicit link,
 INRED,Redi,no explicit link,
-INSLT,Salt Lake,conflicting or missing match,1257591
+INRGU,Ryngku,added from UNECE 2025-1 without a coordinate,
 INSAD,Sanathnagar,no explicit link,
-INSAR,Sardar,no explicit link,
+INSBZ,Shella Bazar,added from UNECE 2025-1 without a coordinate,
 INSWD,Shriwardhan,no explicit link,
 INSIM,Sima/Navabunder,no explicit link,
 INSHP,Simbhour Port,no explicit link,
@@ -1041,30 +997,46 @@ INSMR,Simor,no explicit link,
 INSBH,Sinbhour,no explicit link,
 INSNG,Singhabad,no explicit link,
 INSPR,Sirpur,no explicit link,
+INSNB,Sonabarsa,added from UNECE 2025-1 without a coordinate,
+INSMP,Srimantapur,added from UNECE 2025-1 without a coordinate,
+INSKP,Sukhia Pokhari,added from UNECE 2025-1 without a coordinate,
 INSRV,Surasani-Yanam,no explicit link,
+INSTR,Sutarkandi,added from UNECE 2025-1 without a coordinate,
 INTPH,Thopputhurai,no explicit link,
+INTKN,Tikonia,added from UNECE 2025-1 without a coordinate,
 INTYR,Tirukkadayyur,no explicit link,
 INTIV,Tiviri,no explicit link,
+INTTS,T.T.Shed,added from UNECE 2025-1 without a coordinate,
+INTNG,Tungi,added from UNECE 2025-1 without a coordinate,
+INULP,Ultapani,added from UNECE 2025-1 without a coordinate,
 INULW,Ulwa,no explicit link,
 INUMB,Umbergoan,conflicting or missing match,1253869
+INVAL,Valvada,added from UNECE 2025-1 without a coordinate,
 INVSI,Vansi-Borsi,no explicit link,
 INVRD,Varavda,no explicit link,
 INVSV,Varsova,no explicit link,
 INVNG,Vemgira,no explicit link,
 INVEP,Veppalodai,no explicit link,
 INNGS,Village Namaya Shipkila,no explicit link,
+INKJW,Wipro Sez/Kodathi,added from UNECE 2025-1 without a coordinate,
 IQALF,Abu Al Fulus,conflicting or missing match,389880
 IQIKD,Iskandariyha,conflicting or missing match,99226
 IQKHA,Khor Al Amaya,no explicit link,
 IQNAS,Najat,no explicit link,
+IRUZA,Al Uzsayr,added from UNECE 2025-1 without a coordinate,
 IRBAH,Bandar Assaluyeh,no explicit link,
 IRBSR,Bandar Shahid Rajaee,no explicit link,
+IRDGN,Basargan,added from UNECE 2025-1 without a coordinate,
+IRGHA,Ghazvin (Qazwin),added from UNECE 2025-1 without a coordinate,
 IRGSM,Gheshm,conflicting or missing match,6649407
 IRIQH,Islam Qal'eh,no explicit link,
 IRKHO,Khorramshahr,conflicting or missing match,127319;11886642
 IRLRR,Lar,conflicting or missing match,139873
 IRLIN,Lingah,no explicit link,
+IROSM,Mosul,added from UNECE 2025-1 without a coordinate,
 IRWPS,Persepolis,no explicit link,
+IRRTM,Ratawi,added from UNECE 2025-1 without a coordinate,
+IRSMW,Samawa,added from UNECE 2025-1 without a coordinate,
 ISBIL,Bildudalur - hofn,conflicting or missing match,3418226
 ISBGJ,Borgarfjordur eystri,conflicting or missing match,3228381
 ISDPV,Djupavik,no explicit link,
@@ -1088,83 +1060,41 @@ ISSIG,Siglufjordur - hofn,no explicit link,
 ISSTD,Stodhvarfjordur,no explicit link,
 ISSTR,Straumsvik,no explicit link,
 ISSTY,Stykkisholmur - hofn,conflicting or missing match,3412888;6295713
-ISSUD,Sudureyri/Sugandafjord,conflicting or missing match,11549871
 ISTHN,Tjorneshofn,no explicit link,
-ITASM,Albisola Marina,conflicting or missing match,3183314
 ITBAG,Bagno-Rubiera,no explicit link,
 ITBAC,Baraccola,no explicit link,
-ITBED,Bedizzole(Brescia),conflicting or missing match,6534215
-ITBDF,Bianconese di Fontevivo,conflicting or missing match,3182071
+ITBOR,Borgo Di Trevi,added from UNECE 2025-1 without a coordinate,
 ITIDQ,Bresseo di Teolo,no explicit link,
 ITBZD,Bruzolo di Susa,no explicit link,
-ITCDI,Calderari,conflicting or missing match,8950390
-ITCZX,Cannizzaro,conflicting or missing match,8949240
-ITCPF,Capodarco di Fermo,conflicting or missing match,3180694
-ITCVA,Castellana,conflicting or missing match,3178595
-ITCEO,Castello,conflicting or missing match,2525792
-ITCGL,Castiglione,conflicting or missing match,3179415
-ITCDP,Cecchini di Pasiano,conflicting or missing match,3179240
 ITCEN,Cesara Novara,no explicit link,
-ITCLT,Collalto,conflicting or missing match,3178445
-ITCTT,Crocetta,conflicting or missing match,3177773
 ITCGM,Crugola di Mornago,no explicit link,
+ITCUS,Cusinati Di Rosa,added from UNECE 2025-1 without a coordinate,
 ITDDO,Dogana do Ortonovo,no explicit link,
-ITEST,Este,conflicting or missing match,3165185
 ITFAL,Falconara,conflicting or missing match,3177250
+ITGDD,Gallo d'Alba,added from UNECE 2025-1 without a coordinate,
 ITGOR,Gorgona,conflicting or missing match,3166997
-ITLGO,Lancenigo,conflicting or missing match,3164090
-ITLTA,Lastra,conflicting or missing match,3175074
+ITZKT,Isola del Gran Sasso d'Italia,added from UNECE 2025-1 without a coordinate,
 ITLEU,Leumann,no explicit link,
 ITLSA,Limite sull'Arno,no explicit link,
-ITLKT,Lunata,no explicit link,
-ITMGG,Maggiore,conflicting or missing match,3172979
-ITMNC,Mandrio di Correggio,conflicting or missing match,8950127
-ITMPP,Mappano,no explicit link,
-ITMNG,Mignagola di Carbonera,conflicting or missing match,3218797
-ITMBC,"Misterbianco, Catania",conflicting or missing match,2524123
 ITMCV,Molinetto-Ciliverghe,no explicit link,
-ITMRE,Montale Rangone,conflicting or missing match,3173090
-ITOLO,Olona,conflicting or missing match,3172065
-ITORI,Orio Litta (Milano),no explicit link,
-ITODM,Ortona dei Marsi,no explicit link,
+ITMJC,Mollicciara,added from UNECE 2025-1 without a coordinate,
+ITMCI,Monleone di Cicagna,added from UNECE 2025-1 without a coordinate,
+ITNVO,Nuova Olonio,added from UNECE 2025-1 without a coordinate,
 ITONN,Osmannoro,no explicit link,
 ITOMM,Oste-Montemurlo,no explicit link,
-ITPDA,Padova,conflicting or missing match,3171728;7778933
 ITPLM,Palazzolo Milanese,no explicit link,
 ITNIC,Pian di Macina,no explicit link,
-ITPTV,Piano Tavola,conflicting or missing match,8949115
-ITPLS,Polesine,conflicting or missing match,3182576
-ITPZO,Ponzano Magra,conflicting or missing match,8950613
-ITQTO,Quarto,conflicting or missing match,3169700
+ITPFO,Ponte Fornaci,added from UNECE 2025-1 without a coordinate,
+ITRHI,Reschigliano,added from UNECE 2025-1 without a coordinate,
 ITXXX,RIS Inland waterways,no explicit link,
-ITRIV,Rivalta Scrivia,conflicting or missing match,3169261
-ITROG,"Rogoredo, Milan",conflicting or missing match,3169088
 ITRUS,Rovereto sulla Secchia,no explicit link,
 ITSAL,Salerno,conflicting or missing match,3168673;3170096;11126903
-ITSBC,Sambuca di Pesa,conflicting or missing match,6544009
-ITSDT,San Donato,conflicting or missing match,3168414
-ITSNT,San Nicolo a Trebbia,no explicit link,
-ITSNP,San Pietro,conflicting or missing match,3167811
-ITSAR,San Rocco,conflicting or missing match,8950617
-ITSCR,Santa Croce,conflicting or missing match,2523362
-ITSDR,Sarmeola di Rubano,conflicting or missing match,3167120
-ITSDV,Seghe di Velo,conflicting or missing match,8950112
 ITSEC,Settimello-Calenzano,no explicit link,
-ITSBM,Solara di Bomporto,conflicting or missing match,8949278
-ITSBT,Solbiate,conflicting or missing match,3166439
-ITZPZ,Spezzano,conflicting or missing match,2523022
-ITTML,Talamello,no explicit link,
 ITTEV,Tavernelle Vicentina-Altavilla Vicentina,no explicit link,
 ITVAD,Vado/Bologna,conflicting or missing match,3164991
 ITVDO,Vado/Lucca,no explicit link,
-ITVDR,Verderio,conflicting or missing match,6535364
-ITVTM,Vertemate,conflicting or missing match,3164506
-ITVCO,Vico,conflicting or missing match,3164407
-ITVDC,Vighizzolo Di Cantu,conflicting or missing match,7669424
-ITVIG,Vigliano,conflicting or missing match,3164368
 ITVCA,Villanova Camposanpiero,no explicit link,
 ITVSS,Villa Sesso,no explicit link,
-ITZCO,Zocco,conflicting or missing match,3175808
 ITZUG,Zugliano,conflicting or missing match,3165794
 JPABS,Abohshita,no explicit link,
 JPABO,Aboshi/Himeji,conflicting or missing match,1854359
@@ -1337,6 +1267,7 @@ JPKSY,"Kasasa, Yamaguchi",no explicit link,
 JPKDJ,Kasedo,no explicit link,
 JPKAE,Kashimae,conflicting or missing match,11524907
 JPKSM,"Kashima, Ibaraki",conflicting or missing match,1860748
+JPKTI,Kataichi,added from UNECE 2025-1 without a coordinate,
 JPKTK,Kataku,no explicit link,
 JPKBA,Katasoba,no explicit link,
 JPKWC,"Kawachi, Nagasaki",conflicting or missing match,1864846
@@ -1430,13 +1361,11 @@ JPMNE,Mine,conflicting or missing match,1857079
 JPMNJ,Minna/Motobu,no explicit link,
 JPMNN,Minna/Tarama,no explicit link,
 JPMKI,"Misaki, Kochi",conflicting or missing match,1853340
-JPMSM,"Mishima, Shizuoka",conflicting or missing match,1856977
 JPMSR,Mishiro,no explicit link,
 JPMSO,Misho,no explicit link,
 JPMIS,"Misumi, Kumamoto",conflicting or missing match,1855259
 JPMTC,Mitachi,no explicit link,
 JPMIT,"Mitaka, Hiroshima",no explicit link,
-JPMTA,"Mitaka, Tokyo",conflicting or missing match,1860437
 JPMQT,"Mito, Kagawa",no explicit link,
 JPMKS,Mitsukoshima,no explicit link,
 JPMIR,Miura/Mitsushima,no explicit link,
@@ -1478,6 +1407,7 @@ JPNGO,"Nagoya, Aichi",conflicting or missing match,1856057;12233244
 JPNAH,"Naha, Okinawa",conflicting or missing match,1856035;6300458;9853024
 JPNGN,Naigainoura,no explicit link,
 JPNKH,"Nakahama, Tottori",no explicit link,
+JPNGK,Nakakoshi,added from UNECE 2025-1 without a coordinate,
 JPNMT,Nakaminato,conflicting or missing match,2111732
 JPNKN,Nakanoura,no explicit link,
 JPNKT,"Nakata, Hiroshima",no explicit link,
@@ -1502,12 +1432,12 @@ JPNOU,Noh,no explicit link,
 JPNJR,Nojiri,no explicit link,
 JPNMI,Nomi,no explicit link,
 JPNON,Nonohama,no explicit link,
-JPNCO,"Nonoichi, Ishikawa",conflicting or missing match,1854979
 JPNNH,Nunohama,no explicit link,
 JPNYK,Nyukou,no explicit link,
 JPNYZ,Nyuzu,no explicit link,
 JPOOC,Ochiyo,no explicit link,
 JPODA,Odahigashi,no explicit link,
+JPODT,Odaiba,added from UNECE 2025-1 without a coordinate,
 JPODO,Odoh,no explicit link,
 JPOGA,Ogasawara,conflicting or missing match,2111520
 JPOGK,"Ogi, Kagawa",conflicting or missing match,1854638
@@ -1527,7 +1457,6 @@ JPOSR,Ohgasari,no explicit link,
 JPOGE,Ohge,no explicit link,
 JPOGS,Ohgishima,no explicit link,
 JPOGU,Ohgushi,no explicit link,
-JPOHO,Ohi,no explicit link,
 JPOIG,Ohigawa,no explicit link,
 JPOKH,Ohkawara,no explicit link,
 JPONE,Ohnejime,no explicit link,
@@ -1666,6 +1595,7 @@ JPTUR,"Tanoura, Ehime",no explicit link,
 JPTNU,Tanoura/Kitakyushu,conflicting or missing match,1850634
 JPTET,"Tateishi, Ehime",no explicit link,
 JPTTS,"Tateishi, Kagawa",no explicit link,
+JPTAU,Taura,added from UNECE 2025-1 without a coordinate,
 JPTYU,Tayui,no explicit link,
 JPTEK,Tekutsuku,no explicit link,
 JPTRZ,Terazu/Yatsuka,no explicit link,
@@ -1742,19 +1672,21 @@ KIWNI,Washington Islands,conflicting or missing match,4030892
 KMFOU,"Foumboni, Moheli",conflicting or missing match,921889
 KNBAS,"Basseterre, Saint Kitts",conflicting or missing match,3575551
 KNSKB,Saint Kitts,conflicting or missing match,3575174
+KPREM,Bumpyo (Rempo),added from UNECE 2025-1 without a coordinate,
 KPHGM,Hungnam,conflicting or missing match,1877449
 KPSON,Songjin,conflicting or missing match,2040578
 KRCGY,Chungyang,no explicit link,
 KRHAR,Haryana,no explicit link,
-KRHSO,Hwasong,conflicting or missing match,6575762
-KROCH,Ochang,conflicting or missing match,6797282
 KRPRY,Pry,no explicit link,
 KWJBD,Jebel Dhana,no explicit link,
 KWKWM,Khor al Mufatta,no explicit link,
+KWMAM,Mina Alo Manti,added from UNECE 2025-1 without a coordinate,
 KZHOR,Horgos,no explicit link,
+KZKOR,Kordai,added from UNECE 2025-1 without a coordinate,
 LAUDO,Udomxay,no explicit link,
 LAVAN,Vangtoud,no explicit link,
 LBOUZ,Ouzai,no explicit link,
+LBRST,Ras Selata,added from UNECE 2025-1 without a coordinate,
 LBZHR,Zahrani Terminal,no explicit link,
 LKDEK,Dekantana,no explicit link,
 LKJCT,Jaya Container Terminal,no explicit link,
@@ -1767,6 +1699,8 @@ LRSAB,Sarioe Bay,no explicit link,
 LRWOI,Wologissi,no explicit link,
 LTKLT,Kaltene,no explicit link,
 LTRUM,Rumiskies,no explicit link,
+LTSVE,Svencoinys,added from UNECE 2025-1 without a coordinate,
+LUMOS,Mosingen,added from UNECE 2025-1 without a coordinate,
 LUXXX,RIS Inland waterways,no explicit link,
 LVPLC,Ploce,no explicit link,
 LYBOU,El Bouri,no explicit link,
@@ -1775,8 +1709,8 @@ LYMTH,Melittah,no explicit link,
 LYSOU,Soussah,no explicit link,
 LYTOA,Toulmeitha,no explicit link,
 LYWAX,Zwara,conflicting or missing match,7730620
+MABRE,Breich,added from UNECE 2025-1 without a coordinate,
 MAVIL,Dakhla,conflicting or missing match,2463447;12196072
-MAKMA,Ksar Majaz,no explicit link,
 MAEUN,Laayoune (El Aaiun),conflicting or missing match,2462881
 MDBRS,Berestovitsa,no explicit link,
 MDXXX,RIS Inland waterways,no explicit link,
@@ -1801,20 +1735,16 @@ MUBAM,Bambous,no explicit link,
 MUCDE,Cloverdale,no explicit link,
 MVADU,Addu,conflicting or missing match,1281893
 MXABB,Atunes,no explicit link,
-MXCCN,Coalcoman,conflicting or missing match,9509405
 MXPIB,Port Isabel,no explicit link,
 MXSLO,San Lorenzo,no explicit link,
 MXSAF,Santa Fe,conflicting or missing match,8858085
-MXTTN,Tultilan,conflicting or missing match,3980911
 MYBAU,"Bau, Sarawak",conflicting or missing match,1734539
 MYBIA,"Biawak, Sarawak",conflicting or missing match,1737007
 MYBNG,"Binatang, Sarawak",conflicting or missing match,1735881
 MYBTN,Bintangor,conflicting or missing match,1762637
 MYBTU,"Bintulu, Sarawak",conflicting or missing match,1737486
-MYBBE,Bukit Beruntung,no explicit link,
 MYBGG,"Bunan Gega, Sarawak",conflicting or missing match,1770044
 MYDDW,Danjindawai,no explicit link,
-MYJTA,"Jitra, Kedah",conflicting or missing match,1736302
 MYKES,Kejit,no explicit link,
 MYKRE,Krety,no explicit link,
 MYKBE,"Kuala Belud, Sabah",no explicit link,
@@ -1851,20 +1781,20 @@ MZMFW,Magaruque,conflicting or missing match,1041965
 NAOGV,Ongava Game Reserve,conflicting or missing match,8299159
 NCTON,Tontouta Apt,conflicting or missing match,8469107
 NEBKN,Birni Nkoni,no explicit link,
+NGABA,Abakaliki,"UNECE 2025-1 coordinate held back, outside its country",
 NGBON,Bonny,conflicting or missing match,2346812;11876773
 NGDEN,Denema,no explicit link,
 NGESC,Escravos,no explicit link,
 NGGRP,Greek Port,no explicit link,
 NGLOA,Lagos Murtala Muhammed Apt,conflicting or missing match,2332458
+NGPEN,Pennington,added from UNECE 2025-1 without a coordinate,
 NGOBO,Que Oboe Terminal/Eket,no explicit link,
-NLAJM,Anjum,conflicting or missing match,2759757
+NGRDR,Rio Del Rey,added from UNECE 2025-1 without a coordinate,
+NGTIK,Tiko,added from UNECE 2025-1 without a coordinate,
 NLBGI,Bergerheide,no explicit link,
 NLBEH,Bergh-Autoweg,no explicit link,
-NLBGU,Bergum,conflicting or missing match,2759103
-NLBKE,Berkel,conflicting or missing match,6929992
 NLBMK,Boortmeerkerk,no explicit link,
 NLDKP,De Kempen,no explicit link,
-NLDRI,Driebergen,conflicting or missing match,2756619
 NLERI,Eric,no explicit link,
 NLFJA,Fonejacht,no explicit link,
 NLGZR,Gilzerijen,no explicit link,
@@ -1877,12 +1807,10 @@ NLLTS,Laatste Stuiver,no explicit link,
 NLLGB,Landgoed Baest,no explicit link,
 NLMEW,Meerlo-Wansum,no explicit link,
 NLNWG,Nieuwegein,conflicting or missing match,2750324;2750325
-NLOST,Oostrum,conflicting or missing match,2749343
 NLOGN,Oud Gein,no explicit link,
 NLRPL,Ramspol,no explicit link,
 NLXXX,RIS Inland waterways,no explicit link,
 NLRBO,Robbenoord,no explicit link,
-NLROR,Rodenrijs,conflicting or missing match,6929992
 NLRSL,Roompotsluis,no explicit link,
 NLSCI,Schiedam,conflicting or missing match,2747596;11511637
 NLSUD,Sint Cloud,no explicit link,
@@ -1893,51 +1821,34 @@ NLVHA,Veldriel,no explicit link,
 NLVGB,Voetangelbrug,no explicit link,
 NLVDN,Vredenduin,no explicit link,
 NLWTN,Warten,no explicit link,
-NLWWR,Wijde Wormer,conflicting or missing match,2756938
-NLZHU,Zevenhuizen (Friesland),conflicting or missing match,2743925
-NLZHN,Zevenhuizen (Utrecht),conflicting or missing match,2743928
-NLZGD,Zwaagdijk,conflicting or missing match,2743592
-NLZWE,Zwaagwesteinde,conflicting or missing match,2743590
 NOALN,Alnabru,no explicit link,
 NOASY,Askoy,no explicit link,
 NOBAR,Barum,conflicting or missing match,3162212
 NOFSU,Fetsund,no explicit link,
 NOFTL,Fortun-Luster,no explicit link,
 NOFRE,Fraena,no explicit link,
-NOHLY,Hafslundsoy,conflicting or missing match,9151462
 NOHGN,Hagan,no explicit link,
-NOHRE,Herre-Bamble,conflicting or missing match,3152862
 NOHUR,Hurum,conflicting or missing match,3140636
-NOKDT,Kalandseidet,no explicit link,
 NOKLR,Kjeller,no explicit link,
 NOKVN,Kvanangen,conflicting or missing match,779159
-NOLIS,Lierstranda,no explicit link,
 NOLYN,Lyngen,conflicting or missing match,780314
 NOMAV,Malselv,conflicting or missing match,3145649
 NOMYO,Myre-Oksnes,conflicting or missing match,3232860
 NONRY,Naroy,conflicting or missing match,3145065
 NONSS,Narsnes,conflicting or missing match,3145063
-NONES,Nesflaten-Suldal,conflicting or missing match,3144697
 NORLN,Raelingen,no explicit link,
 NORMJ,Ramfjordnes,no explicit link,
 NORNA,Rana,conflicting or missing match,3145614
-NOSET,Sem-Tonsberg,conflicting or missing match,3139819
-NOSJA,Senja,conflicting or missing match,3137714
 NOSKL,Skanland,conflicting or missing match,3224350
-NOSKS,Skatval-Stjordal,conflicting or missing match,11524805
 NOSOF,Sorfold,conflicting or missing match,3153141
 NOSTS,Storskog,no explicit link,
 NOTAA,Tana,no explicit link,
-NOTLG,Tjodalyng,no explicit link,
-NOTSD,Torvastad,no explicit link,
 NOTYF,Tysfjord,conflicting or missing match,3159045
 NOTYV,Tysvar,conflicting or missing match,3133448
 NOVAY,Vanylven,conflicting or missing match,3134969
-NOYTR,Ytre Enebakk,no explicit link,
 NPHRJ,Chaurjhari,no explicit link,
 NPKAK,Kakarbitta,no explicit link,
 NPMWP,Mountain,conflicting or missing match,1282909
-NZMNR,Middleton/Christchurch,conflicting or missing match,6220352
 NZMOE,Moerewa,conflicting or missing match,6229241
 OMMUT,Muthra,no explicit link,
 OMOPQ,Port Qaboos,conflicting or missing match,286952
@@ -1952,6 +1863,7 @@ PGBAP,Baibara,conflicting or missing match,2133918
 PGDLB,Dalbertis,conflicting or missing match,2098429
 PGFAQ,Freida River,conflicting or missing match,8298995
 PGIUS,Inus,conflicting or missing match,2095559
+PGJAC,Jacksons,added from UNECE 2025-1 without a coordinate,
 PGKPP,Kakapo,no explicit link,
 PGKJU,Kamiraba,conflicting or missing match,8298698
 PGKAK,Kar,conflicting or missing match,2087553
@@ -1970,6 +1882,7 @@ PGTFA,Tilfalmin,no explicit link,
 PGTLO,Tol,conflicting or missing match,7731550
 PGWOK,Woodlark,conflicting or missing match,2090163
 PHAHE,Aheron/Ozamis,no explicit link,
+PHAEL,Alabel,"UNECE 2025-1 coordinate held back, outside its country",
 PHALA,Alasang/Siain,no explicit link,
 PHALE,Aleran/Ozamis,no explicit link,
 PHANT,Antipolo,no explicit link,
@@ -2037,7 +1950,6 @@ PHMVS,"Mariveles, Luzon",conflicting or missing match,1700868
 PHMSC,Masinloc/Sual,no explicit link,
 PHMAC,Matho Cortez/Bislig,no explicit link,
 PHMCD,Mercedes/Jose Panganiban,no explicit link,
-PHMIC,Misamis Or./Cagayan de Oro,no explicit link,
 PHMSS,Mission/Aparri,no explicit link,
 PHMON,Monserrat/Mati,no explicit link,
 PHMOR,Morong/Mariveles,no explicit link,
@@ -2067,7 +1979,6 @@ PHQUI,Quiddiao/Aparri,no explicit link,
 PHQBL,Quinablagan/Mati,no explicit link,
 PHQPT,Quipit Bay/Ozamis,no explicit link,
 PHREA,Real/Siain,no explicit link,
-PHRIZ,"Rizal, Luzon",conflicting or missing match,1691606
 PHSBB,Sabbot/Siain,no explicit link,
 PHSBY,Sablayan/Batangas,no explicit link,
 PHSAG,Sagay/Iloilo,no explicit link,
@@ -2097,6 +2008,7 @@ PHTAY,Taytay/Puerto Princesa,no explicit link,
 PHTLG,Tolong/Dumaguete,no explicit link,
 PHTLP,Tolopo,no explicit link,
 PHTLS,Tolosa/Tacloban,no explicit link,
+PHTRO,Troloban,added from UNECE 2025-1 without a coordinate,
 PHTGI,Tuguis/Dadiangas,no explicit link,
 PHTGW,Tungawan Bay/Zamboanga,no explicit link,
 PHULY,Ulugan Bay,no explicit link,
@@ -2108,8 +2020,6 @@ PKBAG,Bagh/AJK,no explicit link,
 PKGAD,Gadoon,no explicit link,
 PKHRU,Haripur Hazara,no explicit link,
 PKHSN,Hassanabdal,no explicit link,
-PKHUB,Hub,conflicting or missing match,10340586
-PKKYC,Karachi City,conflicting or missing match,7045974
 PKKBU,Keti Bunder,no explicit link,
 PKKHC,Kohat Cantt,no explicit link,
 PKKOL,Kotli/AJK,no explicit link,
@@ -2117,7 +2027,6 @@ PKLLM,Lala Mosa,no explicit link,
 PKLRG,Lora Lai,conflicting or missing match,7730752
 PKMGP,Mogulpura/Lahore,no explicit link,
 PKMXC,Multan City,no explicit link,
-PKNSR,Nowshera,conflicting or missing match,1341204
 PKOKC,Okara Cantt,no explicit link,
 PKPAJ,Para Chinar,conflicting or missing match,1343232
 PKPSC,Peshawar Cantt,no explicit link,
@@ -2132,32 +2041,33 @@ PKSKO,Shorkot Cantt,no explicit link,
 PKTXA,Taxilla,no explicit link,
 PKTOR,Torkham,no explicit link,
 PLCEL,Celestynow,no explicit link,
-PLCIC,Ciche,conflicting or missing match,774223
 PLDZE,Dobrzykowice Wroclawskie,no explicit link,
 PLDLN,Doluje,no explicit link,
-PLGOG,Gogolin,no explicit link,
 PLGSL,Gora Slaska,no explicit link,
 PLRIA,Krobia,no explicit link,
 PLKCL,Kucelinska,no explicit link,
 PLMIA,Modlinica,no explicit link,
 PLOAI,Omianki,no explicit link,
 PLXXX,RIS Inland waterways,no explicit link,
-PLRKK,Rokiciny - Kolonia,conflicting or missing match,3087046
 PLRGZ,Rudna gwizdanow,no explicit link,
 PLSKO,Slawko,no explicit link,
+PLWYG,Wygledi,added from UNECE 2025-1 without a coordinate,
+PLZPO,Zpowtuchola,added from UNECE 2025-1 without a coordinate,
 PNPCN,Pitcairn Is,no explicit link,
+PRCUP,"Cupey, San Juan",added from UNECE 2025-1 without a coordinate,
+PRGUA,Guabano,added from UNECE 2025-1 without a coordinate,
+PRJIC,Jicome,added from UNECE 2025-1 without a coordinate,
 PRLAM,Las Mareas (Guayama),conflicting or missing match,4565954
-PTCXP,Charneca da Caparica,conflicting or missing match,2270534
-PTCOR,Coronado-Sao Mamede,conflicting or missing match,2734431
-PTLXA,Lixa,conflicting or missing match,2738055
+PRNXL,Noxell,added from UNECE 2025-1 without a coordinate,
+PRTOT,Tottillas,added from UNECE 2025-1 without a coordinate,
 PTMAL,Maceira Lis,no explicit link,
 PTPDB,Pacos de Brandado,no explicit link,
-PTEAS,Santa Eulalia de Arnoso,conflicting or missing match,2742707
 PTSMI,Sao Miguel,conflicting or missing match,2734395
 PYFNX,Fenix,conflicting or missing match,12195603
 QAHNA,Hanna,no explicit link,
 ROAPA,Apahida,no explicit link,
 ROBPU,Baneasa Apt/Bucuresti,conflicting or missing match,6299701
+ROBUV,Bucuresti 50 Vama,added from UNECE 2025-1 without a coordinate,
 ROBUB,Bucuresti Basarab,no explicit link,
 ROBUI,Bucuresti Intrepozite,no explicit link,
 ROBUN,Bucuresti Nord,no explicit link,
@@ -2165,16 +2075,13 @@ RODIN,Dinkelsbuhl,no explicit link,
 RODGV,Draganesti-Vlasca,no explicit link,
 ROGAT,Galati Transbordare,no explicit link,
 ROGRN,Giurgiu Nord,no explicit link,
-ROJUD,Jud. Maramures,conflicting or missing match,673887
 ROLAS,Lasi,no explicit link,
 RONIN,Nicolina,no explicit link,
-ROPDM,Poienarii de Muscel,conflicting or missing match,670234
 ROREN,Resita Nord,no explicit link,
 RORES,Resita Sud,no explicit link,
 ROXXX,RIS Inland waterways,no explicit link,
 ROSUN,Suceava Nord,no explicit link,
 ROTSN,Timisoara Nord,no explicit link,
-ROVAM,Valea Luimihai,no explicit link,
 RSBSA,Baracka,no explicit link,
 RSXXX,RIS Inland waterways,no explicit link,
 RUARM,Arman (Magadan),conflicting or missing match,2127060
@@ -2184,6 +2091,7 @@ RUBER,"Beringovskiy, Port",conflicting or missing match,11361390
 RUCIH,Chikacheva,conflicting or missing match,2126174
 RUDKA,De-Kastri,conflicting or missing match,2126018;11361369
 RUDUD,Dudinka,conflicting or missing match,1507116;11886630
+RUGKA,Golchikka,added from UNECE 2025-1 without a coordinate,
 RUGRH,Gremikha,conflicting or missing match,11361356
 RUKAN,Kandalaksha,conflicting or missing match,553190;11361354
 RUHYR,Khyrov,no explicit link,
@@ -2205,6 +2113,7 @@ RUPVX,Provedenia,no explicit link,
 RURAT,Raduzhnyi,conflicting or missing match,7668536
 RUSWT,Strzhewoi,conflicting or missing match,8531890
 RUTAG,Taganrog,conflicting or missing match,484907;11361378
+RUTAL,Talakan,added from UNECE 2025-1 without a coordinate,
 RUTRR,Trifonov Ruchey,no explicit link,
 RUUGL,Uglegorsk,conflicting or missing match,2120261;11361376
 RUVZB,"Vozrozhdeniya, Bukhta",no explicit link,
@@ -2213,6 +2122,7 @@ RUYAB,Yagelnaya Bukhta,no explicit link,
 RUZAO,"Zavyalova, O",no explicit link,
 RUZEM,Zeleniy Mys,no explicit link,
 RUZHL,Zheleznodorozhniy,no explicit link,
+SAKFH,King Fhad,added from UNECE 2025-1 without a coordinate,
 SAMAN,Manailih,no explicit link,
 SAMUF,Manfouha,no explicit link,
 SAQAL,Qalsn,no explicit link,
@@ -2228,67 +2138,50 @@ SBONE,"Onepusu, Malaita Island",no explicit link,
 SDEDB,Eldebba,conflicting or missing match,7668299
 SDRSS,Roseires,conflicting or missing match,378459
 SDSWA,Swakin,no explicit link,
-SEAGO,Ago,conflicting or missing match,2727386
 SEANK,Ankarsvik,no explicit link,
 SEARK,Arnoviken,no explicit link,
-SEAAS,Aseda,no explicit link,
 SEBBE,Baberg,no explicit link,
 SEBYS,Byske (Brannfors),no explicit link,
 SEFAK,Fagervik,no explicit link,
-SEFLM,Flemingsberg/Stockholm,conflicting or missing match,7118038
 SEGVN,Gravarne,no explicit link,
 SEGRT,Grytgol,no explicit link,
 SEGUN,Gunnebo,no explicit link,
-SEHAB,Habo,no explicit link,
-SEHGR,Hagersten/Stockholm,conflicting or missing match,2709227
 SEJAT,Jatterson,no explicit link,
 SEKAK,Karlsvik,no explicit link,
 SEKUB,Kubikenborg,no explicit link,
-SELAM,Lammhult,no explicit link,
 SELAN,Langasjo,no explicit link,
 SEMAN,Marsviken,no explicit link,
-SENCS,Nacka Strand,conflicting or missing match,12196108
-SENBG,Norberg,no explicit link,
+SEMVK,Maryvik,added from UNECE 2025-1 without a coordinate,
 SENJA,Norrbottens Jarnverk-SSAB,no explicit link,
 SENOR,Norrbyskar,no explicit link,
 SENHN,Nyhamn,no explicit link,
+SENYM,Nymolla,added from UNECE 2025-1 without a coordinate,
+SENYP,Nyvarp,added from UNECE 2025-1 without a coordinate,
 SEOAX,Oaxen,no explicit link,
+SEXXX,RIS Inland waterways,added from UNECE 2025-1 without a coordinate,
 SEROV,Ronnskarsverken,no explicit link,
-SESBV,Satra Brunn,no explicit link,
-SESKH,Skarholmen/Stockholm,conflicting or missing match,2678127
 SESKK,Skonvik,no explicit link,
 SESUN,Sund,conflicting or missing match,2685239
 SESVI,Svinesund,no explicit link,
 SETVK,Torsvik,no explicit link,
-SEVHE,Vasterhaninge,conflicting or missing match,8132063
-SEVIN,Vindeln,no explicit link,
 SHTDC,Tristan da Cunha,conflicting or missing match,3370751
 SIJAR,Jarenina,no explicit link,
 SISVN,Svenica,no explicit link,
 SKBCK,Beckov,no explicit link,
-SKBAA,Devinska Nova Ves/Bratislava,conflicting or missing match,3077170
 SKDOM,Domica,no explicit link,
-SKDRI,Drietoma,no explicit link,
 SKHKS,Haniska pri Kosiciach,no explicit link,
-SKHSM,Horne Srnie,no explicit link,
-SKHOS,Hostovce,conflicting or missing match,724670
 SKKLO,Klokocov,no explicit link,
 SKLMH,Luky p Makytou-Horni Lidec,no explicit link,
 SKLMS,Lysa pod Makytou-Strelna,no explicit link,
 SKMHB,Makov-Horni Becva,no explicit link,
 SKMVA,Matovske Vojkovske,no explicit link,
 SKMYV,Myjava-Vrbovce,no explicit link,
-SKNOB,Nova Bosaca,no explicit link,
-SKBRP,Petrzalka/Bratislava,conflicting or missing match,3058213
-SKPOM,Podzavoz (Milosova),no explicit link,
 SKXXX,RIS Inland waterways,no explicit link,
-SKRSV,Rusovce/Bratislava,conflicting or missing match,3057792
 SKSIB,Siatorska Bukovinka,no explicit link,
 SKSKZ,Skalite-Zwardon,no explicit link,
-SKSSA,Slovenske Nove Mesto,no explicit link,
 SKSVR,Srvcinovec,no explicit link,
+SKTBC,Trebatice,"UNECE 2025-1 coordinate held back, outside its country",
 SKTBE,Trencianske Bohuslavice,no explicit link,
-SKUBL,Ubla,no explicit link,
 SKVEK,"Vefky Kamenec, Pacin",no explicit link,
 SLMUT,Muta,no explicit link,
 SLSBO,Sherbro,conflicting or missing match,2403861
@@ -2296,9 +2189,11 @@ SLSRK,Sierra Leone Apt,no explicit link,
 SMGAL,Galazzano,no explicit link,
 SNMBA,M'bao Terminal,no explicit link,
 SRPRM,Paranam,conflicting or missing match,3383327;11525693
+STSOK,Stormskaer,added from UNECE 2025-1 without a coordinate,
 SVBEL,Belfast,no explicit link,
 SVTUE,Moncagua,no explicit link,
 SYKAC,Kameshli,conflicting or missing match,6300130
+SYWST,Wasit,added from UNECE 2025-1 without a coordinate,
 TGKPE,Kpeme,conflicting or missing match,2365560
 THKAM,Kamuting,no explicit link,
 THSAS,Samulsakom,no explicit link,
@@ -2307,38 +2202,59 @@ TMCRZ,Tchardjou,conflicting or missing match,7730201
 TMTMZ,Termez,no explicit link,
 TNASH,Ashtart Terminal,no explicit link,
 TNKER,Kerkena,no explicit link,
+TRADI,Adiyaman,added from UNECE 2025-1 without a coordinate,
 TRALI,Aliaga,conflicting or missing match,324106;11361436
+TRALT,Altintepe,added from UNECE 2025-1 without a coordinate,
 TRAMA,Amasra,no explicit link,
+TRAYK,Aydinlikoy,added from UNECE 2025-1 without a coordinate,
+TRBYR,Bayramoglu,added from UNECE 2025-1 without a coordinate,
 TRBOG,Bogazagzi,no explicit link,
+TRCTK,Celtik,added from UNECE 2025-1 without a coordinate,
+TRCIF,Ciftehavuzlar,added from UNECE 2025-1 without a coordinate,
+TRCNE,Cigne,added from UNECE 2025-1 without a coordinate,
+TRDAZ,Dazkiri,added from UNECE 2025-1 without a coordinate,
+TRFIK,Fikirtepe,added from UNECE 2025-1 without a coordinate,
 TRGEL,Gelibolu,conflicting or missing match,746983;11361393
 TRHAR,Haramidere,no explicit link,
+TRHAP,Hasanpasa,added from UNECE 2025-1 without a coordinate,
 TRHAY,Haydarpasa,conflicting or missing match,745705;11361410
 TRKPU,Kapikule,no explicit link,
+TRKRH,Karahanli,added from UNECE 2025-1 without a coordinate,
+TRKAZ,Kazlicesme,added from UNECE 2025-1 without a coordinate,
 TRKCO,Kocaeli,conflicting or missing match,6299754
+TRKOZ,Kozyatagi,added from UNECE 2025-1 without a coordinate,
+TRKUL,Kulu,added from UNECE 2025-1 without a coordinate,
+TRKUM,Kumluca,added from UNECE 2025-1 without a coordinate,
 TRKOC,Kusukkuyu,no explicit link,
+TRMLK,Malkara,added from UNECE 2025-1 without a coordinate,
 TRMQJ,Merkez Apt/Balikesir,no explicit link,
 TRMKP,Mustafa Kemalpasa,no explicit link,
+TRMUT,Mut,added from UNECE 2025-1 without a coordinate,
+TRNAL,Nallihan,added from UNECE 2025-1 without a coordinate,
 TRNEM,Nemrut Bay,conflicting or missing match,11361422
 TRODU,Odunluk,no explicit link,
+TRORN,Ornektepe,added from UNECE 2025-1 without a coordinate,
 TRPAZ,"Pazarkule,",no explicit link,
+TRRAH,Rahmanlar,added from UNECE 2025-1 without a coordinate,
 TRRAM,Raman,no explicit link,
 TRSFQ,Sanliurfa,conflicting or missing match,6299766;7539717
 TRSER,Serviburun,no explicit link,
+TRYUM,Yumurtalik Bay,added from UNECE 2025-1 without a coordinate,
 TTLAB,La Brea (Brighton),no explicit link,
 TTPTP,Pointe a Pierre,conflicting or missing match,3573902;11433864
 TTPTF,Point Fortin,conflicting or missing match,3573899;11525721
 TTSCA,Scarborough/Tobago,conflicting or missing match,3573703
 TTTEM,Tembladora,conflicting or missing match,3573618;11525722
 TWCMJ,Chi Mei,conflicting or missing match,1669695
-TWCLI,Chung-Li,conflicting or missing match,1677214
 TWHTC,Hsin-t'ien,conflicting or missing match,1675446
 TWKHH,Kaohsiung,conflicting or missing match,1673820;11494325
 TWKEL,Keelung (Chilung),conflicting or missing match,1678228;11494339
+TWKEZ,Kepz,added from UNECE 2025-1 without a coordinate,
+TWNEZ,"Nepz, Nantze",added from UNECE 2025-1 without a coordinate,
 TWSIJ,Sijhih,no explicit link,
 TWSUO,Suao,conflicting or missing match,1668725;11494336
 TWSMT,Sun Moon Lake,no explicit link,
 TWWOT,Wonan,conflicting or missing match,6587072
-TWWUK,Wu-ku,conflicting or missing match,1673380
 TWYGE,Ying-Ge,no explicit link,
 TZMIC,Michiuja,no explicit link,
 TZMTS,Mtsora,no explicit link,
@@ -2346,334 +2262,162 @@ TZRIJ,Rijiju,no explicit link,
 TZTUN,Tunduna,no explicit link,
 UACCI,Chop-Chierna,no explicit link,
 UACZA,Chop-Zakhon,no explicit link,
-UAGOR,Gorenka,no explicit link,
+UADBV,Dubovyazivka,added from UNECE 2025-1 without a coordinate,
 UGKBG,Kabalega Falls,conflicting or missing match,7668304
 UGYMB,Yumbe,no explicit link,
+UMNAV,Navassa Island,added from UNECE 2025-1 without a coordinate,
 USXBA,Aberdeen,no explicit link,
-USACR,Ackerman,no explicit link,
-USUAX,Agoura,conflicting or missing match,5322553
-USAIE,Aiea (Oahu),no explicit link,
-USAZB,Alvarado,conflicting or missing match,5392171
-USXBD,Ampthill,conflicting or missing match,4744355
 USAAB,Anamosa,no explicit link,
 USAIB,Anita Bay,conflicting or missing match,8299096
-USARI,Arcadia,conflicting or missing match,7260157
 USARR,Arleta,no explicit link,
 USATP,Atlas Point,no explicit link,
-USABM,Auburn,conflicting or missing match,4984565
-USAUR,Aurora,conflicting or missing match,5115704
 USAVC,Avon Lake,no explicit link,
-USBBY,Babylon,conflicting or missing match,5143630
-USXBQ,Baraboo,conflicting or missing match,5278411
 USNAX,Barbers Point (Oahu),conflicting or missing match,5847638;5857190
 USBSZ,Bartletts,conflicting or missing match,5880068
 USBBC,Bay City,conflicting or missing match,4672665
 USBPX,Bayport,no explicit link,
 USBLB,Belair,no explicit link,
 USPSB,Bellefonte-Clearfield Apt,conflicting or missing match,5200920
-USBCF,Belle Glade,conflicting or missing match,4147242
-USBT7,Beloit,conflicting or missing match,4911830
-USBRB,Berlin,conflicting or missing match,5264381
-USBRI,Berlin,conflicting or missing match,5128465
-USBTG,Bethel,conflicting or missing match,5180199
 USBNS,Bether Springs,no explicit link,
 USBGQ,Big Lake,conflicting or missing match,5880670
-USBS2,"Blackshear, Pierce",conflicting or missing match,4183305
 USBOZ,Bonger,no explicit link,
-USBSN,Boston,conflicting or missing match,4786522
-USBOX,Bow,conflicting or missing match,5083685
-USBXJ,Brewton,conflicting or missing match,4059831
-USBV2,"Broadview, Summit",conflicting or missing match,5148269
 USBKR,Brookley,no explicit link,
 USRBH,Brooks Lodge,conflicting or missing match,5867071
-USBKJ,Brooksville,conflicting or missing match,4166124
-USBQN,Brownstown,conflicting or missing match,4987176
-USBT2,"Bryant, Hamlin",conflicting or missing match,5226577
 USBYP,Burley,no explicit link,
 USCWG,Callaway Gardens,conflicting or missing match,4185703
 USCMW,Camano Is.,no explicit link,
 USCMB,Cambridge,no explicit link,
-USCXM,Cameron,conflicting or missing match,4678379
 USADC,Camphill,no explicit link,
 USCZZ,Campo,conflicting or missing match,5323810
-USCQI,Carlisle,conflicting or missing match,7164594
-USCMZ,Carmel,conflicting or missing match,7258078
-USCMV,Carmel Valley,conflicting or missing match,5334312
-USQTA,Catalina,conflicting or missing match,5288786
-USCTQ,Catawba,conflicting or missing match,4474841
-USCSR,Chester,conflicting or missing match,5132002
 USCUT,Chestnut,no explicit link,
-USCII,Chili,conflicting or missing match,5112523
-USCKW,Choctaw,conflicting or missing match,4421536
-USCI2,Cincinnati,conflicting or missing match,4287797
+USJJP,Churchtown,added from UNECE 2025-1 without a coordinate,
 USCKB,Clarksburg,conflicting or missing match,4798621
 USVXJ,Claves,no explicit link,
-USCNC,Clinton,conflicting or missing match,4989133
 USCFA,Coffee Point,conflicting or missing match,8299203
-USCVC,Comstock,conflicting or missing match,4989432
-USCQP,Connellsville,conflicting or missing match,4561342
-USXEM,Corinth,conflicting or missing match,4645003
 USCBA,Corner Bay,no explicit link,
-USCZB,Corydon,conflicting or missing match,4256178
 USCBJ,Country Side,no explicit link,
-USCVQ,Covina,conflicting or missing match,5407933
 USCYE,Crystal Lake,no explicit link,
 USDLR,Dal-nor,no explicit link,
 USDGB,Danger Bay,conflicting or missing match,8693083
-USDVE,Davie,conflicting or missing match,4463082
 USDVV,Davisville,conflicting or missing match,5221745
 USDCR,Decatur,conflicting or missing match,4919565
 USWDB,Deep Bay,no explicit link,
 USDPA,Deerpark,no explicit link,
 USDFX,Defense,no explicit link,
 USDLE,Delisle,no explicit link,
-USDRJ,Delran,conflicting or missing match,5097222
-USDEW,Dewitt,conflicting or missing match,5114621
-USDXC,Dixon,conflicting or missing match,7261725
 USDOE,Doe Run,no explicit link,
-USDMZ,Dominguez,conflicting or missing match,5344817
 USDUF,Duck,conflicting or missing match,4483779
 USDUM,Dunn,no explicit link,
-USEZV,East Danville,no explicit link,
-USEGO,East Goshen,conflicting or missing match,4557726
-USEGM,Edgemont,conflicting or missing match,4557746
-USEDD,Edgewood,conflicting or missing match,5097526
 USEFB,Eight Fathom Bight,conflicting or missing match,8298955
-USECQ,El Cerrito,conflicting or missing match,5345624
 USEMB,Embarcadero/San Francisco,conflicting or missing match,5323631
-USEEX,Essex,conflicting or missing match,7257367
-USESB,Estero Bay,conflicting or missing match,5346915
-USEXG,Evergreen,conflicting or missing match,5794008
-USEWH,Ewa Beach (Oahu),no explicit link,
-USFAE,Fairfield,conflicting or missing match,4621447
-USRPY,Fair Play,conflicting or missing match,7175032
 USFLJ,Falls Bay,conflicting or missing match,8643511
 USFIV,Five Finger,conflicting or missing match,5846306
 USFMC,Five Mile,conflicting or missing match,5878602
-USFCL,Florence,conflicting or missing match,7261268
 USFLU,Flushing Apt/New York,conflicting or missing match,5117473
 USUJF,Fort Gillem,no explicit link,
 USFOX,Fox,conflicting or missing match,5862522
 USFLH,Franklin,no explicit link,
 USFDP,Freisland,no explicit link,
-USGJC,Genesee,conflicting or missing match,5254158
-USGGA,Georgia,conflicting or missing match,5236377
 USGCD,Glen Allen,no explicit link,
-USGHI,Glendale Hghts,no explicit link,
-USGDO,Golden,conflicting or missing match,4421935
-USGFT,Grafton,conflicting or missing match,5058526
-USGFH,Greenfield,conflicting or missing match,4409441
 USFWZ,Green Town,conflicting or missing match,7164893
 USGWH,Greenview Hills,no explicit link,
-USGRW,Greenwich,conflicting or missing match,5119418
-USGFI,Griffin,conflicting or missing match,4691876
-USGWY,Gwynedd,conflicting or missing match,5192305
-USUJS,Hampton,conflicting or missing match,4599937
 USHNX,Hanna,conflicting or missing match,8299124
 USHBC,Hanus Bay,no explicit link,
 USHAY,Haycock,conflicting or missing match,5863815
 USHEV,Hendersonville,conflicting or missing match,4453056
 USHDA,Hidden Falls,conflicting or missing match,8299183
-USHGL,Highland,conflicting or missing match,4895876
-USHIH,Highland,conflicting or missing match,5120759
-USHQW,Highlands,conflicting or missing match,5793242
-USHLX,Holland,conflicting or missing match,5203221
 USHMS,Homeshore,no explicit link,
-USXGN,Hondo,conflicting or missing match,4722843
 USHOF,Hoosierlift,no explicit link,
-USHEK,Hyde Park,conflicting or missing match,5128514
 USICY,Icy Bay,conflicting or missing match,5864472
 USIVH,Ivishak,conflicting or missing match,5865027
 USOAJ,Jacksonville,conflicting or missing match,4452320
 USJFN,Jefferson,conflicting or missing match,5146093
-USJNY,Johnson,conflicting or missing match,5122794
-USKUI,Kailua (Maui),conflicting or missing match,5847490
-USKQO,Kailua (Oahu),no explicit link,
 USKCK,Kansas City,conflicting or missing match,4393219
-USKUA,Kaunakakai (Molokai),conflicting or missing match,5848652
 USKEU,Kelly Bar,conflicting or missing match,8299035
 USKLP,Kelp Bay,conflicting or missing match,8299256
 USKDL,Kendall,no explicit link,
-USKBN,Kennebunk,conflicting or missing match,5281094
-USKIL,Killingly,conflicting or missing match,4833449
-USKMT,Kingsmountain,no explicit link,
 USKZH,Kizhuyak,conflicting or missing match,5866462
 USKBK,Klag Bay,conflicting or missing match,8298751
-USLFL,La Belle,conflicting or missing match,4169144
-USLFO,La Follette,conflicting or missing match,7170292
 USLGZ,La Grange Highlands,no explicit link,
-USLPR,Lakeport,conflicting or missing match,7261991
 USLKS,Lakeside,conflicting or missing match,4704976
 USKDB,Lakeside Marblehead,no explicit link,
 USLIL,Lakeville,conflicting or missing match,4945659
 USLPO,Laporte,no explicit link,
-USLRM,Laurel,conflicting or missing match,4369978
-USLFA,Lebanon,conflicting or missing match,4292686
-USLCG,Le Compte,no explicit link,
-USLXK,Lenox,conflicting or missing match,4903535
 USWLN,Little Naukati,no explicit link,
-USLIX,Livingston,conflicting or missing match,4740941
-USLDN,London,conflicting or missing match,5164352
 USLIJ,Long Island,conflicting or missing match,8298924
 USLOG,Longview,conflicting or missing match,5801621
-USLNE,Los Nietos,conflicting or missing match,7262518
 USLHB,Lost Harbor,conflicting or missing match,8521670
 USLSR,Lost River,conflicting or missing match,5867916
 USLLQ,Lowland,no explicit link,
 USLYQ,Lyon Station,no explicit link,
-USMEE,Manatee,conflicting or missing match,4163296
-USMNS,Mansfield,conflicting or missing match,7257704
 USMWP,Manver,no explicit link,
-USMIN,Marion,conflicting or missing match,4498252
-USMFB,Marshfield,conflicting or missing match,4943213
-USMKR,McKeesport,conflicting or missing match,5187987
 USMPR,McPherson,conflicting or missing match,4275262
 USMQW,McRae,conflicting or missing match,4225959
 USDBD,Midway,conflicting or missing match,4887472
 USMEF,Moffett Field,no explicit link,
 USMWI,Monroe,conflicting or missing match,5263331;5263343
 USMPQ,Monroe Park,no explicit link,
-USMOC,Monticello,no explicit link,
-USMRJ,Moorestown,conflicting or missing match,7258303
 USMPP,Morgans Point,conflicting or missing match,4712319
-USMSW,Morris,conflicting or missing match,4902955
-USNHT,New Hartford,conflicting or missing match,7257382
 USNKV,Nichen Cove,conflicting or missing match,9670878
 USNRR,North,conflicting or missing match,5129245
-USXJN,North Branch,conflicting or missing match,4504476
-USNHU,North Huntingdon,conflicting or missing match,5203693
 USNVR,Northville (Riverhead),no explicit link,
-USOKP,Oak,conflicting or missing match,5204107
-USOKQ,Oakdale,conflicting or missing match,5345025
-USOKI,Oak Island,conflicting or missing match,5102094
 USOBT,Oakland,conflicting or missing match,8081447
-USOCY,Ocean,conflicting or missing match,4503346
 USOCI,Oceanic,conflicting or missing match,8299109
-USOHQ,Oglethorpe,conflicting or missing match,4195850
-USOTQ,Ottawa,conflicting or missing match,5165812
 USOTO,Otto,conflicting or missing match,8299218
 USPFA,Paf Warren,no explicit link,
 USPCE,Painter Creek,conflicting or missing match,8299016
-USPDE,Palisade,conflicting or missing match,5102369
-USPAB,Palm Beach,conflicting or missing match,4177887
-USPKW,Parker,conflicting or missing match,5815136
-USPFO,Park Forest,conflicting or missing match,4892775
 USPKJ,Park Junction,no explicit link,
 USKPK,Parks,conflicting or missing match,8260754
-USXKL,Parris Island,conflicting or missing match,7260557
-USPPW,Paw Paw,conflicting or missing match,5005128
 USPLC,Pearl City (Oahu),no explicit link,
-USPBD,Pembroke,conflicting or missing match,4168139
-USPRI,Perrine,conflicting or missing match,4177917
 USPNF,Peterson's Point,conflicting or missing match,8299223
 USPLS,Plains,conflicting or missing match,4190581
-USXKM,Plainsboro,conflicting or missing match,5102729
 USPLQ,Plaquemine,conflicting or missing match,4319972
 USPLB,Plattsburgh,conflicting or missing match,7258482
 USPTR,Pleasant Harbour,no explicit link,
-USPMF,Plymouth,conflicting or missing match,4165218
 USPVY,Pope Vanoy,no explicit link,
 USPCK,Porcupine Creek,conflicting or missing match,5871884
 USPBW,Port Bienville,no explicit link,
 USPFD,Port Frederick,conflicting or missing match,8299042
-USPOL,Portland,conflicting or missing match,4365981
 USPDL,Port Lions,no explicit link,
 USPRL,Port Oceanic,conflicting or missing match,8299120
-USPBC,Port of Palm Beach,conflicting or missing match,4167754
 USPTY,Port Washington,no explicit link,
-USPZS,Post,conflicting or missing match,4704180
 USBLF,Princeton,conflicting or missing match,4814466
 USUQE,Queen,conflicting or missing match,5872320
-USQUO,Quogue,conflicting or missing match,5116035
-USRGG,Rabun Gap,conflicting or missing match,4189529
 USRAY,Rahway,no explicit link,
 USRBK,Rancho,conflicting or missing match,5385955
-USRDO,Rancho Dominguez,conflicting or missing match,5344817
 USRDB,Red Dog,conflicting or missing match,5872534
 USRDR,Red River,conflicting or missing match,8481822
 USRRV,Red River Ad,no explicit link,
-USRER,Rensselaer,conflicting or missing match,5133670
-USXLG,Richland Hills,conflicting or missing match,4715292
-USRJO,Ringgold,conflicting or missing match,5203250
-USRVL,Riverdale,conflicting or missing match,4353925
-USRHC,Rock Hill,conflicting or missing match,4485709
-USRJN,Rotterdam Junction,conflicting or missing match,7258447
 USRTD,Rotunda,no explicit link,
-USRWY,Rowley,conflicting or missing match,5783644
-USRXY,Roxbury,conflicting or missing match,4955128
-USSSL,Saint Charles,conflicting or missing match,4161624;4908737
-USSCL,Saint Clair,conflicting or missing match,5010978
 USSXW,Saint Paul,no explicit link,
-USSA5,San Antonio,conflicting or missing match,5488864
 USKSR,Sandy River,conflicting or missing match,10377745
 USWSJ,San Juan,conflicting or missing match,5873319
-USSAK,San Pablo,conflicting or missing match,5392528
-USSKL,Schuylkill,conflicting or missing match,5211212
-USSBJ,Seabrook,conflicting or missing match,4504007
-USUYP,Seneca,conflicting or missing match,5137622
-USSFS,Seneca Falls,conflicting or missing match,5137622;5137625
 USNRI,Shangri-la,no explicit link,
 USSHF,Sheffield,conflicting or missing match,4047374
 USHCB,Shoal Cove,conflicting or missing match,8299006
 USSXM,Sixela,no explicit link,
 USSFZ,Smithfield,conflicting or missing match,5223661
-USXLN,South Brunswick,conflicting or missing match,5104814
-USSOQ,South Grafton,conflicting or missing match,4951395
 USSDR,South Johnson City,no explicit link,
-USXMF,South Miami,conflicting or missing match,4173497
-USSSQ,South Pierce,conflicting or missing match,7259774
 USXMR,Southwark,no explicit link,
-USSOS,Spring Park,conflicting or missing match,5048361
-USSQT,Squaw Valley,conflicting or missing match,5398440
-USSTO,Stone,conflicting or missing match,4600911
 USSNB,Strang,no explicit link,
-USSCI,Sun City,conflicting or missing match,5316205
 USSUO,Sun River,conflicting or missing match,5755338
 USSWE,Sunset Whitney Ranch,no explicit link,
-USSXU,Sutton,conflicting or missing match,7263016
-USTZW,Tazewell,conflicting or missing match,4645422
-USTSK,Thomaston,conflicting or missing match,4979277
 USGFB,Togiak Fish,no explicit link,
-USTQL,Toluca Lake,no explicit link,
 USVFB,Travis Air Force Base,no explicit link,
-USUNI,Union,conflicting or missing match,5202382
-USUNZ,Union,conflicting or missing match,4914331
-USUTN,Uniontown,conflicting or missing match,4557713
 USUIZ,Utica,conflicting or missing match,4985784
-USVNN,Vernon,conflicting or missing match,5127835
 USVCK,Vickery,no explicit link,
 USVHF,Vint Hill Farms,no explicit link,
-USVTI,Vista,conflicting or missing match,5336899
-USWPS,Wabasso,conflicting or missing match,4177270
-USWZV,Wailuku (Maui),conflicting or missing match,5854496
-USWPH,Waipahu (Oahu),conflicting or missing match,5854686
-USWLU,Walnut,conflicting or missing match,5406990
 USSZL,Warrensburg,conflicting or missing match,6299142
-USVTO,Washington,conflicting or missing match,4869278
-USWTM,Waterford,conflicting or missing match,4973712
-USXOF,Waverly,conflicting or missing match,4714603
-USWYJ,Wayne,conflicting or missing match,4920423
-USWVZ,West Bath,conflicting or missing match,4982446
-USWCA,West Carrollton,conflicting or missing match,4527963
-USWDP,West Deptford,conflicting or missing match,4504786
 USVKW,West Kavik,conflicting or missing match,8260922
-USWML,Westmoreland,conflicting or missing match,5219009
 USWSU,West Springfield,no explicit link,
 USBRG,Whitesburg,no explicit link,
 USISN,Williston,conflicting or missing match,5692149
 USWIB,Willow Brook,no explicit link,
-USXNS,Windsor,conflicting or missing match,5128577
-USWOJ,Woodbury,conflicting or missing match,4504919
-USXNO,Woodbury,conflicting or missing match,7257433
-USWDQ,Woodland,conflicting or missing match,5410438
-USVTR,Woodson Terrace/St Louis,conflicting or missing match,4415434
-USWDS,Woodstock,conflicting or missing match,4843359
-USWYI,Wyemills,no explicit link,
 USOYS,Yosemite Ntl Park,no explicit link,
-USZGL,Zieglerville,no explicit link,
 UYCPP,Cuenca del Plata,no explicit link,
 UYJIT,Jose Ignacio Terminal,conflicting or missing match,11525731
 UYLAP,La Paloma/Rocha,conflicting or missing match,3442105
+UYSJC,San Jose de Carrasco,added from UNECE 2025-1 without a coordinate,
 VCSVD,Saint Vincent,conflicting or missing match,3577815;3577816;3577817
 VEAMY,Amuay,conflicting or missing match,3649293;11525737
 VEBAV,Bachaquero/Maracaibo L,no explicit link,
@@ -2682,10 +2426,12 @@ VEETV,El Tablazo/Maracaibo L,no explicit link,
 VEGUB,Guaranao Bay,conflicting or missing match,11550094
 VELCV,La Ceiba/Maracaibo L,no explicit link,
 VELAG,La Guaira,conflicting or missing match,3637721;11525740
+VELAM,Lama,added from UNECE 2025-1 without a coordinate,
 VEPMR,Palmarejo/Maracaibo L.,no explicit link,
 VEPRG,Pertigalete,conflicting or missing match,3630321;11525742
 VEPHO,Puerto de Hierro,conflicting or missing match,3629695;11525745
 VEPCU,Punta Cuchillo,no explicit link,
+VEQAA,Quanta,added from UNECE 2025-1 without a coordinate,
 VESFX,San Felix,conflicting or missing match,3645528
 VEWOK,Wonken,conflicting or missing match,7731623
 VGNSX,N. Sound/Virgin Gorda,conflicting or missing match,3577326
@@ -2694,16 +2440,14 @@ VIENP,Enighed Pond,no explicit link,
 VIHOC,Hovic,no explicit link,
 VILIB,Limetree Bay,conflicting or missing match,12196103
 VNHAA,Hoai An,conflicting or missing match,8440833
-VNVIC,"Ho Chi Minh, VICT",conflicting or missing match,11549688
 VNKHU,Khonh Hung,no explicit link,
-VNLAN,Long An-Ben Luc,conflicting or missing match,1588010
 VNPHL,Phuoe Le,no explicit link,
+VNPNG,Po Hang,added from UNECE 2025-1 without a coordinate,
 VNHHO,Quanduc,no explicit link,
 VNTAM,Tanamexco ICD,no explicit link,
 VNTCG,Tan Cang,conflicting or missing match,1563170
 VNTSN,Tan Son Nhat Apt,conflicting or missing match,1904593
 VNTBI,Thang Binh,conflicting or missing match,1592105
-VNVYN,Vinh Yen,conflicting or missing match,1560037
 VUGBA,Big Bay,no explicit link,
 VUPSA,Port Sandwich,no explicit link,
 VUUIQ,Quine Hill,conflicting or missing match,7730722
@@ -2721,7 +2465,9 @@ YEMFY,Mayfa'ah,conflicting or missing match,408801
 YERAK,Ras Al Kalib,no explicit link,
 YESAL,Saleef Port,conflicting or missing match,9222714
 ZAAOB,Algoa Bay,no explicit link,
+ZABBR,Beit Bridge,added from UNECE 2025-1 without a coordinate,
 ZACTT,City Centre,no explicit link,
+ZACTD,City Deep,added from UNECE 2025-1 without a coordinate,
 ZARSS,Izmit,no explicit link,
 ZABGR,Kingsford,no explicit link,
 ZAKYA,Kyalami,conflicting or missing match,8063431
@@ -2731,13 +2477,15 @@ ZAMHW,Matshewe,no explicit link,
 ZAMWT,Maydon Whart,no explicit link,
 ZAMID,Middelkraal,no explicit link,
 ZAMZF,Mzamba(Wild Coast Sun),conflicting or missing match,8299241
+ZAPDE,Pelindaba East,added from UNECE 2025-1 without a coordinate,
 ZAPIT,Point,conflicting or missing match,977717
+ZARMB,Ramatlhabama,added from UNECE 2025-1 without a coordinate,
 ZARKD,Rocky's Drift,no explicit link,
 ZANTY,Sun City,conflicting or missing match,7668230
 ZATDT,Tanda Tula,conflicting or missing match,7731538
-ZAUHL,Umhlali,no explicit link,
 ZAVAC,Vaalcon,no explicit link,
 ZAWKB,Walker Bay,no explicit link,
 ZAWAT,Waterfront,no explicit link,
 ZAWBR,Woodbrook,no explicit link,
+ZMCHA,Chachacha,added from UNECE 2025-1 without a coordinate,
 ZWBAT,Bata,no explicit link,

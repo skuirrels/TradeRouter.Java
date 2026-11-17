@@ -1,0 +1,17 @@
+{
+  "retrieved": "2026-11-16",
+  "sources": {
+    "allCountries.zip": "GeoNames all-countries dump, CC BY 4.0, https://download.geonames.org/export/dump/allCountries.zip",
+    "alternateNamesV2.zip": "GeoNames alternate names dump, CC BY 4.0, https://download.geonames.org/export/dump/alternateNamesV2.zip",
+    "airports.csv": "OurAirports airports, public domain, https://davidmegginson.github.io/ourairports-data/airports.csv",
+    "wikidata-unlocode-coords.csv": "Wikidata Query Service, CC0, https://query.wikidata.org/sparql, as CSV, query: SELECT ?item ?code ?coord ?itemLabel WHERE { ?item wdt:P1937 ?code . ?item wdt:P625 ?coord . SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". } }",
+    "unece-2025-1.zip": "UNECE UN/LOCODE 2025-1 release, for each code's subdivision, https://unlocode.unece.org/publications/"
+  },
+  "files": {
+    "allCountries.zip": "1b41c71ac73ce7d7b52a84d805c12b86aa31f96f5206d0af5cc54c5ff2a978e1",
+    "alternateNamesV2.zip": "4c37bb6e2fc351a4a26912c69ba5fa0a88e649de4b7183332ffa8217780e446a",
+    "airports.csv": "9d6a27f0a3067364cd92ea49589c3f515d0330c3aa5ff30e98b007cbfabd05df",
+    "wikidata-unlocode-coords.csv": "6bf50617887292cc6fc5f51226b8f21f24c2741560959e3e585cfc2e5b56eae1",
+    "unece-2025-1.zip": "ad409fc7149b10f98d61190c34d9daf78b78bb8b31464cc66de1a89d09b01b5d"
+  }
+}

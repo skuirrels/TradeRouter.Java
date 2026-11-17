@@ -105,9 +105,31 @@ final class RoadLegs {
                 }
                 yield estimate(sequence, from, to, units, request, straightLineKm,
                         result.source() + " returned " + result.status().displayName() + ": "
-                                + (result.message() != null ? result.message() : "no reason supplied") + ".");
+                                + formatProviderReason(result.message()));
             }
         };
+    }
+
+    // The provider's reason as one sentence: "no reason supplied" when the message is blank, trimmed, and with a
+    // full stop added unless it already ends with ".", "!" or "?". Blank and trim follow .NET's char.IsWhiteSpace,
+    // which also counts no-break spaces, so the warning text matches TradeRouter.Net.
+    static String formatProviderReason(String message) {
+        int start = 0;
+        int end = message == null ? 0 : message.length();
+        while (start < end && isNetWhiteSpace(message.charAt(start))) {
+            start++;
+        }
+        while (end > start && isNetWhiteSpace(message.charAt(end - 1))) {
+            end--;
+        }
+        String reason = start == end ? "no reason supplied" : message.substring(start, end);
+        char last = reason.charAt(reason.length() - 1);
+        return last == '.' || last == '!' || last == '?' ? reason : reason + ".";
+    }
+
+    // .NET's char.IsWhiteSpace: space, line and paragraph separators, U+0009 to U+000D and U+0085.
+    private static boolean isNetWhiteSpace(char c) {
+        return Character.isSpaceChar(c) || (c >= '\t' && c <= '\r') || c == '\u0085';
     }
 
     private static GeoJsonFeature estimate(
@@ -135,13 +157,16 @@ final class RoadLegs {
                     + JsonWriter.formatDouble(straightLineKm) + " km great-circle lower bound.");
         }
 
-        String warning = providerWarning == null || providerWarning.isBlank()
-                ? estimate.warning()
-                : providerWarning + " " + estimate.warning();
-        return createFeature(
+        boolean providerFellBack = providerWarning != null && !providerWarning.isBlank();
+        String warning = providerFellBack
+                ? providerWarning + " " + estimate.warning()
+                : estimate.warning();
+        GeoJsonFeature feature = createFeature(
                 from, to, units, request.getSpeedsKmh(), request.getRoadDurationMode(),
                 estimate.distanceKm(), null, null,
                 "circuity_estimate", estimate.model(), null, null, warning, straightLineKm);
+        feature.properties().setDistanceFallback(providerFellBack);
+        return feature;
     }
 
     private static GeoJsonFeature createFeature(

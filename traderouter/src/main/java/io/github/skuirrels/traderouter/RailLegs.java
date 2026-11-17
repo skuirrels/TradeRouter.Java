@@ -88,7 +88,7 @@ final class RailLegs {
 
         GeoJsonFeature feature = DefaultTradeRouterEngine.calculateStraightLeg(
                 from, to, TransportMode.RAIL, units, request.getSpeedsKmh());
-        feature.properties().setDistanceWarning(warning);
+        feature.properties().setDistanceWarning(warning).setDistanceFallback(true);
         return feature;
     }
 

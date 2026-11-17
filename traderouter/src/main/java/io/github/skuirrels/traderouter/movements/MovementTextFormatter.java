@@ -1,15 +1,20 @@
 package io.github.skuirrels.traderouter.movements;
 
+import io.github.skuirrels.traderouter.geojson.TradeRouterProperties;
 import io.github.skuirrels.traderouter.passages.Passage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Renders a {@link MovementResult} as the fixed-width text report returned by {@link MovementResult#toText()}.
  */
 final class MovementTextFormatter {
+    // The line breaks .NET's ReplaceLineEndings recognises: CRLF first, then CR, LF, NEL, LS, PS and FF.
+    private static final Pattern LINE_BREAK = Pattern.compile("\\r\\n|[\\r\\n\\u0085\\u2028\\u2029\\f]");
+
     private MovementTextFormatter() {
     }
 
@@ -64,6 +69,7 @@ final class MovementTextFormatter {
                 formatRailAllowances(movement),
                 n1(movement.totalTransitHours()),
                 n1(movement.totalTransitHours() / 24.0)));
+        appendFallbackWarnings(output, movement);
 
         if (includeExplanations) {
             appendLine(output, formatDistanceBasisExplanation(movement));
@@ -74,6 +80,41 @@ final class MovementTextFormatter {
         }
 
         return output.toString().stripTrailing();
+    }
+
+    // One line per leg whose distance fell back: a road-route provider was unavailable or out of coverage, or the
+    // rail network could not route the leg. Printed with or without explanations; nothing when no leg fell back.
+    // The label is padded to the 14 characters of "Distance basis", like the footnotes below it.
+    private static void appendFallbackWarnings(StringBuilder output, MovementResult movement) {
+        for (LegResult leg : movement.legs()) {
+            TradeRouterProperties properties = leg.feature().properties();
+            if (!properties.isDistanceFallback() || properties.getDistanceWarning() == null) {
+                continue;
+            }
+            String warning = toSingleLine(properties.getDistanceWarning());
+            if (warning.isEmpty()) {
+                continue;
+            }
+            appendLine(output, String.format(Locale.ROOT, "%-14s = %s", "Leg " + leg.sequence() + " warning", warning));
+        }
+    }
+
+    // A provider message can contain line breaks; each warning stays on one line of the report. Every line break
+    // that .NET's ReplaceLineEndings recognises (CR, LF, CRLF, NEL, LS, PS and FF) becomes one space, and trailing
+    // whitespace, as .NET's char.IsWhiteSpace defines it, is removed so a warning prints the same wherever it falls
+    // in the report. A warning that is only whitespace comes back empty and is not printed.
+    static String toSingleLine(String text) {
+        String singleLine = LINE_BREAK.matcher(text).replaceAll(" ");
+        int end = singleLine.length();
+        while (end > 0 && isNetWhiteSpace(singleLine.charAt(end - 1))) {
+            end--;
+        }
+        return singleLine.substring(0, end);
+    }
+
+    // .NET's char.IsWhiteSpace: space, line and paragraph separators, U+0009 to U+000D and U+0085.
+    private static boolean isNetWhiteSpace(char c) {
+        return Character.isSpaceChar(c) || (c >= '\t' && c <= '\r') || c == '\u0085';
     }
 
     // Rail allowances default to zero; the summary names them only when a request sets them.

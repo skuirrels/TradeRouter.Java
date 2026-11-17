@@ -7,6 +7,8 @@ import io.github.skuirrels.traderouter.common.DistanceUnit;
 import io.github.skuirrels.traderouter.data.EmbeddedResources;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
 import io.github.skuirrels.traderouter.geojson.GeoJsonMultiLineString;
+import io.github.skuirrels.traderouter.locations.LocationFunction;
+import io.github.skuirrels.traderouter.locations.UnLocode;
 import io.github.skuirrels.traderouter.passages.Passage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -41,7 +43,9 @@ class RoutingTests {
     @ParameterizedTest
     @CsvSource({
             "AGSJO, AGSJS", // Saint John's, Antigua
-            "JOAQJ, JOAQB"  // Aqaba
+            "JOAQJ, JOAQB", // Aqaba
+            "CNNBO, CNNGB", // Ningbo, filed by the port list under the airport's code
+            "CNTNG, CNTSN"  // Tianjin Pt
     })
     void portCodeRouteOfficialUnLocodeResolvesThroughItsAlias(String officialCode, String portListCode) {
         assertThat(DefaultTradeRouterEngine.getDefault().ports().getByCode(officialCode))
@@ -64,7 +68,15 @@ class RoutingTests {
         aliases.forEach((code, portCode) -> {
             assertThat(engine.ports().getByCodeCandidates(code)).as("%s must not shadow a port-list record", code).isEmpty();
             assertThat(engine.unLocodes().getByCode(code).isSeaPort()).as("%s must be a UN/LOCODE sea port", code).isTrue();
-            assertThat(engine.unLocodes().getByCode(portCode)).as("%s is aliased only because UN/LOCODE lacks it", portCode).isNull();
+            // The port-list code is aliased because UN/LOCODE lacks it, or files it as a named airport, which the
+            // resolver places at the airport.
+            UnLocode listed = engine.unLocodes().getByCode(portCode);
+            if (listed != null) {
+                assertThat(listed.functions()).as("%s must be absent from UN/LOCODE or an airport", portCode)
+                        .contains(LocationFunction.AIRPORT);
+                assertThat(listed.isSeaPort()).as("%s must not be a UN/LOCODE sea port", portCode).isFalse();
+                assertThat(listed.name()).as("%s must be a named airport", portCode).containsPattern("(?i)\\b(apt|airport)\\b");
+            }
             assertThat(engine.ports().getByCodeCandidates(portCode)).as("%s must map to one %s record", code, portCode).hasSize(1);
         });
     }

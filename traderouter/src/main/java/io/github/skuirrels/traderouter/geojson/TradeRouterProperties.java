@@ -21,6 +21,7 @@ public final class TradeRouterProperties {
     private String durationBasis;
     private String geometryBasis;
     private String distanceWarning;
+    private boolean distanceFallback;
     private Port portOrigin;
     private Port portDest;
     private List<String> traversedPassages;
@@ -189,6 +190,22 @@ public final class TradeRouterProperties {
     /** Sets the distance warning. */
     public TradeRouterProperties setDistanceWarning(String distanceWarning) {
         this.distanceWarning = distanceWarning;
+        return this;
+    }
+
+    /**
+     * Whether {@link #getDistanceWarning()} reports a fallback: a road-route provider returned
+     * {@code UNAVAILABLE} or {@code OUTSIDE_COVERAGE} and the leg was estimated, or a rail leg the rail network
+     * could not route was left at great-circle distance. {@code MovementResult.toText()} prints these warnings.
+     * Not serialised.
+     */
+    public boolean isDistanceFallback() {
+        return distanceFallback;
+    }
+
+    /** Sets whether the distance warning reports a fallback. Not serialised. */
+    public TradeRouterProperties setDistanceFallback(boolean distanceFallback) {
+        this.distanceFallback = distanceFallback;
         return this;
     }
 

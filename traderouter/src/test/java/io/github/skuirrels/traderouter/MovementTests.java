@@ -204,11 +204,11 @@ class MovementTests {
 
     @Test
     void movementCodeKnownToUnLocodeButUncoordinatedThrowsWithItsName() {
-        // Khalidia has no coordinate in UNECE or a verified supplement, and is not in the port list.
-        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Delivery from port AEJEA to place AEKHA Road"))
+        // Indooroodilly has no coordinate in UNECE or a verified supplement, and is not in the port list.
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Delivery from port AEJEA to place AEIND Road"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("AEKHA")
-                .hasMessageContaining("Khalidia")
+                .hasMessageContaining("AEIND")
+                .hasMessageContaining("Indooroodilly")
                 .hasMessageContaining("no coordinates");
     }
 
@@ -266,7 +266,7 @@ class MovementTests {
         ResolvedLocation resolved = TradeRoutes.locate("GBLGE");
         assertThat(resolved.source()).isEqualTo("unlocode");
         assertThat(resolved.coordinate()).isEqualTo(lightwater.coordinate());
-        assertThat(database.countWithCoordinates()).isEqualTo(103_846);
+        assertThat(database.countWithCoordinates()).isEqualTo(113_532);
     }
 
     @Test
@@ -280,7 +280,7 @@ class MovementTests {
         // A flipped sign (Luque, Paraguay, published in the northern hemisphere) and swapped latitude and longitude.
         assertThat(database.getByCode("PYLUQ").coordinate().latitude()).isCloseTo(-25.27, within(0.01));
         assertThat(database.getByCode("DEGKO").coordinate().latitude()).isCloseTo(52.17, within(0.01));
-        assertThat(database.countWithCoordinates()).isEqualTo(103_846);
+        assertThat(database.countWithCoordinates()).isEqualTo(113_532);
     }
 
     @Test

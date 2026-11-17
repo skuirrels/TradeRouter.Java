@@ -50,6 +50,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of the {@link TradeRouterEngine} maritime navigation engine. Thread-safe and designed
@@ -663,7 +664,9 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             return new ResolvedLocation(code, name, overridden, null, "coordinates", functions);
         }
 
-        return resolveCode(code, request.getResolver());
+        Set<LocationFunction> declared = request.getAdditionalLocationFunctions().get(code);
+        boolean declaredSeaPort = declared != null && declared.contains(LocationFunction.SEA_PORT);
+        return resolveCode(code, request.getResolver(), declaredSeaPort);
     }
 
     private static Set<LocationFunction> functionsOf(UnLocode knownLocation, Port knownPort) {
@@ -678,10 +681,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (code == null || code.isBlank()) {
             throw new IllegalArgumentException("Location code cannot be null or whitespace.");
         }
-        return resolveCode(code.trim().toUpperCase(Locale.ROOT), null);
+        return resolveCode(code.trim().toUpperCase(Locale.ROOT), null, false);
     }
 
-    private ResolvedLocation resolveCode(String code, LocationResolver resolver) {
+    private ResolvedLocation resolveCode(String code, LocationResolver resolver, boolean declaredSeaPort) {
         UnLocode unLocode = unLocodes().getByCode(code);
         Port port = selectPortRecord(code, () -> unLocode);
 
@@ -689,7 +692,14 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         // When the names disagree (the port list's CNSHG is Sanshan, UN/LOCODE's is Shanghai Pt) UN/LOCODE wins.
         // It also wins when the port list puts a same-named place far from the UN/LOCODE position: that is a
         // namesake filed under the code, such as the port list's USPIT, Pilottown in Louisiana, not Pittsburgh.
-        if (port != null && (unLocode == null || namesAgree(port.name(), unLocode.name()))
+        // And it wins when it records the code as a named airport with a position, because the port-list record is
+        // then the city's port filed under the airport's IATA code: UN/LOCODE's CNNGB is Ningbo Lishe International
+        // Apt, 11 km from the port list's Ningbo, whose own code is CNNBO. A caller who declares the sea-port
+        // function for the code in MovementRequest.getAdditionalLocationFunctions() means the port, so the port list
+        // stands.
+        boolean portIsOtherFacility = port != null && !declaredSeaPort && unLocode != null
+                && unLocode.coordinate() != null && isNamedAirport(unLocode);
+        if (port != null && !portIsOtherFacility && (unLocode == null || namesAgree(port.name(), unLocode.name()))
                 && (unLocode == null || unLocode.coordinate() == null
                         || Haversine.distanceKm(port.coordinate(), unLocode.coordinate()) <= PORT_LIST_NAMESAKE_KM)) {
             return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
@@ -732,6 +742,22 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
      * but a port-list entry further away than this is a namesake filed under the code.
      */
     private static final double PORT_LIST_NAMESAKE_KM = 50.0;
+
+    /**
+     * Whether UN/LOCODE files the code as an airport and nothing on the water: the airport function without the
+     * sea-port function (after the sea-port supplement), and a name containing the word "Apt" or "Airport".
+     */
+    private static boolean isNamedAirport(UnLocode unLocode) {
+        return unLocode.functions().contains(LocationFunction.AIRPORT)
+                && !unLocode.functions().contains(LocationFunction.SEA_PORT)
+                && AIRPORT_NAME_WORD.matcher(unLocode.name()).find();
+    }
+
+    // Unicode word boundaries, as .NET's \b uses. UNICODE_CHARACTER_CLASS would also fold case the Unicode way, so
+    // that dotless i matched i, which .NET's culture-invariant IgnoreCase does not; the letters are spelled out in
+    // both cases instead.
+    private static final Pattern AIRPORT_NAME_WORD = Pattern.compile(
+            "\\b(?:[Aa][Pp][Tt]|[Aa][Ii][Rr][Pp][Oo][Rr][Tt])\\b", Pattern.UNICODE_CHARACTER_CLASS);
 
     private static boolean namesAgree(String portName, String unLocodeName) {
         String a = normaliseName(portName);
