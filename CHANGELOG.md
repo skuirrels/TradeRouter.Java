@@ -23,6 +23,7 @@ Ported from TradeRouter.Net 2.15.1 at `bc19cba`, which includes 2.14.0 and 2.15.
 - Within a movement, a location with a code is now resolved once per distinct code, coordinate and name, as in TradeRouter.Net, so the coordinate check runs once for a stop shared by two legs.
 - The README's coordinate-supplement summary gave 12 corrected GeoNames links in one place and 13 in another; both now say 13.
 - The `Location.fromCode(code, coordinate)` and `Location.coordinate()` Javadoc no longer says the coordinate bypasses lookup, since (0, 0) now gives way to the code. TradeRouter.Net 2.15.1 still has the old wording.
+- `docs/waypoints-and-choke-points.md` gives the current coverage, 113,541 of 116,022 codes, with 2,481 unresolved.
 - The README's rail section now gives the rail supplement as 100 codes, 72 in the United States, like its data section. TradeRouter.Net 2.15.1 still says 98 there.
 
 ## [2.13.0] - 2026-11-17
