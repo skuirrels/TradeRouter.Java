@@ -2,6 +2,29 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.15.1 at `bc19cba`, which includes 2.14.0 and 2.15.0: sea legs at airport-named codes and the 18 November UN/LOCODE data fixes (`4444e16`, `039b6bd`), location warnings, placeholder coordinates, same-place legs and the rail warnings (`b657a07`, `04cbf14`), and the Kansas City and Port Huron rail functions (`d929fdb`, `5aa03db`). Java skips 2.14.0 and 2.15.0. Every embedded data file is byte-identical to TradeRouter.Net 2.15.1.
+
+### Added
+
+- Each leg can carry a `location_warning` (`TradeRouterProperties.getLocationWarning()`). It appears when coordinates given with a known code lie more than `MovementRequest.getCoordinateCodeToleranceKm()` (50 km by default) from the code's listed position, which usually means the code or the coordinates are wrong, or from the code's `MovementRequest.getCoordinates()` entry when it has one. The coordinates are still used. Codes neither embedded list knows are not checked, and `Double.POSITIVE_INFINITY` turns the check off; a negative or NaN tolerance is rejected. `MovementResult.toText()` prints it as a `Leg <n> location` line. It is serialised after `distance_warning`.
+
+### Fixed
+
+- Coordinates of exactly (0, 0), the value many systems store when no position was captured, are no longer routed from as given when a code is present. The code resolves instead and the leg carries a `location_warning`; a (0, 0) entry in `MovementRequest.getCoordinates()` is skipped the same way. Previously CNSZX with (0, 0) produced a 14,152 km road leg from the Atlantic. Without a usable code the coordinates are still used, now with a `location_warning`.
+- A road or rail leg that starts and ends at the same place is exactly 0 km with `distance_basis` `great_circle` and no `distance_warning`, and a 0 km road leg takes no time without needing a configured road speed. Road legs previously reported a 0 km `circuity_estimate` with the estimator's warning, and could call the road-network provider for nothing. A supplied route still takes precedence.
+- A rail leg with a listed end outside the United States, Canada and Mexico now says so, as the only countries the embedded rail network covers, instead of reporting a gap of thousands of kilometres to the nearest North American line. Every rail great-circle warning now adds that the distance is a straight-line lower bound, shorter than the shortest feasible distance ISO 14083 and GLEC call for on rail, and points to `MovementRequest.getRailRouteOverrides()`. Routing is unchanged.
+- A sea leg at a code that UN/LOCODE records as a named airport, such as Shanghai (`CNSHA`), Ningbo (`CNNGB`), Xiamen (`CNXMN`), Qingdao (`CNTAO`), Dalian (`CNDLC`) or Tianjin (`CNTSN`), now starts or ends at the port-list port under that code instead of being rejected as an airport. A movement that uses such a code only at the end of sea legs or as a `Waypoint.port`, and never on an air leg or as a `Waypoint.airport`, now means the port, so a road leg that joins the sea leg there ends at the port too. The port-list record is used only when it lies within 50 km of the maritime network; inland cities the port list files under airport codes, such as Zhengzhou (`CNCGO`) and Tucson (`USTUS`), are still rejected. A movement that also uses the code on an air leg keeps the airport, and `locate` still returns the airport.
+- Antwerp Churchill Terminal (`BEANT`) can end a sea leg: the sea-port supplement gains the entry.
+- Helsinki (`FIHEL`) and Kaohsiung (`TWKHH`) can end an air leg, as UNECE 2025-1 lists both as airports, and so can Milan (`ITMIL`), because MIL is the IATA code for all Milan airports. Each keeps its position.
+- Kansas City, Kansas (`USKCK`), and Port Huron (`USPHN`) can end a rail leg. UNECE records neither as a rail terminal; the rail supplement now cites Union Pacific's Kansas City Intermodal Terminal, opened at 1810 Bayard Avenue in July 2025, and CN's rail yard at Port Huron. Portal, North Dakota (`USPQT`), a border crossing, and Nashville (`USBNA`), where no source names a terminal, still need `MovementRequest.addLocationFunctions`.
+- Nine UN/LOCODEs that UNECE publishes without a coordinate now resolve from reviewed supplement rows: `USKCK`, `IDAJN`, `TRKCO`, `CNQSE`, `CNFRT`, `GBLUT`, `PHCVE`, `GBPFT` and `CAYTO`. 113,541 of 116,022 codes now have coordinates.
+- Within a movement, a location with a code is now resolved once per distinct code, coordinate and name, as in TradeRouter.Net, so the coordinate check runs once for a stop shared by two legs.
+- The README's coordinate-supplement summary gave 12 corrected GeoNames links in one place and 13 in another; both now say 13.
+- The `Location.fromCode(code, coordinate)` and `Location.coordinate()` Javadoc no longer says the coordinate bypasses lookup, since (0, 0) now gives way to the code. TradeRouter.Net 2.15.1 still has the old wording.
+- The README's rail section now gives the rail supplement as 100 codes, 72 in the United States, like its data section. TradeRouter.Net 2.15.1 still says 98 there.
+
 ## [2.13.0] - 2026-11-17
 
 Ported from TradeRouter.Net 2.13.0 at `ca02c9a`, which includes 2.11.0, 2.11.1 and 2.12.0: the UNECE 2025-1 additions (`ca0e914`), the added-code coordinate fill (`2ca4d03`), the Charleston, Illinois correction (`fc92b75`), the fallback warnings in the movement text report (`8ea8ada`, `52e151a`) and the airport-named UN/LOCODEs and Ningbo codes (`094b7cf`, `a9a4980`). Java skips 2.11.0 to 2.12.0. Every embedded data file is byte-identical to TradeRouter.Net 2.13.0.

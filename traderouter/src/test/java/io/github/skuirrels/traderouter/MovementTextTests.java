@@ -217,7 +217,9 @@ class MovementTextTests {
         MovementResult result = TradeRoutes.calculateMovement("DEDUI to PLWAW Rail");
 
         assertThat(result.toText().split("\n", -1)).contains(
-                "Leg 1 warning  = PLWAW is 5,419 km from the nearest main line of the embedded North American rail network, beyond the 25 km limit; great-circle distance used.");
+                "Leg 1 warning  = DEDUI to PLWAW is outside the United States, Canada and Mexico, the only countries the embedded rail network covers. "
+                        + "Great-circle distance used: a straight-line lower bound, shorter than the shortest feasible rail distance that ISO 14083 and GLEC call for. "
+                        + "Supply the distance in MovementRequest.getRailRouteOverrides() where it is known.");
     }
 
     @Test
@@ -225,7 +227,7 @@ class MovementTextTests {
         MovementResult result = TradeRoutes.calculateMovement("DEDUS to DEDUI Road\nDEDUI to PLWAW Rail");
 
         String[] lines = result.toText(false).split("\n", -1);
-        assertThat(lines[lines.length - 1]).startsWith("Leg 2 warning  = PLWAW is ");
+        assertThat(lines[lines.length - 1]).startsWith("Leg 2 warning  = DEDUI to PLWAW is outside the United States, Canada and Mexico");
     }
 
     @Test

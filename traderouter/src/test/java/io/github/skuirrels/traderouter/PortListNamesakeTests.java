@@ -6,12 +6,15 @@ import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
 import io.github.skuirrels.traderouter.graph.MaritimeGraph;
 import io.github.skuirrels.traderouter.locations.LocationFunction;
 import io.github.skuirrels.traderouter.locations.UnLocode;
+import io.github.skuirrels.traderouter.movements.LegKind;
 import io.github.skuirrels.traderouter.movements.LegResult;
+import io.github.skuirrels.traderouter.movements.MovementLeg;
 import io.github.skuirrels.traderouter.movements.MovementParser;
 import io.github.skuirrels.traderouter.movements.MovementPlan;
 import io.github.skuirrels.traderouter.movements.MovementRequest;
 import io.github.skuirrels.traderouter.movements.MovementResult;
 import io.github.skuirrels.traderouter.movements.ResolvedLocation;
+import io.github.skuirrels.traderouter.movements.RoadRoutingMode;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.movements.Waypoint;
 import io.github.skuirrels.traderouter.ports.Port;
@@ -361,6 +364,75 @@ class PortListNamesakeTests {
 
         assertThat(leg.from().source()).isEqualTo("coordinates");
         assertThat(leg.from().coordinate()).isEqualTo(supplied);
+    }
+
+    // UN/LOCODE files each as the city's airport; the port list holds the city's port under the same code.
+    @ParameterizedTest
+    @CsvSource({"CNSHA, Shanghai", "CNNGB, Ningbo", "CNXMN, Xiamen", "CNTAO, Qingdao", "CNDLC, Dalian"})
+    void movementSeaLegAtANamedAirportCodeUsesThePortListPort(String code, String portName) {
+        List<LegResult> legs = TradeRoutes.calculateMovement(code + " to NLRTM Sea").legs();
+
+        assertThat(legs).hasSize(1);
+        LegResult leg = legs.get(0);
+        assertThat(leg.from().source()).isEqualTo("ports");
+        assertThat(leg.from().port().name()).isEqualTo(portName);
+        assertThat(leg.from().functions()).contains(LocationFunction.SEA_PORT);
+        assertThat(leg.feature().properties().getDistanceBasis()).isEqualTo("maritime_network");
+    }
+
+    // The port list files these inland cities under the airport's code, far from the maritime network.
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "CNCGO", // Zhengzhou.
+            "CNTYN", // Taiyuan.
+            "USTUS", // Tucson.
+            "USMSP"  // Minneapolis, flagged a terminal in the port list.
+    })
+    void movementSeaLegAtANamedAirportCodeInlandIsStillRejected(String code) {
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement(code + " to NLRTM Sea"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageMatching("(?s).*Sea.*" + code + ".*airport.*");
+    }
+
+    @Test
+    void movementDeclaredSeaPortStillUsesAnInlandPortListRecord() {
+        // A declaration is the caller's own statement, so it is not second-guessed by the network check.
+        MovementRequest request = new MovementRequest(MovementParser.parse("CNCGO to NLRTM Sea"))
+                .addLocationFunctions("CNCGO", LocationFunction.SEA_PORT);
+
+        assertThat(DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs().get(0).from().source())
+                .isEqualTo("ports");
+    }
+
+    @Test
+    void movementRoadLegJoiningASeaLegAtANamedAirportCodeEndsAtThePort() {
+        MovementRequest request = new MovementRequest(List.of(
+                new MovementLeg("CNSZX", "CNSHA", TransportMode.ROAD, LegKind.PICKUP),
+                new MovementLeg("CNSHA", "NLRTM", TransportMode.SEA)))
+                .setRoadRoutingMode(RoadRoutingMode.ESTIMATE_ONLY);
+
+        List<LegResult> legs = DefaultTradeRouterEngine.getDefault().calculateMovement(request).legs();
+
+        assertThat(legs.get(0).to().source()).isEqualTo("ports");
+        assertThat(legs.get(1).from().coordinate()).isEqualTo(legs.get(0).to().coordinate());
+    }
+
+    @Test
+    void movementNamedAirportCodeOnAnAirLegStaysAtTheAirportEvenWithASeaLeg() {
+        // Every leg touching a code shares one position, so a code used for both air and sea keeps the airport.
+        MovementRequest request = new MovementRequest(List.of(
+                new MovementLeg("KRPUS", "CNSHA", TransportMode.SEA),
+                new MovementLeg("CNSHA", "GBLHR", TransportMode.AIR)));
+
+        assertThatThrownBy(() -> DefaultTradeRouterEngine.getDefault().calculateMovement(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageMatching("(?s).*Sea.*CNSHA.*airport.*getAdditionalLocationFunctions.*");
+    }
+
+    @Test
+    void locateStillPrefersTheAirportForANamedAirportCode() {
+        // Locate has no leg to read the mode from, so it keeps UN/LOCODE's airport.
+        assertThat(TradeRoutes.locate("CNSHA").source()).isEqualTo("unlocode");
     }
 
     @Test

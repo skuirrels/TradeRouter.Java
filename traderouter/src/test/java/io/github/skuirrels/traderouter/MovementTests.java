@@ -3,8 +3,10 @@ package io.github.skuirrels.traderouter;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import io.github.skuirrels.traderouter.common.Coordinate;
+import io.github.skuirrels.traderouter.common.Haversine;
 import io.github.skuirrels.traderouter.common.DistanceUnit;
 import io.github.skuirrels.traderouter.geojson.GeoJsonFeature;
+import io.github.skuirrels.traderouter.locations.LocationFunction;
 import io.github.skuirrels.traderouter.locations.UnLocode;
 import io.github.skuirrels.traderouter.movements.AirCargoService;
 import io.github.skuirrels.traderouter.movements.EmissionFactors;
@@ -266,7 +268,7 @@ class MovementTests {
         ResolvedLocation resolved = TradeRoutes.locate("GBLGE");
         assertThat(resolved.source()).isEqualTo("unlocode");
         assertThat(resolved.coordinate()).isEqualTo(lightwater.coordinate());
-        assertThat(database.countWithCoordinates()).isEqualTo(113_532);
+        assertThat(database.countWithCoordinates()).isEqualTo(113_541);
     }
 
     @Test
@@ -280,15 +282,25 @@ class MovementTests {
         // A flipped sign (Luque, Paraguay, published in the northern hemisphere) and swapped latitude and longitude.
         assertThat(database.getByCode("PYLUQ").coordinate().latitude()).isCloseTo(-25.27, within(0.01));
         assertThat(database.getByCode("DEGKO").coordinate().latitude()).isCloseTo(52.17, within(0.01));
-        assertThat(database.countWithCoordinates()).isEqualTo(113_532);
+        assertThat(database.countWithCoordinates()).isEqualTo(113_541);
     }
 
     @Test
-    void movementRejectsPortLabelWhenUnLocodeSaysAirport() {
-        // The port list calls CNTSN Tianjin, while embedded UN/LOCODE records only an airport function.
-        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Port FRLEH to Port CNTSN Sea"))
+    void movementPortLabelAtANamedAirportCodeUsesThePortListPort() {
+        // The port list calls CNTSN Tianjin, while embedded UN/LOCODE records Tianjin Binhai airport. A port
+        // waypoint on a sea leg means the port.
+        LegResult leg = TradeRoutes.calculateMovement("Port FRLEH to Port CNTSN Sea").legs().get(0);
+
+        assertThat(leg.to().source()).isEqualTo("ports");
+        assertThat(leg.to().port().name()).isEqualTo("Tianjin");
+    }
+
+    @Test
+    void movementRejectsPortLabelWhenUnLocodeSaysAirportOnly() {
+        // Kansas City International has no port-list record, so a port waypoint there is still rejected.
+        assertThatThrownBy(() -> TradeRoutes.calculateMovement("Port FRLEH to Port USMCI Sea"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("CNTSN")
+                .hasMessageContaining("USMCI")
                 .hasMessageContaining("declared as Port")
                 .hasMessageContaining("airport");
     }
@@ -308,6 +320,19 @@ class MovementTests {
         assertThat(destination.source()).isEqualTo("ports");
         assertThat(destination.port().portCode()).isEqualTo(code);
         assertThat(result.legs().get(0).length()).isGreaterThan(0.0);
+    }
+
+    @Test
+    void movementAntwerpChurchillTerminalCanEndASeaLeg() {
+        // UN/LOCODE records only the multimodal function for the Churchilldok terminal; it is not in the port list.
+        UnLocode record = engine().unLocodes().getByCode("BEANT");
+        assertThat(record.functions()).containsExactlyInAnyOrder(LocationFunction.SEA_PORT, LocationFunction.MULTIMODAL);
+
+        LegResult leg = TradeRoutes.calculateMovement("CNSGH to BEANT Sea").legs().get(0);
+
+        assertThat(leg.to().source()).isEqualTo("unlocode");
+        assertThat(Haversine.distanceKm(leg.to().coordinate(), new Coordinate(4.367, 51.283))).isLessThan(2.0);
+        assertThat(leg.length()).isBetween(18_000.0, 22_000.0);
     }
 
     @Test

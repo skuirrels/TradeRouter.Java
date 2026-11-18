@@ -23,12 +23,16 @@ public final class Location {
         return new Location(normalizeCode(code), null, null);
     }
 
-    /** Creates a location from a code with a known coordinate, bypassing lookup. */
+    /**
+     * Creates a location from a code with a known coordinate. The coordinate is used as given, except (0, 0), a
+     * placeholder that gives way to the code's position; coordinates far from the code's position carry a
+     * {@code location_warning}.
+     */
     public static Location fromCode(String code, Coordinate coordinate) {
         return fromCode(code, coordinate, null);
     }
 
-    /** Creates a location from a code with a known coordinate and display name, bypassing lookup. */
+    /** Creates a location from a code with a known coordinate and display name; see {@link #fromCode(String, Coordinate)}. */
     public static Location fromCode(String code, Coordinate coordinate, String name) {
         if (coordinate == null) {
             throw new IllegalArgumentException("Location coordinate cannot be null; use fromCode(code) to resolve the code instead.");
@@ -54,7 +58,10 @@ public final class Location {
         return code;
     }
 
-    /** Explicit coordinate, or null. When set it takes precedence over any lookup of {@link #code()}. */
+    /**
+     * Explicit coordinate, or null. When set it takes precedence over the position of {@link #code()}, unless it is
+     * the (0, 0) placeholder.
+     */
     public Coordinate coordinate() {
         return coordinate;
     }

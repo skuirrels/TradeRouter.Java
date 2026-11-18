@@ -77,6 +77,39 @@ class RailRoutingTests {
     }
 
     @Test
+    void railListedLegOutsideTheNetworkCountriesSaysSoRatherThanMeasuringToTheNetwork() {
+        MovementRequest request = new MovementRequest(List.of(new MovementLeg("DEDUI", "NLRTM", TransportMode.RAIL)));
+
+        LegResult leg = singleLeg(request);
+
+        assertThat(leg.feature().properties().getDistanceBasis()).isEqualTo("great_circle");
+        assertThat(leg.feature().properties().getDistanceWarning())
+                .startsWith("DEDUI to NLRTM is outside the United States, Canada and Mexico, the only countries the embedded rail network covers.")
+                .contains("straight-line lower bound")
+                .contains("MovementRequest.getRailRouteOverrides()")
+                .doesNotContain("km from the nearest main line");
+        assertThat(leg.length()).isBetween(160.0, 170.0);
+    }
+
+    @Test
+    void railUnlistedEndOutsideNorthAmericaStillGivesTheGapToTheNetwork() {
+        // A caller's own codes are not listed UN/LOCODEs, so their letters do not name a country for the warning.
+        MovementRequest request = new MovementRequest(List.of(new MovementLeg(
+                Location.fromCode("FRZZ1", new Coordinate(2.35, 48.85)),
+                Location.fromCode("FRZZ2", new Coordinate(0.107, 49.486)),
+                TransportMode.RAIL)));
+
+        LegResult leg = singleLeg(request);
+
+        assertThat(leg.from().functions()).isNull();
+        assertThat(leg.feature().properties().getDistanceWarning())
+                .startsWith("FRZZ1 is ")
+                .contains("km from the nearest main line of the embedded North American rail network")
+                .contains("straight-line lower bound")
+                .doesNotContain("outside the United States");
+    }
+
+    @Test
     void railEndBeyondTheSnapDistanceKeepsGreatCircleDistance() {
         MovementRequest request = railLeg(LOS_ANGELES, "Los Angeles", CHICAGO, "Chicago");
         request.setRailNetworkSnapKm(0.0);

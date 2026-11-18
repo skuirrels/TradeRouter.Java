@@ -38,13 +38,14 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -378,7 +379,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         seaOptions.setAppendOriginDestination(true);
         DistanceUnit units = seaOptions.getUnits();
 
-        Map<String, ResolvedLocation> resolvedByCode = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<ResolutionKey, Resolution> resolvedByCode = new HashMap<>();
+        Set<String> seaPortCodes = codesUsedOnlyAsSeaPorts(request);
         List<MovementLeg> legs = request.getLegs();
         List<LegResult> legResults = new ArrayList<>(legs.size());
         CompletableFuture<MovementResult> result = new CompletableFuture<>();
@@ -397,7 +399,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                 if (result.isDone()) {
                     throw new CancellationException("The movement calculation was cancelled.");
                 }
-                return calculateLeg(index, request, allowProvider, seaOptions, units, resolvedByCode, legResults, inFlight);
+                return calculateLeg(index, request, allowProvider, seaOptions, units, resolvedByCode, seaPortCodes, legResults, inFlight);
             });
         }
 
@@ -417,20 +419,25 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             boolean allowProvider,
             TradeRouterOptions seaOptions,
             DistanceUnit units,
-            Map<String, ResolvedLocation> resolvedByCode,
+            Map<ResolutionKey, Resolution> resolvedByCode,
+            Set<String> seaPortCodes,
             List<LegResult> legResults,
             AtomicReference<CompletableFuture<?>> inFlight) {
         List<MovementLeg> legs = request.getLegs();
         MovementLeg leg = legs.get(index);
         int sequence = index + 1;
-        ResolvedLocation from = resolveLocation(leg.from(), request, resolvedByCode);
-        ResolvedLocation to = resolveLocation(leg.to(), request, resolvedByCode);
+        Resolution fromResolution = resolveLocation(leg.from(), request, resolvedByCode, seaPortCodes);
+        Resolution toResolution = resolveLocation(leg.to(), request, resolvedByCode, seaPortCodes);
+        ResolvedLocation from = fromResolution.resolved();
+        ResolvedLocation to = toResolution.resolved();
+        String fromWarning = fromResolution.warning();
+        String toWarning = toResolution.warning();
         validateWaypoint(sequence, "from", leg.fromKind(), leg.mode(), from, request.getAdditionalLocationFunctions());
         validateWaypoint(sequence, "to", leg.toKind(), leg.mode(), to, request.getAdditionalLocationFunctions());
 
         if (index > 0) {
             ResolvedLocation prior = legResults.get(legResults.size() - 1).to();
-            if (Haversine.distanceKm(prior.coordinate(), from.coordinate()) > 0.001) {
+            if (Haversine.distanceKm(prior.coordinate(), from.coordinate()) > SAME_PLACE_KM) {
                 throw new IllegalArgumentException(
                         "Leg " + sequence + " starts at " + from.label() + ", but leg " + (sequence - 1) + " ends at "
                                 + prior.label() + ". Movement legs must form one continuous chain.");
@@ -463,6 +470,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             properties.setKind(leg.kind().wireString());
             properties.setFrom(from.label());
             properties.setTo(to.label());
+            properties.setLocationWarning(Objects.equals(fromWarning, toWarning) ? fromWarning : join(fromWarning, toWarning));
             boolean isSea = leg.mode() == TransportMode.SEA;
             boolean followsSeaLeg = isSea && sequence > 1 && legs.get(sequence - 2).mode() == TransportMode.SEA;
             properties.setPortHours(isSea ? 2.0 * request.getPortDwellHours() : 0.0);
@@ -612,61 +620,241 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         return new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(coords), properties);
     }
 
-    private ResolvedLocation resolveLocation(
+    /** A location as resolved for a movement, and the {@code location_warning} it gives the legs that touch it. */
+    private record Resolution(ResolvedLocation resolved, String warning) {
+    }
+
+    /** Everything that shapes how a location with a code resolves, so a stop shared by two legs resolves once. */
+    private record ResolutionKey(String code, Coordinate coordinate, String name) {
+    }
+
+    /** Two positions this close are the same place: the same tolerance the leg-chaining check uses. */
+    static final double SAME_PLACE_KM = 0.001;
+
+    /**
+     * Codes the request uses as the end of a sea leg or as a declared port, and never as the end of an air leg or a
+     * declared airport. UN/LOCODE files some city codes as the airport (CNSHA is Shanghai Hongqiao) while the port
+     * list holds the city's port under the same code; for these codes the movement means the port. A code used both
+     * ways keeps the default resolution, because every leg that touches it must start or end at one position.
+     */
+    private static Set<String> codesUsedOnlyAsSeaPorts(MovementRequest request) {
+        Set<String> sea = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        Set<String> air = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        for (MovementLeg leg : request.getLegs()) {
+            addSeaOrAirUse(leg.from(), leg.fromKind(), leg.mode(), sea, air);
+            addSeaOrAirUse(leg.to(), leg.toKind(), leg.mode(), sea, air);
+        }
+        sea.removeAll(air);
+        return sea;
+    }
+
+    private static void addSeaOrAirUse(Location location, WaypointKind kind, TransportMode mode, Set<String> sea, Set<String> air) {
+        String code = location.code();
+        if (code == null) {
+            return;
+        }
+        if (mode == TransportMode.SEA || kind == WaypointKind.PORT) {
+            sea.add(code);
+        }
+        if (mode == TransportMode.AIR || kind == WaypointKind.AIRPORT) {
+            air.add(code);
+        }
+    }
+
+    private Resolution resolveLocation(
             Location location,
             MovementRequest request,
-            Map<String, ResolvedLocation> resolvedByCode) {
-        boolean cacheable = location.code() != null && location.coordinate() == null;
-        if (cacheable) {
-            ResolvedLocation cached = resolvedByCode.get(location.code());
-            if (cached != null) {
-                return cached;
-            }
+            Map<ResolutionKey, Resolution> resolvedByCode,
+            Set<String> seaPortCodes) {
+        // A location with a code is cached for the movement, keyed on everything that shapes how it resolves, so a
+        // stop shared by two legs is looked up and checked once. A coordinate-only location needs no lookup.
+        if (location.code() == null) {
+            Resolution uncached = resolveUncached(location, request, seaPortCodes);
+            uncached.resolved().coordinate().validate();
+            return uncached;
         }
 
-        ResolvedLocation resolved = resolveUncached(location, request);
-        resolved.coordinate().validate();
-
-        if (cacheable) {
-            resolvedByCode.put(location.code(), resolved);
+        ResolutionKey key = new ResolutionKey(location.code(), location.coordinate(), location.name());
+        Resolution cached = resolvedByCode.get(key);
+        if (cached != null) {
+            return cached;
         }
 
-        return resolved;
+        Resolution result = resolveUncached(location, request, seaPortCodes);
+        result.resolved().coordinate().validate();
+        resolvedByCode.put(key, result);
+        return result;
+    }
+
+    /**
+     * Exactly (0, 0) is the value systems store when a position was never captured. It lies in the open Atlantic off
+     * West Africa, where no shipment is picked up or delivered, so it is treated as missing.
+     */
+    private static boolean isPlaceholder(Coordinate coordinate) {
+        return coordinate.longitude() == 0.0 && coordinate.latitude() == 0.0;
+    }
+
+    /** The caller's {@link MovementRequest#getCoordinates()} entry for a code, unless absent or a (0, 0) placeholder. */
+    private static Coordinate overrideOf(String code, MovementRequest request) {
+        Coordinate coordinate = request.getCoordinates().get(code);
+        return coordinate == null || isPlaceholder(coordinate) ? null : coordinate;
     }
 
     /**
      * Resolution order: an explicit coordinate on the location; {@link MovementRequest#getCoordinates()}; the
      * embedded port list when UN/LOCODE agrees it is the same place; the UN/LOCODE list when it carries
      * coordinates; the port list otherwise, unless UN/LOCODE names a different place; then
-     * {@link MovementRequest#getResolver()}.
+     * {@link MovementRequest#getResolver()}. A (0, 0) coordinate is a placeholder: it gives way to the code's
+     * position when there is one.
      */
-    private ResolvedLocation resolveUncached(Location location, MovementRequest request) {
-        if (location.coordinate() != null) {
-            Port knownPort = location.code() != null ? ports().getByCode(location.code(), location.coordinate()) : null;
-            UnLocode knownLocation = location.code() != null ? unLocodes().getByCode(location.code()) : null;
-            Set<LocationFunction> functions = functionsOf(knownLocation, knownPort);
-            String name = location.name() != null ? location.name()
-                    : knownLocation != null ? knownLocation.name()
-                    : knownPort != null ? knownPort.name() : null;
-            return new ResolvedLocation(location.code(), name, location.coordinate(), null, "coordinates", functions);
+    private Resolution resolveUncached(Location location, MovementRequest request, Set<String> seaPortCodes) {
+        Coordinate given = location.coordinate();
+        if (given == null) {
+            return resolveCodeWithOverride(location.code(), request, seaPortCodes);
         }
 
+        if (isPlaceholder(given)) {
+            return resolvePlaceholder(location, given, request, seaPortCodes);
+        }
+
+        ResolvedLocation resolved = atGivenCoordinate(location.code(), location.name(), given);
+        return new Resolution(resolved,
+                location.code() == null ? null : describeCoordinateMismatch(location.code(), given, request, seaPortCodes));
+    }
+
+    /**
+     * A location at a caller-supplied coordinate. Its functions and name come from the code's records, but no port
+     * record is attached, because the stored position may differ from the one supplied.
+     */
+    private ResolvedLocation atGivenCoordinate(String code, String name, Coordinate coordinate) {
+        Port knownPort = code != null ? ports().getByCode(code, coordinate) : null;
+        UnLocode knownLocation = code != null ? unLocodes().getByCode(code) : null;
+        Set<LocationFunction> functions = functionsOf(knownLocation, knownPort);
+        String resolvedName = name != null ? name
+                : knownLocation != null ? knownLocation.name()
+                : knownPort != null ? knownPort.name() : null;
+        return new ResolvedLocation(code, resolvedName, coordinate, null, "coordinates", functions);
+    }
+
+    /**
+     * (0, 0) given on a location gives way to the code's position, from {@link MovementRequest#getCoordinates()} or
+     * the embedded lists, when there is one. Without a code, or with one nothing can place, it is used as given.
+     * Either way the leg says so.
+     */
+    private Resolution resolvePlaceholder(Location location, Coordinate given, MovementRequest request, Set<String> seaPortCodes) {
         String code = location.code();
-
-        // A caller-supplied coordinate wins outright and no dataset record is attached, because the
-        // stored position may differ from the override.
-        Coordinate overridden = request.getCoordinates().get(code);
-        if (overridden != null) {
-            UnLocode knownLocation = unLocodes().getByCode(code);
-            Port knownPort = ports().getByCode(code, overridden);
-            Set<LocationFunction> functions = functionsOf(knownLocation, knownPort);
-            String name = knownLocation != null ? knownLocation.name() : knownPort != null ? knownPort.name() : null;
-            return new ResolvedLocation(code, name, overridden, null, "coordinates", functions);
+        if (code == null) {
+            String subject = location.name() == null
+                    ? "Coordinates (0, 0)"
+                    : "Coordinates (0, 0) given for " + location.name();
+            return new Resolution(atGivenCoordinate(null, location.name(), given),
+                    subject + " are usually a placeholder for a missing position; they were used as given.");
         }
 
+        String usedAsGiven = "Coordinates (0, 0) given for " + code + " are usually a placeholder, but " + code
+                + " has no listed position to use instead, so they were used as given.";
+        Resolution byCode;
+        try {
+            byCode = resolveCodeWithOverride(code, request, seaPortCodes);
+        } catch (IllegalArgumentException e) {
+            return new Resolution(atGivenCoordinate(code, location.name(), given), usedAsGiven);
+        }
+
+        ResolvedLocation listed = byCode.resolved();
+        ResolvedLocation renamed = new ResolvedLocation(listed.code(),
+                location.name() != null ? location.name() : listed.name(),
+                listed.coordinate(), listed.port(), listed.source(), listed.functions());
+        if (isPlaceholder(renamed.coordinate())) {
+            return new Resolution(renamed, join(usedAsGiven, byCode.warning()));
+        }
+
+        String source = overrideOf(code, request) != null
+                ? "its position in MovementRequest.getCoordinates() was used"
+                : "the code's own position was used";
+        return new Resolution(renamed, join(
+                "Coordinates (0, 0) given for " + code + " are a placeholder and were ignored; " + source + ".",
+                byCode.warning()));
+    }
+
+    /**
+     * Resolves a code: the caller's {@link MovementRequest#getCoordinates()} entry wins outright, then the embedded
+     * lists and the resolver. A (0, 0) entry is a placeholder and is skipped, unless nothing else can place the code.
+     */
+    private Resolution resolveCodeWithOverride(String code, MovementRequest request, Set<String> seaPortCodes) {
+        Coordinate entry = request.getCoordinates().get(code);
+        if (entry == null) {
+            return new Resolution(
+                    resolveCode(code, request.getResolver(), isDeclaredSeaPort(code, request), seaPortCodes.contains(code)),
+                    null);
+        }
+
+        if (!isPlaceholder(entry)) {
+            return new Resolution(atGivenCoordinate(code, null, entry), null);
+        }
+
+        try {
+            return new Resolution(
+                    resolveCode(code, request.getResolver(), isDeclaredSeaPort(code, request), seaPortCodes.contains(code)),
+                    "MovementRequest.getCoordinates() gives (0, 0) for " + code
+                            + ", a placeholder, so it was ignored and the code's own position was used.");
+        } catch (IllegalArgumentException e) {
+            return new Resolution(atGivenCoordinate(code, null, entry),
+                    "MovementRequest.getCoordinates() gives (0, 0) for " + code + ", usually a placeholder, but " + code
+                            + " has no listed position to use instead, so it was used as given.");
+        }
+    }
+
+    /**
+     * Describes coordinates given with a code that lie further than the request's tolerance from the code's
+     * position: the caller's {@link MovementRequest#getCoordinates()} entry when there is one, otherwise the position
+     * in the embedded lists. Codes the lists do not know, such as a caller's own site codes, are not checked, and the
+     * resolver is not called for them.
+     */
+    private String describeCoordinateMismatch(String code, Coordinate given, MovementRequest request, Set<String> seaPortCodes) {
+        if (request.getCoordinateCodeToleranceKm() == Double.POSITIVE_INFINITY) {
+            return null;
+        }
+
+        Coordinate reference;
+        String described;
+        Coordinate overridden = overrideOf(code, request);
+        if (overridden != null) {
+            reference = overridden;
+            described = "its position in MovementRequest.getCoordinates()";
+        } else {
+            ResolvedLocation listed;
+            try {
+                listed = resolveCode(code, null, isDeclaredSeaPort(code, request), seaPortCodes.contains(code));
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+            reference = listed.coordinate();
+            described = listed.name() == null ? "its listed position" : "its listed position (" + listed.name() + ")";
+        }
+
+        double gapKm = Haversine.distanceKm(given, reference);
+        if (gapKm <= request.getCoordinateCodeToleranceKm()) {
+            return null;
+        }
+
+        return "Coordinates given for " + code + " lie " + n0(gapKm) + " km from " + described + ", beyond the "
+                + n0(request.getCoordinateCodeToleranceKm()) + " km tolerance; the coordinates were used."
+                + " Check that the code and coordinates name the same place.";
+    }
+
+    /** A caller who declares the sea-port function for a code means the port, so the port list stands. */
+    private static boolean isDeclaredSeaPort(String code, MovementRequest request) {
         Set<LocationFunction> declared = request.getAdditionalLocationFunctions().get(code);
-        boolean declaredSeaPort = declared != null && declared.contains(LocationFunction.SEA_PORT);
-        return resolveCode(code, request.getResolver(), declaredSeaPort);
+        return declared != null && declared.contains(LocationFunction.SEA_PORT);
+    }
+
+    private static String join(String first, String second) {
+        return first == null ? second : second == null ? first : first + " " + second;
+    }
+
+    /** A whole number with thousands separators, as .NET's {@code N0} format writes it in the invariant culture. */
+    static String n0(double value) {
+        return String.format(Locale.ROOT, "%,.0f", value);
     }
 
     private static Set<LocationFunction> functionsOf(UnLocode knownLocation, Port knownPort) {
@@ -681,10 +869,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (code == null || code.isBlank()) {
             throw new IllegalArgumentException("Location code cannot be null or whitespace.");
         }
-        return resolveCode(code.trim().toUpperCase(Locale.ROOT), null, false);
+        return resolveCode(code.trim().toUpperCase(Locale.ROOT), null, false, false);
     }
 
-    private ResolvedLocation resolveCode(String code, LocationResolver resolver, boolean declaredSeaPort) {
+    private ResolvedLocation resolveCode(String code, LocationResolver resolver, boolean declaredSeaPort, boolean usedAsSeaPort) {
         UnLocode unLocode = unLocodes().getByCode(code);
         Port port = selectPortRecord(code, () -> unLocode);
 
@@ -696,14 +884,25 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         // then the city's port filed under the airport's IATA code: UN/LOCODE's CNNGB is Ningbo Lishe International
         // Apt, 11 km from the port list's Ningbo, whose own code is CNNBO. A caller who declares the sea-port
         // function for the code in MovementRequest.getAdditionalLocationFunctions() means the port, so the port list
-        // stands.
-        boolean portIsOtherFacility = port != null && !declaredSeaPort && unLocode != null
-                && unLocode.coordinate() != null && isNamedAirport(unLocode);
+        // stands. So does a movement that uses the code only at the end of sea legs, when the port-list record lies
+        // within PORT_LIST_SEA_ACCESS_KM of the maritime network; further away it is inland, such as the port list's
+        // CNCGO, Zhengzhou, or USTUS, Tucson, and the code stays the airport. The port-list record used for a port
+        // carries the sea-port function.
+        boolean namedAirport = unLocode != null && unLocode.coordinate() != null && isNamedAirport(unLocode);
+        // The network check only matters for a named airport, so it is skipped otherwise: a road-only movement with a
+        // port waypoint need not load the maritime graph.
+        boolean portIsOtherFacility = namedAirport
+                && !(declaredSeaPort || (usedAsSeaPort && port != null && reachesSeaNetwork(port)));
         if (port != null && !portIsOtherFacility && (unLocode == null || namesAgree(port.name(), unLocode.name()))
                 && (unLocode == null || unLocode.coordinate() == null
                         || Haversine.distanceKm(port.coordinate(), unLocode.coordinate()) <= PORT_LIST_NAMESAKE_KM)) {
-            return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports",
-                    unLocode != null ? unLocode.functions() : SEA_PORT_ONLY);
+            Set<LocationFunction> functions = unLocode != null ? unLocode.functions() : SEA_PORT_ONLY;
+            if (namedAirport) {
+                EnumSet<LocationFunction> withSeaPort = EnumSet.of(LocationFunction.SEA_PORT);
+                withSeaPort.addAll(functions);
+                functions = withSeaPort;
+            }
+            return new ResolvedLocation(code, port.name(), port.coordinate(), port, "ports", functions);
         }
 
         if (unLocode != null && unLocode.coordinate() != null) {
@@ -742,6 +941,20 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
      * but a port-list entry further away than this is a namesake filed under the code.
      */
     private static final double PORT_LIST_NAMESAKE_KM = 50.0;
+
+    /**
+     * How far a port-list record may lie from the nearest maritime network node and still be taken as a sea port for
+     * a code UN/LOCODE files as an airport. The coastal ports filed under airport codes, such as Shanghai and
+     * Guangzhou, lie within 50 km; the others, inland cities such as Zhengzhou and Tucson and river ports the network
+     * does not reach, such as Nanjing, lie 78 to 1,282 km away.
+     */
+    private static final double PORT_LIST_SEA_ACCESS_KM = 50.0;
+
+    private boolean reachesSeaNetwork(Port port) {
+        MaritimeGraph maritime = graph();
+        return Haversine.distanceKm(port.coordinate(), maritime.getCoordinate(maritime.findNearestNode(port.coordinate())))
+                <= PORT_LIST_SEA_ACCESS_KM;
+    }
 
     /**
      * Whether UN/LOCODE files the code as an airport and nothing on the water: the airport function without the
@@ -922,6 +1135,10 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (!Double.isFinite(request.getRailNetworkSnapKm()) || request.getRailNetworkSnapKm() < 0) {
             throw new IllegalArgumentException(
                     "Rail network snap distance must be finite and non-negative. Received: " + request.getRailNetworkSnapKm());
+        }
+        if (!(request.getCoordinateCodeToleranceKm() >= 0.0)) {
+            throw new IllegalArgumentException(
+                    "Coordinate and code tolerance must be non-negative. Received: " + request.getCoordinateCodeToleranceKm());
         }
         request.getEmissions().validate();
         validatePositiveOptional(request.getCargoTonnes(), "cargoTonnes");
