@@ -973,6 +973,7 @@ The Java library is a faithful port: the embedded data is byte-identical, the al
 | `RailServiceAllowance.ClassIRailroads`, `CountClassIInterchanges(IEnumerable<(string? Owner, double Km)>)` | `RailServiceAllowance.CLASS_I_RAILROADS`, `countClassIInterchanges(Iterable<TrackSegment>)` |
 | `ArgumentException`, `ArgumentOutOfRangeException` | `IllegalArgumentException` |
 | `InvalidOperationException` | `IllegalStateException` |
+| Exception messages and the `distance_warning` and `location_warning` texts name .NET members, such as `MovementRequest.Coordinates` and `MovementRequest.RailRouteOverrides` | The same texts name the Java accessors, such as `MovementRequest.getCoordinates()` and `MovementRequest.getRailRouteOverrides()`; the rest of each message is identical |
 | `FormatException` from the leg parser | `MovementFormatException`, an `IllegalArgumentException` |
 | `IRoadRouteProvider.RouteAsync` returning `ValueTask`, with a `CancellationToken` | `RoadRouteProvider.routeAsync` returning `CompletableFuture`; cancel the future instead of passing a token |
 | `CalculateMovementAsync(request, cancellationToken)` | `calculateMovementAsync(request)` returning a cancellable `CompletableFuture` |
