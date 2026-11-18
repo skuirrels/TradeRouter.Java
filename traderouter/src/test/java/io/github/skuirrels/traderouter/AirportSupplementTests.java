@@ -10,6 +10,8 @@ import io.github.skuirrels.traderouter.movements.MovementResult;
 import io.github.skuirrels.traderouter.movements.TransportMode;
 import io.github.skuirrels.traderouter.movements.Waypoint;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -99,6 +101,29 @@ class AirportSupplementTests {
         assertThat(ningbo.functions()).containsExactlyInAnyOrder(
                 LocationFunction.SEA_PORT, LocationFunction.RAIL_TERMINAL, LocationFunction.AIRPORT);
         assertThat(ningbo.coordinate()).isNotNull();
+    }
+
+    @ParameterizedTest
+    // UNECE 2025-1 lists Helsinki and Kaohsiung as airports; the port list keeps their positions. MIL is the IATA
+    // code for all Milan airports; the code stays in the city.
+    @ValueSource(strings = {"FIHEL", "TWKHH", "ITMIL"})
+    void movementCityCodeWithASupplementedAirportCanEndAnAirLeg(String code) {
+        assertThat(DefaultTradeRouterEngine.getDefault().unLocodes().getByCode(code).isAirport()).isTrue();
+
+        List<LegResult> legs = TradeRoutes.calculateMovement(code + " to DEFRA Air").legs();
+
+        assertThat(legs).hasSize(1);
+        assertThat(legs.get(0).from().source()).isEqualTo("ports");
+        assertThat(legs.get(0).feature().properties().getDistanceBasis()).isEqualTo("great_circle");
+        assertThat(legs.get(0).length()).isGreaterThan(400.0);
+    }
+
+    @Test
+    void movementHelsinkiAndKaohsiungStillEndSeaLegsAtTheirPorts() {
+        List<LegResult> legs = TradeRoutes.calculateMovement("FIHEL to TWKHH Sea").legs();
+
+        assertThat(legs).hasSize(1);
+        assertThat(legs.get(0).feature().properties().getDistanceBasis()).isEqualTo("maritime_network");
     }
 
     @Test

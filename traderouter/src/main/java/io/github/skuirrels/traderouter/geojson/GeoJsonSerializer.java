@@ -62,6 +62,7 @@ final class GeoJsonSerializer {
         optional(writer, "duration_basis", p.getDurationBasis());
         optional(writer, "geometry_basis", p.getGeometryBasis());
         optional(writer, "distance_warning", p.getDistanceWarning());
+        optional(writer, "location_warning", p.getLocationWarning());
         if (p.getPortOrigin() != null) {
             writer.name("port_origin");
             writePort(writer, p.getPortOrigin());

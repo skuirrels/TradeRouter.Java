@@ -83,19 +83,26 @@ final class MovementTextFormatter {
     }
 
     // One line per leg whose distance fell back: a road-route provider was unavailable or out of coverage, or the
-    // rail network could not route the leg. Printed with or without explanations; nothing when no leg fell back.
+    // rail network could not route the leg. A leg with a location_warning, which usually means a wrong code or
+    // coordinate, gets a "location" line too. Printed with or without explanations; nothing when no leg warns.
     // The label is padded to the 14 characters of "Distance basis", like the footnotes below it.
     private static void appendFallbackWarnings(StringBuilder output, MovementResult movement) {
         for (LegResult leg : movement.legs()) {
             TradeRouterProperties properties = leg.feature().properties();
-            if (!properties.isDistanceFallback() || properties.getDistanceWarning() == null) {
-                continue;
+            if (properties.isDistanceFallback()) {
+                appendWarning(output, "Leg " + leg.sequence() + " warning", properties.getDistanceWarning());
             }
-            String warning = toSingleLine(properties.getDistanceWarning());
-            if (warning.isEmpty()) {
-                continue;
-            }
-            appendLine(output, String.format(Locale.ROOT, "%-14s = %s", "Leg " + leg.sequence() + " warning", warning));
+            appendWarning(output, "Leg " + leg.sequence() + " location", properties.getLocationWarning());
+        }
+    }
+
+    private static void appendWarning(StringBuilder output, String label, String text) {
+        if (text == null) {
+            return;
+        }
+        String warning = toSingleLine(text);
+        if (!warning.isEmpty()) {
+            appendLine(output, String.format(Locale.ROOT, "%-14s = %s", label, warning));
         }
     }
 

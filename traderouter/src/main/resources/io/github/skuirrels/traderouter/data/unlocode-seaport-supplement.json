@@ -1,4 +1,5 @@
 [
   { "code": "BRALU", "name": "Alumar Pt / Sao Luis", "source": "Wikipedia (pt), Porto da Alumar: private-use terminal in Sao Luis handling about 300 bulk carriers a year" },
-  { "code": "CADCN", "name": "Duncan Bay", "source": "Wikipedia, Elk Falls Mill: deep-water port at the former mill site at Duncan Bay, Campbell River" }
+  { "code": "CADCN", "name": "Duncan Bay", "source": "Wikipedia, Elk Falls Mill: deep-water port at the former mill site at Duncan Bay, Campbell River" },
+  { "code": "BEANT", "name": "Antwerp Churchill Terminal", "source": "Wikipedia (nl), Churchilldok: a dock of the port of Antwerp on the right bank of the Scheldt, off Kanaaldok B1, whose PSA concession holds container quays 402 to 430, at 51°17′N 4°22′E, https://nl.wikipedia.org/wiki/Churchilldok" }
 ]

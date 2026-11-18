@@ -152,7 +152,6 @@ CAXLF,Leaf Bay,no explicit link,
 CAOCH,Locusthill,added from UNECE 2025-1 without a coordinate,
 CAMGD,Magdalen Is,no explicit link,
 CAYMC,Maricourt Airstrip,no explicit link,
-CAYTO,Metropolitan Area Apt/Toronto,conflicting or missing match,11549704
 CAYML,Murray Bay,conflicting or missing match,6296232
 CAZNG,Negginan,conflicting or missing match,8299200
 CANPU,Nepeau,no explicit link,
@@ -239,7 +238,6 @@ CNDOP,Donglian Port,no explicit link,
 CNDSN,Dongshan Pt,conflicting or missing match,11494331
 CNDLT,Dulata,no explicit link,
 CNDUR,Duruan Town,no explicit link,
-CNFRT,Foshan New Pt,conflicting or missing match,11524246
 CNFYX,Fuyang Xiguan Apt,conflicting or missing match,7910485
 CNFZX,Fuzhouxingang,no explicit link,
 CNGQD,Ganqmod,no explicit link,
@@ -301,7 +299,6 @@ CNMZT,Muzhaerte,no explicit link,
 CNNSY,Nianshanyapojiao,no explicit link,
 CNNZG,Nianzigou,no explicit link,
 CNPHN,Pinghu'Nan,no explicit link,
-CNQSE,Qingshuihe/Shenzhen,no explicit link,
 CNQZH,Qinzhou,conflicting or missing match,1797551;11494319
 CNSAJ,Qinzhoushajing,no explicit link,
 CNTCG,Qoqek Apt,conflicting or missing match,7668812
@@ -653,7 +650,6 @@ GBLDO,Llandudno,no explicit link,
 GBLOZ,Lode,no explicit link,
 GBLGN,Loughton,no explicit link,
 GBLWM,Low Moor,no explicit link,
-GBLUT,Luton,conflicting or missing match,6296589
 GBLNE,Lyne,no explicit link,
 GBMGH,Maghera,no explicit link,
 GBMTG,Matching Green,no explicit link,
@@ -672,7 +668,6 @@ GBPST,Parkeston Quay,no explicit link,
 GBPRH,Portland Harbour,no explicit link,
 GBPPE,Port Penrhyn,no explicit link,
 GBOYL,Poyle,no explicit link,
-GBPFT,Purfleet,conflicting or missing match,2639845
 GBRAV,Ravensthorpe Dewsbury,no explicit link,
 GBRDB,Redbourn,no explicit link,
 GBRPH,Reepham,no explicit link,
@@ -755,7 +750,6 @@ HUSPG,Sopron Gysev,no explicit link,
 IDADB,Adang Bay,no explicit link,
 IDAMA,"Amamapare, Ij",conflicting or missing match,11524818
 IDAMP,"Ampenan, Bali",conflicting or missing match,8534688
-IDAJN,"Arjuna, Java",conflicting or missing match,1651221
 IDARB,Aroe Bay,no explicit link,
 IDAUN,Arun,conflicting or missing match,6703731
 IDBJU,"Banjuwangi, Java",conflicting or missing match,1650077;8531789
@@ -1910,7 +1904,6 @@ PHCML,Camalagawan/Aparri,no explicit link,
 PHCNY,Canaybon/Catbalogan,no explicit link,
 PHCSB,Casul Bay/Ozamis,no explicit link,
 PHCTB,Catamon Bay/Iloilo,no explicit link,
-PHCVE,"Cavite, Luzon",conflicting or missing match,1717640
 PHCLV,Claveria/Aparri,conflicting or missing match,1717348
 PHDCB,Dahikan Bay,no explicit link,
 PHDPT,Diapitan/Siain,no explicit link,
@@ -2221,7 +2214,6 @@ TRHAY,Haydarpasa,conflicting or missing match,745705;11361410
 TRKPU,Kapikule,no explicit link,
 TRKRH,Karahanli,added from UNECE 2025-1 without a coordinate,
 TRKAZ,Kazlicesme,added from UNECE 2025-1 without a coordinate,
-TRKCO,Kocaeli,conflicting or missing match,6299754
 TRKOZ,Kozyatagi,added from UNECE 2025-1 without a coordinate,
 TRKUL,Kulu,added from UNECE 2025-1 without a coordinate,
 TRKUM,Kumluca,added from UNECE 2025-1 without a coordinate,
@@ -2332,7 +2324,6 @@ USICY,Icy Bay,conflicting or missing match,5864472
 USIVH,Ivishak,conflicting or missing match,5865027
 USOAJ,Jacksonville,conflicting or missing match,4452320
 USJFN,Jefferson,conflicting or missing match,5146093
-USKCK,Kansas City,conflicting or missing match,4393219
 USKEU,Kelly Bar,conflicting or missing match,8299035
 USKLP,Kelp Bay,conflicting or missing match,8299256
 USKDL,Kendall,no explicit link,

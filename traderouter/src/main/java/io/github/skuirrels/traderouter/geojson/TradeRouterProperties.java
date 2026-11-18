@@ -22,6 +22,7 @@ public final class TradeRouterProperties {
     private String geometryBasis;
     private String distanceWarning;
     private boolean distanceFallback;
+    private String locationWarning;
     private Port portOrigin;
     private Port portDest;
     private List<String> traversedPassages;
@@ -206,6 +207,21 @@ public final class TradeRouterProperties {
     /** Sets whether the distance warning reports a fallback. Not serialised. */
     public TradeRouterProperties setDistanceFallback(boolean distanceFallback) {
         this.distanceFallback = distanceFallback;
+        return this;
+    }
+
+    /**
+     * Warning about a leg's start or end position: coordinates given with a code that lie far from the code's
+     * listed position, or a (0, 0) placeholder, which is replaced by the code's own position when there is a code.
+     * Null when there is nothing to report. JSON: {@code location_warning}.
+     */
+    public String getLocationWarning() {
+        return locationWarning;
+    }
+
+    /** Sets the location warning. */
+    public TradeRouterProperties setLocationWarning(String locationWarning) {
+        this.locationWarning = locationWarning;
         return this;
     }
 

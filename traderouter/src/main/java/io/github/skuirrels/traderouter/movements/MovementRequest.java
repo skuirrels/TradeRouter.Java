@@ -20,6 +20,7 @@ import java.util.TreeMap;
 public final class MovementRequest {
     private List<MovementLeg> legs = new ArrayList<>();
     private final Map<String, Coordinate> coordinates = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private double coordinateCodeToleranceKm = 50.0;
     private LocationResolver resolver;
     private final Map<String, Set<LocationFunction>> additionalLocationFunctions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private TradeRouterOptions seaOptions;
@@ -92,6 +93,23 @@ public final class MovementRequest {
     /** Adds a coordinate for a location code. */
     public MovementRequest putCoordinate(String code, Coordinate coordinate) {
         coordinates.put(code, coordinate);
+        return this;
+    }
+
+    /**
+     * Furthest, in kilometres, that coordinates given with a known code may lie from the code's listed position
+     * before the leg carries a {@code location_warning}. The coordinates are still used. The default is 50 km, the
+     * distance the resolver already allows between a port and its town. Set {@link Double#POSITIVE_INFINITY} to turn
+     * the check off. Coordinates of exactly (0, 0) are always treated as a placeholder: with a code they are ignored
+     * in favour of the code's position, and without one they are used as given with a {@code location_warning}.
+     */
+    public double getCoordinateCodeToleranceKm() {
+        return coordinateCodeToleranceKm;
+    }
+
+    /** Sets the coordinate and code tolerance in kilometres. */
+    public MovementRequest setCoordinateCodeToleranceKm(double coordinateCodeToleranceKm) {
+        this.coordinateCodeToleranceKm = coordinateCodeToleranceKm;
         return this;
     }
 

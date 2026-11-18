@@ -52,6 +52,13 @@ final class RoadLegs {
                     "supplied", supplied.source(), null, null, null, straightLineKm));
         }
 
+        // Start and end are the same place, so the distance is exactly zero: nothing to route or estimate.
+        if (straightLineKm <= DefaultTradeRouterEngine.SAME_PLACE_KM) {
+            return CompletableFuture.completedFuture(createFeature(
+                    from, to, units, request.getSpeedsKmh(), request.getRoadDurationMode(),
+                    0.0, null, null, "great_circle", "built_in", null, null, null, 0.0));
+        }
+
         if (request.getRoadRoutingMode() == RoadRoutingMode.REQUIRE_NETWORK && request.getRoadRouteProvider() == null) {
             throw new IllegalStateException("Road leg " + sequence + " (" + from.label() + " to " + to.label()
                     + ") requires a road-network provider, but none is configured.");
@@ -200,6 +207,9 @@ final class RoadLegs {
         double resolvedDuration;
         if (useRouteDuration) {
             resolvedDuration = durationHours;
+        } else if (distanceKm == 0.0) {
+            // No distance takes no time at any speed, so a same-place leg needs no configured road speed.
+            resolvedDuration = 0.0;
         } else {
             Double speedKmh = speedsKmh.get(TransportMode.ROAD);
             if (speedKmh == null || speedKmh <= 0.0) {

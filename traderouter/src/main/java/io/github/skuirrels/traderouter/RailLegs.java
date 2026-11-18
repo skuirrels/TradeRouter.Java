@@ -59,7 +59,9 @@ final class RailLegs {
             DistanceUnit units,
             MovementRequest request,
             Supplier<MaritimeGraph> railGraph) {
-        if (request.getRailRoutingMode() == RailRoutingMode.GREAT_CIRCLE_ONLY) {
+        // A leg that starts and ends at the same place is exactly zero, wherever it is.
+        if (request.getRailRoutingMode() == RailRoutingMode.GREAT_CIRCLE_ONLY
+                || Haversine.distanceKm(from.coordinate(), to.coordinate()) <= DefaultTradeRouterEngine.SAME_PLACE_KM) {
             return DefaultTradeRouterEngine.calculateStraightLeg(from, to, TransportMode.RAIL, units, request.getSpeedsKmh());
         }
 
@@ -69,27 +71,50 @@ final class RailLegs {
         double accessKm = Haversine.distanceKm(from.coordinate(), graph.getCoordinate(origin));
         double egressKm = Haversine.distanceKm(graph.getCoordinate(destination), to.coordinate());
 
-        String warning;
-        if (accessKm > request.getRailNetworkSnapKm() || egressKm > request.getRailNetworkSnapKm()) {
+        String reason;
+        if ((accessKm > request.getRailNetworkSnapKm() && isListedOutsideRailNetworkCountries(from))
+                || (egressKm > request.getRailNetworkSnapKm() && isListedOutsideRailNetworkCountries(to))) {
+            reason = from.label() + " to " + to.label()
+                    + " is outside the United States, Canada and Mexico, the only countries the embedded rail network covers.";
+        } else if (accessKm > request.getRailNetworkSnapKm() || egressKm > request.getRailNetworkSnapKm()) {
             boolean originFurther = accessKm >= egressKm;
             String label = originFurther ? from.label() : to.label();
             double gapKm = originFurther ? accessKm : egressKm;
-            warning = label + " is " + n0(gapKm) + " km from the nearest main line of the embedded North American rail network, "
-                    + "beyond the " + n0(request.getRailNetworkSnapKm()) + " km limit; great-circle distance used.";
+            reason = label + " is " + DefaultTradeRouterEngine.n0(gapKm) + " km from the nearest main line of the embedded North American rail network, "
+                    + "beyond the " + DefaultTradeRouterEngine.n0(request.getRailNetworkSnapKm()) + " km limit.";
         } else {
             PathResult path = BidirectionalDijkstra.findPath(graph, origin, destination, null);
             if (!path.path().isEmpty() && Double.isFinite(path.lengthKm())) {
                 return createNetworkFeature(graph, from, to, units, request.getSpeedsKmh(),
                         accessKm + path.lengthKm() + egressKm, path.path());
             }
-            warning = "No connected main line joins " + from.label() + " and " + to.label()
-                    + " on the embedded North American rail network; great-circle distance used.";
+            reason = "No connected main line joins " + from.label() + " and " + to.label()
+                    + " on the embedded North American rail network.";
         }
 
         GeoJsonFeature feature = DefaultTradeRouterEngine.calculateStraightLeg(
                 from, to, TransportMode.RAIL, units, request.getSpeedsKmh());
-        feature.properties().setDistanceWarning(warning).setDistanceFallback(true);
+        feature.properties()
+                .setDistanceWarning(reason
+                        + " Great-circle distance used: a straight-line lower bound, shorter than the shortest feasible rail"
+                        + " distance that ISO 14083 and GLEC call for."
+                        + " Supply the distance in MovementRequest.getRailRouteOverrides() where it is known.")
+                .setDistanceFallback(true);
         return feature;
+    }
+
+    /**
+     * Whether a location is a listed UN/LOCODE or port in a country other than the United States, Canada or Mexico,
+     * the countries the embedded rail network covers. Used only to word a rail warning; routing is decided by
+     * distance from the network alone, so a caller's own site code that happens to start with another country's
+     * letters cannot change the route.
+     */
+    private static boolean isListedOutsideRailNetworkCountries(ResolvedLocation location) {
+        if (location.functions() == null) {
+            return false;
+        }
+        String country = countryOf(location);
+        return country != null && !country.equals("US") && !country.equals("CA") && !country.equals("MX");
     }
 
     /**
@@ -200,9 +225,5 @@ final class RailLegs {
                     "No positive speed configured for mode RAIL. Set MovementRequest.getSpeedsKmh() for RAIL.");
         }
         return speedKmh;
-    }
-
-    private static String n0(double value) {
-        return String.format(Locale.ROOT, "%,.0f", value);
     }
 }
