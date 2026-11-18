@@ -2,7 +2,7 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
-## [Unreleased]
+## [2.15.1] - 2026-11-18
 
 Ported from TradeRouter.Net 2.15.1 at `bc19cba`, which includes 2.14.0 and 2.15.0: sea legs at airport-named codes and the 18 November UN/LOCODE data fixes (`4444e16`, `039b6bd`), location warnings, placeholder coordinates, same-place legs and the rail warnings (`b657a07`, `04cbf14`), and the Kansas City and Port Huron rail functions (`d929fdb`, `5aa03db`). Java skips 2.14.0 and 2.15.0. Every embedded data file is byte-identical to TradeRouter.Net 2.15.1.
 
@@ -228,6 +228,7 @@ First release on Maven Central, ported from TradeRouter.Net 2.0.0 at `de93a0e`.
 - Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
+[2.15.1]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.15.1
 [2.13.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.13.0
 [2.10.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.10.0
 [2.9.1]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.9.1
