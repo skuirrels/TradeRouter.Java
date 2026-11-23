@@ -2,7 +2,9 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
-## [Unreleased]
+## [2.17.0] - 2026-11-23
+
+Ported from TradeRouter.Net 2.17.0 at `39c32c4`. Java skips 2.16.0, whose source-generated JSON is .NET-specific, and the .NET 11 targets in 2.17.0 do not apply. Every embedded data file is byte-identical to TradeRouter.Net 2.17.0.
 
 ### Changed
 
@@ -239,7 +241,7 @@ First release on Maven Central, ported from TradeRouter.Net 2.0.0 at `de93a0e`.
 - Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
-[Unreleased]: https://github.com/skuirrels/TradeRouter.Java/compare/v2.15.1...HEAD
+[2.17.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.17.0
 [2.15.1]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.15.1
 [2.13.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.13.0
 [2.10.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.10.0
