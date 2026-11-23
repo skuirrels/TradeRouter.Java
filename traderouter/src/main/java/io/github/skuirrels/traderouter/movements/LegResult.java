@@ -109,6 +109,14 @@ public final class LegResult {
         return orZero(properties().getCo2eKgPerTonne());
     }
 
+    /**
+     * CO2e rate per container in grams per TEU-kilometre, on sea, road and rail legs when the movement states a TEU
+     * count, or null; see {@link TradeRouterProperties#getCo2eGramsPerTeuKm()}.
+     */
+    public Double co2eGramsPerTeuKm() {
+        return properties().getCo2eGramsPerTeuKm();
+    }
+
     /** CO2e for this leg in kilograms when the movement states a cargo weight or TEU count, or null. */
     public Double co2eKg() {
         return properties().getCo2eKg();

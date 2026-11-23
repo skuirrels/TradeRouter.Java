@@ -699,7 +699,7 @@ class MovementTests {
 
         LegResult sea = result.legs().get(1);
         assertThat(sea.co2eGramsPerTonneKm()).isEqualTo(7.17);
-        assertThat(sea.feature().properties().getCo2eGramsPerTeuKm()).isEqualTo(71.7);
+        assertThat(sea.co2eGramsPerTeuKm()).isEqualTo(71.7);
         assertThat(sea.co2eKg()).isCloseTo(71.7 * 2.0 * sea.length() / 1000.0, within(1e-9));
         assertThat(result.legs().get(0).co2eGramsPerTonneKm()).as("road is the same in v3.2 and v3.3").isEqualTo(125.0);
         assertThat(result.toText()).contains("71.7 g per TEU-km on sea legs");
@@ -711,14 +711,14 @@ class MovementTests {
 
         LegResult sea = result.legs().get(1);
         assertThat(sea.co2eBasis()).isEqualTo("teu");
-        assertThat(sea.feature().properties().getCo2eGramsPerTeuKm()).isEqualTo(73.4);
+        assertThat(sea.co2eGramsPerTeuKm()).isEqualTo(73.4);
         assertThat(sea.co2eKg()).isCloseTo(73.4 * 2.0 * sea.length() / 1000.0, within(1e-9));
 
         LegResult road = result.legs().get(0);
         assertThat(road.co2eBasis()).as("12 t in 2 TEU is below the 20 t a pair of average containers carries")
                 .isEqualTo("teu_average_weight");
         assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * 20.0, within(1e-9));
-        assertThat(road.feature().properties().getCo2eGramsPerTeuKm()).as("125 g per tonne-km at 10 t per TEU")
+        assertThat(road.co2eGramsPerTeuKm()).as("125 g per tonne-km at 10 t per TEU")
                 .isCloseTo(1250.0, within(1e-9));
 
         assertThat(result.cargoTeu()).isEqualTo(2.0);
@@ -744,7 +744,7 @@ class MovementTests {
         MovementResult result = TradeRoutes.calculateMovement(MELBOURNE_MOVEMENT, null, tonnes, teu);
 
         for (LegResult leg : result.legs()) {
-            Double rate = leg.feature().properties().getCo2eGramsPerTeuKm();
+            Double rate = leg.co2eGramsPerTeuKm();
             assertThat(rate).as("leg %d (%s) is charged per container", leg.sequence(), leg.leg().mode()).isNotNull();
             assertThat(leg.co2eKg()).isCloseTo(rate * teu * leg.length() / 1000.0, within(1e-9));
         }
@@ -779,7 +779,7 @@ class MovementTests {
         LegResult road = result.legs().get(0);
         assertThat(road.co2eBasis()).isEqualTo(basis);
         assertThat(road.co2eKg()).isCloseTo(road.co2eKgPerTonne() * chargedTonnes, within(1e-9));
-        assertThat(road.feature().properties().getCo2eGramsPerTeuKm()).as("125 g per tonne-km times the tonnes charged per TEU")
+        assertThat(road.co2eGramsPerTeuKm()).as("125 g per tonne-km times the tonnes charged per TEU")
                 .isCloseTo(gramsPerTeuKm, within(1e-9));
     }
 
@@ -796,18 +796,18 @@ class MovementTests {
         LegResult rail = engine().calculateMovement(railRequest).legs().get(0);
         assertThat(rail.co2eBasis()).isEqualTo("teu_average_weight");
         assertThat(rail.co2eKg()).isCloseTo(rail.co2eKgPerTonne() * 10.0, within(1e-9));
-        assertThat(rail.feature().properties().getCo2eGramsPerTeuKm()).isCloseTo(rail.co2eGramsPerTonneKm() * 10.0, within(1e-9));
+        assertThat(rail.co2eGramsPerTeuKm()).isCloseTo(rail.co2eGramsPerTonneKm() * 10.0, within(1e-9));
 
         railRequest.setCargoTonnes(15.0);
         LegResult heavyRail = engine().calculateMovement(railRequest).legs().get(0);
         assertThat(heavyRail.co2eBasis()).as("15 t is above the 10 t average for one TEU").isEqualTo("tonnes");
-        assertThat(heavyRail.feature().properties().getCo2eGramsPerTeuKm())
+        assertThat(heavyRail.co2eGramsPerTeuKm())
                 .isCloseTo(heavyRail.co2eGramsPerTonneKm() * 15.0, within(1e-9));
 
         LegResult air = TradeRoutes.calculateMovement("Airport GBLHR to Airport AUMEL Air", null, 0.5, 1.0).legs().get(0);
         assertThat(air.co2eBasis()).as("air cargo is not carried in TEU slots").isEqualTo("tonnes");
         assertThat(air.co2eKg()).isCloseTo(air.co2eKgPerTonne() * 0.5, within(1e-9));
-        assertThat(air.feature().properties().getCo2eGramsPerTeuKm()).as("air legs are not charged per container").isNull();
+        assertThat(air.co2eGramsPerTeuKm()).as("air legs are not charged per container").isNull();
     }
 
     @Test
@@ -817,7 +817,7 @@ class MovementTests {
         assertThat(result.legs()).allMatch(leg -> "tonnes".equals(leg.co2eBasis()));
         assertThat(result.legs()).allMatch(leg -> Math.abs(leg.co2eKg() - leg.co2eKgPerTonne() * 0.1) < 1e-9);
         assertThat(result.legs()).as("no TEU count was given")
-                .allMatch(leg -> leg.feature().properties().getCo2eGramsPerTeuKm() == null);
+                .allMatch(leg -> leg.co2eGramsPerTeuKm() == null);
     }
 
     @Test
