@@ -565,6 +565,13 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             properties.setCo2eKg(kgPerTonne * request.getCargoTeu() * factors.getAverageTonnesPerTeu());
             properties.setCo2eBasis("teu_average_weight");
         }
+
+        // A road or rail leg with a TEU count also states its rate per container: the per-tonne rate times the tonnes
+        // charged per TEU. Then co2e_kg = co2e_g_per_teu_km × TEU × km / 1000 on every containerised leg, as at sea.
+        if (containerTonnes != null) {
+            double chargedTonnes = Math.max(containerTonnes, request.getCargoTonnes() != null ? request.getCargoTonnes() : 0.0);
+            properties.setCo2eGramsPerTeuKm(gramsPerTonneKm * chargedTonnes / request.getCargoTeu());
+        }
     }
 
     private GeoJsonFeature calculateSeaLeg(int sequence, MovementLeg leg, ResolvedLocation from, ResolvedLocation to, TradeRouterOptions options) {

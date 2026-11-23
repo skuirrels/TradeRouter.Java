@@ -57,7 +57,11 @@ public final class EmissionFactors {
         return this;
     }
 
-    /** GLEC average cargo weight per TEU, 10 tonnes, used to convert between the two sea bases. */
+    /**
+     * GLEC average cargo weight per TEU, 10 tonnes. It converts between the two sea bases, is the minimum weight per TEU
+     * that road and rail legs are charged on when a TEU count is given (and the weight assumed when none is), and so
+     * sets the {@code co2e_g_per_teu_km} those legs report.
+     */
     public double getAverageTonnesPerTeu() {
         return averageTonnesPerTeu;
     }

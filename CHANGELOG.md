@@ -2,6 +2,12 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+### Changed
+
+- Road and rail legs of a movement with a TEU count now carry `co2e_g_per_teu_km` (`TradeRouterProperties.getCo2eGramsPerTeuKm()`), as sea legs already did. It is the per-tonne rate times the tonnes charged per TEU, the greater of the stated weight per TEU and the average tonnes per TEU in `EmissionFactors` (10 t by default), so 1,250 g for one road container charged at 10 t with the default factors. Every containerised leg now satisfies `co2e_kg = co2e_g_per_teu_km × TEU × km / 1000`; before, road and rail legs left the field null even though a TEU count had set their charge. CO2e figures are unchanged. Air legs, and legs of a movement without a TEU count, still leave it out. Code that took the field's presence to mean a sea leg should check `mode` instead. Ported from TradeRouter.Net `8d7f64d`.
+
 ## [2.15.1] - 2026-11-18
 
 Ported from TradeRouter.Net 2.15.1 at `bc19cba`, which includes 2.14.0 and 2.15.0: sea legs at airport-named codes and the 18 November UN/LOCODE data fixes (`4444e16`, `039b6bd`), location warnings, placeholder coordinates, same-place legs and the rail warnings (`b657a07`, `04cbf14`), and the Kansas City and Port Huron rail functions (`d929fdb`, `5aa03db`). Java skips 2.14.0 and 2.15.0. Every embedded data file is byte-identical to TradeRouter.Net 2.15.1.
@@ -233,6 +239,7 @@ First release on Maven Central, ported from TradeRouter.Net 2.0.0 at `de93a0e`.
 - Published as `io.github.skuirrels:traderouter` with sources and Javadoc jars, an `Automatic-Module-Name` of `io.github.skuirrels.traderouter`, reproducible jar timestamps, and the licence, third-party notices and data provenance under `META-INF`. `docs/releasing.md` covers signing and the Central Portal.
 - A JUnit 5 suite asserts the .NET reference figures. A console sample, an OSRM runner script and JMH benchmarks ship as separate modules.
 
+[Unreleased]: https://github.com/skuirrels/TradeRouter.Java/compare/v2.15.1...HEAD
 [2.15.1]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.15.1
 [2.13.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.13.0
 [2.10.0]: https://github.com/skuirrels/TradeRouter.Java/releases/tag/v2.10.0
