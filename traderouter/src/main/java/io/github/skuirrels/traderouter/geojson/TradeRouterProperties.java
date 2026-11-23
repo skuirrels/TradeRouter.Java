@@ -514,7 +514,15 @@ public final class TradeRouterProperties {
         return this;
     }
 
-    /** CO2e rate per container for sea legs, in grams per TEU-kilometre, when the movement states a TEU count. JSON: {@code co2e_g_per_teu_km}. */
+    /**
+     * CO2e rate per container, in grams per TEU-kilometre, present on sea, road and rail legs when the movement states a
+     * TEU count. On sea it is the per-container intensity. On road and rail it is {@link #getCo2eGramsPerTonneKm()}
+     * times the tonnes charged per TEU, the greater of the stated weight per TEU and
+     * {@link io.github.skuirrels.traderouter.movements.EmissionFactors#getAverageTonnesPerTeu()} (10 t by default): 1,250
+     * for road at the default 125 g per tonne-km and 10 t. On each of these legs {@link #getCo2eKg()} is this rate times the TEU count times the
+     * leg length in kilometres, divided by 1,000. Air legs are not charged per container and leave it out.
+     * JSON: {@code co2e_g_per_teu_km}.
+     */
     public Double getCo2eGramsPerTeuKm() {
         return co2eGramsPerTeuKm;
     }

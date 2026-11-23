@@ -551,8 +551,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         }
 
         // Road and rail legs of a containerised movement are charged per container too: a light box still needs a
-        // whole truck or wagon slot, and the per-tonne default factors assume an average load (GLEC Framework,
-        // road load factor guidance). The stated weight is used only when it exceeds the average for the TEU count.
+        // whole truck or wagon slot, and the per-tonne default factors assume an average load, so these legs are
+        // charged on at least the GLEC average weight per TEU. The stated weight is used only when it exceeds that.
         // Air is not containerised in TEU terms and keeps the stated weight.
         Double containerTonnes = request.getCargoTeu() != null && (mode == TransportMode.ROAD || mode == TransportMode.RAIL)
                 ? request.getCargoTeu() * factors.getAverageTonnesPerTeu()
@@ -564,6 +564,13 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         } else if (request.getCargoTeu() != null) {
             properties.setCo2eKg(kgPerTonne * request.getCargoTeu() * factors.getAverageTonnesPerTeu());
             properties.setCo2eBasis("teu_average_weight");
+        }
+
+        // A road or rail leg with a TEU count also states its rate per container: the per-tonne rate times the tonnes
+        // charged per TEU. Then co2e_kg = co2e_g_per_teu_km × TEU × km / 1000 on every containerised leg, as at sea.
+        if (containerTonnes != null) {
+            double chargedTonnes = Math.max(containerTonnes, request.getCargoTonnes() != null ? request.getCargoTonnes() : 0.0);
+            properties.setCo2eGramsPerTeuKm(gramsPerTonneKm * chargedTonnes / request.getCargoTeu());
         }
     }
 
