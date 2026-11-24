@@ -19,6 +19,18 @@ public final class TradeRouterOptions {
     /** The A* pathfinding algorithm. */
     public static final String ASTAR = "astar";
 
+    /**
+     * The default {@link #getNetworkAccessWarningKm()}, 50 km: the distance within which the engine also takes a
+     * port-list record to reach the sea network. Half of the port list's main terminal ports lie within 15 km of a
+     * node and nine in ten within about 80 km. Assigned in a static initialiser rather than as a constant, so code
+     * compiled against this class reads the value at run time and picks up later changes.
+     */
+    public static final double DEFAULT_NETWORK_ACCESS_WARNING_KM;
+
+    static {
+        DEFAULT_NETWORK_ACCESS_WARNING_KM = 50.0;
+    }
+
     private DistanceUnit units = DistanceUnit.KM;
     private double speedKnots = 16.0;
     private boolean appendOriginDestination;
@@ -29,8 +41,12 @@ public final class TradeRouterOptions {
     private boolean returnPassages;
     private boolean returnSeaAreas;
     private String algorithm = DIJKSTRA;
+    private double networkAccessWarningKm = DEFAULT_NETWORK_ACCESS_WARNING_KM;
 
-    /** Creates options with the defaults: kilometres, 16 knots, no restrictions, Northwest Passage closed, Dijkstra. */
+    /**
+     * Creates options with the defaults: kilometres, 16 knots, no restrictions, Northwest Passage closed, Dijkstra,
+     * and a network-access warning beyond {@link #DEFAULT_NETWORK_ACCESS_WARNING_KM}.
+     */
     public TradeRouterOptions() {
     }
 
@@ -201,6 +217,22 @@ public final class TradeRouterOptions {
         return this;
     }
 
+    /**
+     * How far, in kilometres, a route's origin or destination may lie from the nearest maritime network node before
+     * the route carries a {@code distance_warning}. The route joins the network at that node in a straight line,
+     * which may cross land and is not a sailed track. Default is {@link #DEFAULT_NETWORK_ACCESS_WARNING_KM}; set
+     * {@link Double#POSITIVE_INFINITY} to turn the warning off.
+     */
+    public double getNetworkAccessWarningKm() {
+        return networkAccessWarningKm;
+    }
+
+    /** Sets the distance beyond which a route end far from the maritime network carries a warning. */
+    public TradeRouterOptions setNetworkAccessWarningKm(double networkAccessWarningKm) {
+        this.networkAccessWarningKm = networkAccessWarningKm;
+        return this;
+    }
+
     /** Returns a copy of these options with an independent restriction set. */
     public TradeRouterOptions copy() {
         if (restrictions == null) {
@@ -215,7 +247,8 @@ public final class TradeRouterOptions {
                 .setIncludePorts(includePorts)
                 .setPortParameters(portParameters == null ? null : portParameters.copy())
                 .setReturnPassages(returnPassages)
-                .setReturnSeaAreas(returnSeaAreas);
+                .setReturnSeaAreas(returnSeaAreas)
+                .setNetworkAccessWarningKm(networkAccessWarningKm);
         copy.algorithm = algorithm;
         return copy;
     }
@@ -241,6 +274,10 @@ public final class TradeRouterOptions {
             throw new IllegalArgumentException(
                     "Unknown pathfinding algorithm '" + algorithm + "'. Expected 'dijkstra' or 'astar'.");
         }
+        if (Double.isNaN(networkAccessWarningKm) || networkAccessWarningKm < 0) {
+            throw new IllegalArgumentException(
+                    "Network access warning distance must be non-negative. Received: " + networkAccessWarningKm);
+        }
         if (portParameters != null) {
             portParameters.validate();
         }
@@ -254,8 +291,10 @@ public final class TradeRouterOptions {
     public String toString() {
         return "TradeRouterOptions[units=" + units + ", speedKnots=" + speedKnots
                 + ", appendOriginDestination=" + appendOriginDestination + ", restrictions=" + restrictions
-                + ", includePorts=" + includePorts + ", returnPassages=" + returnPassages
+                + ", allowNorthwest=" + allowNorthwest + ", includePorts=" + includePorts
+                + ", returnPassages=" + returnPassages
                 + ", returnSeaAreas=" + returnSeaAreas
-                + ", algorithm=" + Objects.toString(algorithm) + "]";
+                + ", algorithm=" + Objects.toString(algorithm)
+                + ", networkAccessWarningKm=" + networkAccessWarningKm + "]";
     }
 }

@@ -235,6 +235,23 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
 
     @Override
     public List<GeoJsonFeature> calculateRoutes(Coordinate origin, Coordinate destination, TradeRouterOptions options) {
+        List<SeaRoute> routes = seaRoutes(origin, destination, options);
+        List<GeoJsonFeature> features = new ArrayList<>(routes.size());
+        for (SeaRoute route : routes) {
+            features.add(route.feature());
+        }
+        return features;
+    }
+
+    /**
+     * A sea route with how far each requested end lies from the network node the route starts or ends at, which
+     * a movement sea leg needs to name its own ends in the network-access warning. .NET keeps these as internal
+     * properties of the feature; Java keeps them off the public API.
+     */
+    private record SeaRoute(GeoJsonFeature feature, double originAccessKm, double destinationAccessKm, boolean singleNode) {
+    }
+
+    private List<SeaRoute> seaRoutes(Coordinate origin, Coordinate destination, TradeRouterOptions options) {
         Objects.requireNonNull(origin, "origin").validate();
         Objects.requireNonNull(destination, "destination").validate();
 
@@ -257,7 +274,7 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             portMatrix = List.of(new PortPair(null, null));
         }
 
-        List<GeoJsonFeature> results = new ArrayList<>(portMatrix.size());
+        List<SeaRoute> results = new ArrayList<>(portMatrix.size());
 
         for (PortPair pair : portMatrix) {
             Port pFrom = pair.originPort();
@@ -266,6 +283,15 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
             Coordinate routedDest = pTo != null ? pTo.coordinate() : destination;
 
             PathResult shortest = graph().shortestPath(routedOrigin, routedDest, restrictions, algorithm);
+
+            // How far each requested end lies from the network node the route starts or ends at. Measured before the
+            // endpoints below are inserted into the path, which the route coordinates take over.
+            boolean routed = shortest.found();
+            double originAccessKm = routed ? Haversine.distanceKm(origin, shortest.path().get(0)) : 0.0;
+            double destinationAccessKm = routed
+                    ? Haversine.distanceKm(destination, shortest.path().get(shortest.path().size() - 1))
+                    : 0.0;
+            boolean singleNode = routed && shortest.path().size() == 1;
 
             List<Coordinate> routeCoords;
             if (!shortest.found()) {
@@ -314,6 +340,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     .setDurationHours(duration)
                     .setDistanceBasis("maritime_network")
                     .setDistanceSource(maritimeDistanceSource)
+                    .setDistanceWarning(describeNetworkAccess(null, originAccessKm, null, destinationAccessKm,
+                            effective.getNetworkAccessWarningKm(), singleNode, appendOrigDest))
                     .setDurationBasis("assumed_speed")
                     .setGeometryBasis("maritime_network")
                     .setPortOrigin(includePorts ? pFrom : null)
@@ -322,7 +350,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
                     // Measured on the continuous path, connectors included, before the antimeridian split.
                     .setTraversedSeaAreas(returnSeaAreas ? SeaArea.traverse(normalizedCoords) : null);
 
-            results.add(new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(normalizedCoords), properties));
+            results.add(new SeaRoute(new GeoJsonFeature(GeoJsonGeometry.fromCoordinates(normalizedCoords), properties),
+                    originAccessKm, destinationAccessKm, singleNode));
         }
 
         return results;
@@ -579,7 +608,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         // calculateMovement drops them again when the caller did not ask for returnPassages.
         TradeRouterOptions routingOptions = options.isReturnPassages() ? options : options.copy();
         routingOptions.setReturnPassages(true);
-        GeoJsonFeature feature = calculateRoute(from.coordinate(), to.coordinate(), routingOptions);
+        SeaRoute route = seaRoutes(from.coordinate(), to.coordinate(), routingOptions).get(0);
+        GeoJsonFeature feature = route.feature();
 
         if (feature.geometry() == null || feature.geometry().positions().size() < 2) {
             throw new IllegalStateException(
@@ -593,7 +623,50 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
         if (feature.properties().getPortDest() == null) {
             feature.properties().setPortDest(to.port());
         }
+        // Name the leg's own ends in the warning rather than "the origin" and "the destination".
+        feature.properties().setDistanceWarning(describeNetworkAccess(from.label(), route.originAccessKm(),
+                to.label(), route.destinationAccessKm(), routingOptions.getNetworkAccessWarningKm(),
+                route.singleNode(), true));
         return feature;
+    }
+
+    /**
+     * Describes each end of a sea route that lies further than {@code limitKm} from the network node the route
+     * starts or ends at, or returns null when neither does. A null label stands for "the origin" or "the
+     * destination"; a given label is used as it is. {@code singleNode} says both ends snap to one node, so the route
+     * never uses the network. {@code joinedInLength} says whether the straight connector to that node is part of the
+     * route's geometry and length. Numbers are formatted with {@link Locale#ROOT}, matching .NET's invariant culture,
+     * so the warning reads the same on every host.
+     */
+    static String describeNetworkAccess(
+            String originLabel, double originKm, String destinationLabel, double destinationKm, double limitKm,
+            boolean singleNode, boolean joinedInLength) {
+        List<String> ends = new ArrayList<>(2);
+        if (originKm > limitKm) {
+            ends.add((originLabel != null ? originLabel : "The origin") + " is " + groupedKm(originKm) + " km");
+        }
+        if (destinationKm > limitKm) {
+            String label = destinationLabel != null
+                    ? destinationLabel
+                    : ends.isEmpty() ? "The destination" : "the destination";
+            ends.add(label + " is " + groupedKm(destinationKm) + " km");
+        }
+        if (ends.isEmpty()) {
+            return null;
+        }
+
+        String connector = singleNode
+                ? "Both ends snap to the same node, so the route is a straight line between them, which may cross land and is not a sailed track."
+                : joinedInLength
+                        ? "The route joins the network there in a straight line, counted in the length, which may cross land and is not a sailed track."
+                        : "The route does not run to the requested point, so its length leaves part or all of the gap out.";
+        return String.join(" and ", ends) + " from the nearest node of the maritime network, beyond the "
+                + groupedKm(limitKm) + " km networkAccessWarningKm. " + connector;
+    }
+
+    /** Formats like .NET's invariant {@code N0}: no decimals, comma thousands separators, midpoints away from zero. */
+    private static String groupedKm(double km) {
+        return String.format(Locale.ROOT, "%,.0f", km);
     }
 
     static GeoJsonFeature calculateStraightLeg(
@@ -953,7 +1026,8 @@ public final class DefaultTradeRouterEngine implements TradeRouterEngine {
      * How far a port-list record may lie from the nearest maritime network node and still be taken as a sea port for
      * a code UN/LOCODE files as an airport. The coastal ports filed under airport codes, such as Shanghai and
      * Guangzhou, lie within 50 km; the others, inland cities such as Zhengzhou and Tucson and river ports the network
-     * does not reach, such as Nanjing, lie 78 to 1,282 km away.
+     * does not reach, such as Nanjing, lie 78 to 1,282 km away. TradeRouterOptions.DEFAULT_NETWORK_ACCESS_WARNING_KM
+     * is documented as matching this value; review it when this changes.
      */
     private static final double PORT_LIST_SEA_ACCESS_KM = 50.0;
 

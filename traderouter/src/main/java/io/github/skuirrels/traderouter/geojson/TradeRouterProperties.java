@@ -180,8 +180,10 @@ public final class TradeRouterProperties {
     }
 
     /**
-     * Warning attached to an estimated road distance, a provider fallback or a rail leg left at great-circle
-     * distance, or null.
+     * Warning attached to an estimated road distance, a provider fallback, a rail leg left at great-circle
+     * distance, or a sea route whose origin or destination lies further than
+     * {@link io.github.skuirrels.traderouter.TradeRouterOptions#getNetworkAccessWarningKm()} from the maritime
+     * network, or null.
      * JSON: {@code distance_warning}.
      */
     public String getDistanceWarning() {

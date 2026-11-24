@@ -62,7 +62,7 @@ class AddedCoordinateFillTests {
         Map<String, JsonNode> published = loadPublishedRows();
         Map<String, String> aliases = EmbeddedResources.loadPortCodeAliases();
 
-        assertThat(rows).hasSize(1_485);
+        assertThat(rows).hasSize(1_484); // 1,485 generated; a reviewed row replaced the Port of Palm Beach (USPBC).
         assertThat(codes).doesNotHaveDuplicates();
         for (JsonNode row : rows) {
             String code = row.get("code").asString();
