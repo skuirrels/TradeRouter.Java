@@ -2,6 +2,19 @@
 
 All notable changes to TradeRouter.Java are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Version numbers follow TradeRouter.Net, whose [changelog](https://github.com/skuirrels/TradeRouter.Net/blob/main/CHANGELOG.md) records the same routing, data and emissions changes.
 
+## [Unreleased]
+
+Ported from TradeRouter.Net 2.18.0 at `4fd891e`. Every embedded data file is byte-identical to TradeRouter.Net 2.18.0.
+
+### Added
+
+- A sea route or movement sea leg whose origin or destination lies more than `TradeRouterOptions.getNetworkAccessWarningKm()` from the nearest maritime network node now carries a `distance_warning` naming the end and the gap, for example `BRMAO is 1,084 km from the nearest node of the maritime network`. The route joins the network there in a straight line that may cross land, and that line is counted in the length when the real endpoints are added. When both ends snap to the same node, the warning says the route is a straight line between them. Numbers in the warning are formatted with `Locale.ROOT`, so it reads the same on every host. The default, `TradeRouterOptions.DEFAULT_NETWORK_ACCESS_WARNING_KM` (50 km), is the distance within which the resolver takes a port-list record to reach the sea. Set it to `Double.POSITIVE_INFINITY` to turn the warning off. Lengths, durations and the `maritime_network` distance basis are unchanged. Ported from TradeRouter.Net `0c92d59` and `70eb206`; the warning names the option `networkAccessWarningKm` where .NET says `NetworkAccessWarningKm`, and the distances .NET keeps as internal feature properties stay off the Java API.
+
+### Fixed
+
+- Ten harbour towns and the Port of Palm Beach (`USPBC`), which UNECE files without the sea-port function, can end a sea leg or be a port waypoint: Moa (`CUMOA`), Namlea (`IDNAM`), San Andres Island (`COADZ`), Miquelon (`PMMQC`), Saumlaki (`IDSXK`), Narsaq (`GLJNS`), Bimini (`BSBIM`), Ebeye (`MHQEE`), Palmeira (`CVPAL`) and Sal Rei (`CVSAR`). The sea-port supplement gains an entry for each, citing the harbour. Ported from TradeRouter.Net `65748fe` and `44502fa`.
+- Saudarkrokur harbour (`ISSAU`) and Chofu, Shimonoseki (`JPCHF`), sea ports that UNECE publishes without a coordinate, now resolve from reviewed rows in the coordinate supplement, and the Port of Palm Beach (`USPBC`) moves 13 km south to the port in Riviera Beach. 113,543 of 116,022 codes now have coordinates, and `docs/waypoints-and-choke-points.md` gives the new coverage.
+
 ## [2.17.0] - 2026-11-23
 
 Ported from TradeRouter.Net 2.17.0 at `39c32c4`. Java skips 2.16.0, whose source-generated JSON is .NET-specific, and the .NET 11 targets in 2.17.0 do not apply. Every embedded data file is byte-identical to TradeRouter.Net 2.17.0.

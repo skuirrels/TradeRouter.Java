@@ -25,7 +25,7 @@ class UnLocodeReleaseMergeTests {
     @Test
     void databaseHoldsTheOriginalImportPlusTheAddedCodes() {
         assertThat(unLocodes().count()).isEqualTo(116_022);
-        assertThat(unLocodes().countWithCoordinates()).isEqualTo(113_541);
+        assertThat(unLocodes().countWithCoordinates()).isEqualTo(113_543);
     }
 
     @ParameterizedTest
