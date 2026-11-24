@@ -43,7 +43,10 @@ public final class TradeRouterOptions {
     private String algorithm = DIJKSTRA;
     private double networkAccessWarningKm = DEFAULT_NETWORK_ACCESS_WARNING_KM;
 
-    /** Creates options with the defaults: kilometres, 16 knots, no restrictions, Northwest Passage closed, Dijkstra. */
+    /**
+     * Creates options with the defaults: kilometres, 16 knots, no restrictions, Northwest Passage closed, Dijkstra,
+     * and a network-access warning beyond {@link #DEFAULT_NETWORK_ACCESS_WARNING_KM}.
+     */
     public TradeRouterOptions() {
     }
 
@@ -288,7 +291,8 @@ public final class TradeRouterOptions {
     public String toString() {
         return "TradeRouterOptions[units=" + units + ", speedKnots=" + speedKnots
                 + ", appendOriginDestination=" + appendOriginDestination + ", restrictions=" + restrictions
-                + ", includePorts=" + includePorts + ", returnPassages=" + returnPassages
+                + ", allowNorthwest=" + allowNorthwest + ", includePorts=" + includePorts
+                + ", returnPassages=" + returnPassages
                 + ", returnSeaAreas=" + returnSeaAreas
                 + ", algorithm=" + Objects.toString(algorithm)
                 + ", networkAccessWarningKm=" + networkAccessWarningKm + "]";
